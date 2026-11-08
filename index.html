@@ -35,7 +35,7 @@ header small { display: block; opacity: .85; font-size: 12px; }
 header .der { margin-left: auto; display: flex; gap: 6px; }
 header button { background: rgba(255,255,255,.18); color: #fff; border: 0; border-radius: 8px; padding: 6px 10px; font-weight: 600; cursor: pointer; }
 @media (max-width: 480px) {
-  header { gap: 8px; padding: 10px 12px; }
+  header { gap: 8px; padding: 10px 12px; padding-top: max(10px, env(safe-area-inset-top)); }
   header h1 { font-size: 18px; white-space: nowrap; }
   header small { display: none; }
   header button { padding: 6px 8px; font-size: 13px; }
