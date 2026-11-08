@@ -29,6 +29,13 @@ header h1 { margin: 0; font-size: 20px; letter-spacing: .3px; }
 header small { display: block; opacity: .85; font-size: 12px; }
 header .der { margin-left: auto; display: flex; gap: 6px; }
 header button { background: rgba(255,255,255,.18); color: #fff; border: 0; border-radius: 8px; padding: 6px 10px; font-weight: 600; cursor: pointer; }
+@media (max-width: 480px) {
+  header { gap: 8px; padding: 10px 12px; }
+  header h1 { font-size: 18px; white-space: nowrap; }
+  header small { display: none; }
+  header button { padding: 6px 8px; font-size: 13px; }
+  #btnSugerir .txt { display: none; }
+}
 main { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
 .buscar { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--text); font-size: 15px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
@@ -102,7 +109,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 <header>
   <img src="logo.svg" alt="">
   <div><h1>Canelo Wind</h1><small>Viento y olas para windsurf, kite y wing</small></div>
-  <div class="der"><button id="btnSugerir" title="Buzón de sugerencias">💡 Sugerencias</button><button id="btnUnidad" title="Cambiar unidades">nudos</button></div>
+  <div class="der"><button id="btnSugerir" title="Buzón de sugerencias">💡<span class="txt"> Sugerencias</span></button><button id="btnUnidad" title="Cambiar unidades">nudos</button></div>
 </header>
 <main id="app"><div class="cargando">Cargando…</div></main>
 <footer>Previsión: Open-Meteo (modelos meteorológicos). Comprueba siempre el viento medido y el estado del mar antes de salir.<br>
