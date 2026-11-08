@@ -125,6 +125,14 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .seguridad { background: #3A1714; color: #FFC9C2; border-color: #6B2A23; } }
 .consejos ul { margin: 0; padding-left: 20px; }
 .consejos li { margin-bottom: 6px; }
+/* Pantalla de elegir idioma */
+.elige-idioma { text-align: center; }
+.elige-idioma img { border-radius: 18px; box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+.elige-idioma h2 { margin: 8px 0 2px; }
+.idiomas { display: grid; gap: 8px; margin-top: 12px; }
+.idioma { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--text); border-radius: 12px; padding: 12px 16px; font-size: 17px; font-weight: 700; cursor: pointer; text-align: left; }
+.idioma span { font-size: 26px; }
+.idioma.on { border-color: var(--brand); box-shadow: inset 0 0 0 2px var(--brand); }
 /* Visor de webs dentro de la app */
 .visor { position: fixed; inset: 0; z-index: 30; background: var(--bg); display: flex; flex-direction: column; }
 .barra-visor { display: flex; gap: 8px; align-items: center; padding: 10px 12px; padding-top: max(10px, env(safe-area-inset-top));
@@ -138,24 +146,26 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 <body>
 <header>
   <img src="logo.svg" alt="">
-  <div><h1>Canelo Wind</h1><small>Viento y olas para windsurf, kite y wing</small></div>
-  <div class="der"><button id="btnSugerir" title="Buzón de sugerencias">💡<span class="txt"> Sugerencias</span></button><button id="btnUnidad" title="Cambiar unidades">nudos</button></div>
+  <div><h1>Canelo Wind</h1><small id="appSub">Viento y olas para windsurf, kite y wing</small></div>
+  <div class="der"><button id="btnIdioma" title="Idioma">🌐 ES</button><button id="btnSugerir" title="Buzón de sugerencias">💡<span class="txt"> Sugerencias</span></button><button id="btnUnidad" title="Cambiar unidades">nudos</button></div>
 </header>
 <main id="app"><div class="cargando">Cargando…</div></main>
-<footer>Previsión: Open-Meteo (modelos meteorológicos). Comprueba siempre el viento medido y el estado del mar antes de salir.<br>
-  ¿Falta un spot o algo no va bien? <a href="#" id="pieSugerir">Escríbenos en el buzón de sugerencias</a>.<br>
-  <a href="instalar.html">📲 Instalar la app en el móvil</a></footer>
+<footer><span id="pie1"></span><br>
+  <span id="pie2"></span> <a href="#" id="pieSugerir"></a>.<br>
+  <a href="instalar.html" id="pie4"></a></footer>
 
+<script src="idiomas.js"></script>
 <script src="spots.js"></script>
 <script src="config.js"></script>
 <script src="consejos.js"></script>
+<script src="textos_spots.js"></script>
 <script>
 // ---------- Utilidades ----------
 const $ = (s) => document.querySelector(s);
 const guardar = (k, v) => { try { localStorage.setItem("cw_" + k, JSON.stringify(v)); } catch (e) {} };
 const leer = (k, d) => { try { const v = localStorage.getItem("cw_" + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
 
-const UNIDADES = { kn: { t: "nudos", c: "kn", f: 1 }, kmh: { t: "km/h", c: "km/h", f: 1.852 }, ms: { t: "m/s", c: "m/s", f: 0.5144 } };
+const UNIDADES = { kn: { get t() { return t("nudos"); }, c: "kn", f: 1 }, kmh: { t: "km/h", c: "km/h", f: 1.852 }, ms: { t: "m/s", c: "m/s", f: 0.5144 } };
 let unidad = leer("unidad", "kn");
 let favoritos = leer("favoritos", []);
 let filtroRegion = leer("region", "Todas"), filtroIsla = "Todas", filtroDeporte = "Todos", textoBuscar = "";
@@ -163,41 +173,44 @@ const cache = {};
 // Región (Canarias, Andalucía…) y hora local de cada spot
 const regionDe = (s) => s.region || "Canarias";
 const consejosDe = (s) => (typeof CONSEJOS !== "undefined" && CONSEJOS[s.id]) || { consejos: [], seguridad: "" };
+// Textos del spot en el idioma elegido (si no hay traducción, en español)
+const textosDe = (s) => {
+  const es = consejosDe(s), tr = IDIOMA !== "es" && typeof TEXTOS_SPOTS !== "undefined" && TEXTOS_SPOTS[s.id] && TEXTOS_SPOTS[s.id][IDIOMA];
+  return { nota: (tr && tr.nota) || s.nota, consejos: (tr && tr.consejos) || es.consejos, seguridad: tr ? tr.seguridad : es.seguridad };
+};
+const nombreRegion = (r) => t("reg_" + r);
+const nombreNivel = (nv) => t("niv_" + nv);
 const tzDe = (s) => s.tz || (regionDe(s) === "Canarias" ? "Atlantic/Canary" : "Europe/Madrid");
 
-const PUNTOS = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSO","SO","OSO","O","ONO","NO","NNO"];
-const rumbo = (g) => PUNTOS[Math.round(((g % 360) / 22.5)) % 16];
+const rumbo = (g) => PUNTOS_IDIOMA[IDIOMA][Math.round(((g % 360) / 22.5)) % 16];
 // Dirección "buena" del spot: N, NE, E... aceptamos ±30° alrededor
 const GRADOS = { N: 0, NE: 45, E: 90, SE: 135, S: 180, SO: 225, O: 270, NO: 315 };
 const enDirecciones = (lista, g) => lista.some(d => Math.abs(((g - GRADOS[d]) + 540) % 360 - 180) <= 30);
 const dirBuena = (spot, g) => enDirecciones(spot.buenos, g);
 
 // ---------- Nota de cada hora: muy malo, malo, regular, bueno, muy bueno ----------
-const NOTAS = [
-  { t: "Muy malo", c: "#C8423B" }, { t: "Malo", c: "#E8793A" }, { t: "Regular", c: "#D9A520" },
-  { t: "Bueno", c: "#5FA83A" }, { t: "Muy bueno", c: "#16924F" },
-];
-const notaHtml = (n, peq) => `<span class="nota${peq ? " peq" : ""}" style="background:${NOTAS[n].c}">${NOTAS[n].t}</span>`;
+const NOTAS = ["#C8423B", "#E8793A", "#D9A520", "#5FA83A", "#16924F"];
+const notaHtml = (n, peq) => `<span class="nota${peq ? " peq" : ""}" style="background:${NOTAS[n]}">${t("n" + n)}</span>`;
 // w, g: viento y rachas (nudos) · d: dirección · ola: metros (o null) · codigo: tiempo (95+ = tormenta)
 function evaluar(spot, w, g, d, ola, codigo) {
   const experto = /experto/i.test(spot.nivel), aprender = /iniciaci|todos/i.test(spot.nivel);
   const motivos = [];
   let n;
-  if (w < 8) { n = 0; motivos.push("casi sin viento"); }
-  else if (w < 11) { n = 1; motivos.push("viento flojo"); }
-  else if (w < 14) { n = 2; motivos.push("viento justo"); }
+  if (w < 8) { n = 0; motivos.push(t("m_sin")); }
+  else if (w < 11) { n = 1; motivos.push(t("m_flojo")); }
+  else if (w < 14) { n = 2; motivos.push(t("m_justo")); }
   else if (w < 18) n = 3;
   else if (w <= (experto ? 38 : 28)) n = 4;
-  else if (w <= (experto ? 45 : 34)) { n = 3; motivos.push("viento muy fuerte"); }
-  else if (w <= (experto ? 50 : 40)) { n = 1; motivos.push("viento excesivo"); }
-  else { n = 0; motivos.push("viento peligroso"); }
+  else if (w <= (experto ? 45 : 34)) { n = 3; motivos.push(t("m_fuerte")); }
+  else if (w <= (experto ? 50 : 40)) { n = 1; motivos.push(t("m_excesivo")); }
+  else { n = 0; motivos.push(t("m_peligroso")); }
   const peligro = consejosDe(spot).peligro || [];
-  if (w >= 6 && peligro.length && enDirecciones(peligro, d)) { n = 0; motivos.push("viento de tierra (off-shore): peligroso"); }
-  else if (w >= 8 && !dirBuena(spot, d)) { n = Math.min(n, 1); motivos.push("dirección mala para este spot"); }
-  if (w >= 12 && g - w >= 12) { n = Math.max(0, n - 1); motivos.push("muy racheado"); }
-  if (ola != null && aprender && ola >= 2) { n = Math.max(0, n - 1); motivos.push("mucha ola para este spot"); }
-  if (ola != null && ola >= 3.5 && !experto) { n = Math.max(0, n - 1); motivos.push("olas grandes"); }
-  if (codigo >= 95) { n = 0; motivos.push("tormenta"); }
+  if (w >= 6 && peligro.length && enDirecciones(peligro, d)) { n = 0; motivos.push(t("m_off")); }
+  else if (w >= 8 && !dirBuena(spot, d)) { n = Math.min(n, 1); motivos.push(t("m_dir")); }
+  if (w >= 12 && g - w >= 12) { n = Math.max(0, n - 1); motivos.push(t("m_rach")); }
+  if (ola != null && aprender && ola >= 2) { n = Math.max(0, n - 1); motivos.push(t("m_mucha_ola")); }
+  if (ola != null && ola >= 3.5 && !experto) { n = Math.max(0, n - 1); motivos.push(t("m_olas_grandes")); }
+  if (codigo >= 95) { n = 0; motivos.push(t("m_tormenta")); }
   return { n, motivos };
 }
 // Agrupa horas seguidas: [12,13,14,17] → "12–15 h y 17 h"
@@ -254,39 +267,39 @@ function pintarLista() {
   // Islas o provincias de la región elegida (solo si hay más de una)
   const islas = filtroRegion === "Todas" ? [] : ["Todas", ...new Set(SPOTS.filter(s => regionDe(s) === filtroRegion).map(s => s.isla))];
   if (!islas.includes(filtroIsla)) filtroIsla = "Todas";
-  const deportes = [["Todos", "Todos"], ["windsurf", "Windsurf"], ["kite", "Kite"], ["wing", "Wing foil"]];
-  const t = textoBuscar.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  const deportes = [["Todos", t("todos")], ["windsurf", t("dep_windsurf")], ["kite", t("dep_kite")], ["wing", t("dep_wing")]];
+  const q = textoBuscar.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
   const visibles = SPOTS.filter(s =>
     (filtroRegion === "Todas" || regionDe(s) === filtroRegion) &&
     (filtroIsla === "Todas" || s.isla === filtroIsla) &&
     (filtroDeporte === "Todos" || s.deportes.includes(filtroDeporte)) &&
-    (!t || (s.nombre + " " + s.zona + " " + s.isla + " " + regionDe(s)).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").includes(t)));
+    (!q || (s.nombre + " " + s.zona + " " + s.isla + " " + regionDe(s) + " " + nombreRegion(regionDe(s))).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").includes(q)));
   // Título de cada grupo: «Tenerife» en Canarias; «Cádiz · Andalucía» en el resto
-  const grupo = (s) => regionDe(s) === "Canarias" || regionDe(s) === s.isla ? s.isla : `${s.isla} · ${regionDe(s)}`;
+  const grupo = (s) => regionDe(s) === "Canarias" || regionDe(s) === s.isla ? s.isla : `${s.isla} · ${nombreRegion(regionDe(s))}`;
 
   const tarjeta = (s) => {
     const a = s.ahora;
-    const badge = a ? `<div class="badge" style="background:${color(a.wind_speed_10m)}">${conv(a.wind_speed_10m)}<small>rachas ${conv(a.wind_gusts_10m)}</small><small>${flecha(a.wind_direction_10m)} ${rumbo(a.wind_direction_10m)}</small></div>` : `<div class="badge" style="background:var(--chip);color:var(--muted)">…</div>`;
+    const badge = a ? `<div class="badge" style="background:${color(a.wind_speed_10m)}">${conv(a.wind_speed_10m)}<small>${t("rachas_min")} ${conv(a.wind_gusts_10m)}</small><small>${flecha(a.wind_direction_10m)} ${rumbo(a.wind_direction_10m)}</small></div>` : `<div class="badge" style="background:var(--chip);color:var(--muted)">…</div>`;
     return `<div class="spot" data-id="${s.id}">
       ${badge}
       <div class="info"><b>${esc(s.nombre)}</b><div class="sub">${esc(s.zona)} · ${esc(s.isla)}</div>
-      <div class="sub">${s.deportes.map(d => ({ windsurf: "🏄 windsurf", kite: "🪁 kite", wing: "🪽 wing" }[d])).join(" · ")}</div>
-      ${a ? `<div style="margin-top:4px">${notaHtml(evaluar(s, a.wind_speed_10m, a.wind_gusts_10m, a.wind_direction_10m, null, a.weather_code || 0).n, true)} <span class="sub">ahora</span></div>` : ""}</div>
-      <button class="fav ${favoritos.includes(s.id) ? "on" : ""}" data-fav="${s.id}" title="Favorito">★</button>
+      <div class="sub">${s.deportes.map(d => ({ windsurf: "🏄 ", kite: "🪁 ", wing: "🪽 " }[d]) + t("dep_" + d)).join(" · ")}</div>
+      ${a ? `<div style="margin-top:4px">${notaHtml(evaluar(s, a.wind_speed_10m, a.wind_gusts_10m, a.wind_direction_10m, null, a.weather_code || 0).n, true)} <span class="sub">${t("ahora_min")}</span></div>` : ""}</div>
+      <button class="fav ${favoritos.includes(s.id) ? "on" : ""}" data-fav="${s.id}" title="${t("favorito")}">★</button>
     </div>`;
   };
 
-  let html = `<input class="buscar" id="buscar" placeholder="Buscar spot…" value="${esc(textoBuscar)}">
-    <div class="chips">${regiones.map(r => `<button class="chip ${r === filtroRegion ? "on" : ""}" data-region="${esc(r)}">${r === "Todas" ? "Toda España" : esc(r)}</button>`).join("")}</div>
-    ${islas.length > 2 ? `<div class="chips">${islas.map(i => `<button class="chip ${i === filtroIsla ? "on" : ""}" data-isla="${esc(i)}">${esc(i)}</button>`).join("")}</div>` : ""}
+  let html = `<input class="buscar" id="buscar" placeholder="${t("buscar")}" value="${esc(textoBuscar)}">
+    <div class="chips">${regiones.map(r => `<button class="chip ${r === filtroRegion ? "on" : ""}" data-region="${esc(r)}">${r === "Todas" ? t("toda") : esc(nombreRegion(r))}</button>`).join("")}</div>
+    ${islas.length > 2 ? `<div class="chips">${islas.map(i => `<button class="chip ${i === filtroIsla ? "on" : ""}" data-isla="${esc(i)}">${i === "Todas" ? t("todas") : esc(i)}</button>`).join("")}</div>` : ""}
     <div class="chips">${deportes.map(([k, n]) => `<button class="chip ${k === filtroDeporte ? "on" : ""}" data-dep="${k}">${n}</button>`).join("")}</div>`;
   const favs = visibles.filter(s => favoritos.includes(s.id));
-  if (favs.length) html += `<h2 class="isla">★ Mis favoritos</h2><div class="lista">${favs.map(tarjeta).join("")}</div>`;
+  if (favs.length) html += `<h2 class="isla">${t("favoritos")}</h2><div class="lista">${favs.map(tarjeta).join("")}</div>`;
   [...new Set(visibles.map(grupo))].forEach(g => {
     html += `<h2 class="isla">${esc(g)}</h2><div class="lista">${visibles.filter(s => grupo(s) === g).map(tarjeta).join("")}</div>`;
   });
-  if (!visibles.length) html += `<p class="cargando">No hay spots con ese filtro.</p>`;
-  html += `<p class="aviso">Viento de ahora según el modelo de previsión (${UNIDADES[unidad].t}). Para el viento medido, entra en el spot y mira «Anemómetros».</p>`;
+  if (!visibles.length) html += `<p class="cargando">${t("sin_spots")}</p>`;
+  html += `<p class="aviso">${t("aviso_lista", { u: UNIDADES[unidad].t })}</p>`;
   $("#app").innerHTML = html;
 
   const b = $("#buscar");
@@ -307,14 +320,14 @@ let diaElegido = 0, verNoche = false;
 
 async function pintarSpot(spot) {
   window.scrollTo(0, 0);
-  $("#app").innerHTML = `<button class="volver" onclick="location.hash=''">← Todos los spots</button><div class="cargando">Cargando la previsión de ${esc(spot.nombre)}…</div>`;
+  $("#app").innerHTML = `<button class="volver" onclick="location.hash=''">${t("volver_lista")}</button><div class="cargando">${t("cargando_prev", { n: esc(spot.nombre) })}</div>`;
   try {
     if (!cache[spot.id] || Date.now() - cache[spot.id].t > 30 * 60 * 1000) {
       const [v, o] = await Promise.all([viento(spot), olas(spot).catch(() => null)]);
       cache[spot.id] = { v, o, t: Date.now() };
     }
   } catch (e) {
-    $("#app").innerHTML = `<button class="volver" onclick="location.hash=''">← Todos los spots</button><div class="caja">No se ha podido descargar la previsión. Comprueba la conexión a internet y vuelve a intentarlo.<br><br><button class="chip on" onclick="router()">Reintentar</button></div>`;
+    $("#app").innerHTML = `<button class="volver" onclick="location.hash=''">${t("volver_lista")}</button><div class="caja">${t("error_prev")}<br><br><button class="chip on" onclick="router()">${t("reintentar")}</button></div>`;
     return;
   }
   dibujarSpot(spot);
@@ -339,50 +352,51 @@ function dibujarSpot(spot) {
   if (diaElegido >= dias.length) diaElegido = 0;
   const dia = dias[diaElegido];
   const horas = H.time.map((t, i) => ({ t, i })).filter(x => x.t.startsWith(dia) && (verNoche || (+x.t.slice(11, 13) >= 7 && +x.t.slice(11, 13) <= 21)));
-  const nombreDia = (d, i) => i === 0 ? "Hoy" : i === 1 ? "Mañana" : new Date(d + "T12:00").toLocaleDateString("es-ES", { weekday: "short", day: "numeric" });
+  const nombreDia = (d, i) => i === 0 ? t("hoy") : i === 1 ? t("manana") : new Date(d + "T12:00").toLocaleDateString(localeIdioma(), { weekday: "short", day: "numeric" });
+  const tx = textosDe(spot);
   const sol = v.daily ? `☀️ ${v.daily.sunrise[diaElegido].slice(11)} – ${v.daily.sunset[diaElegido].slice(11)}` : "";
 
-  const enlaces = (lista, icono) => lista.length ? lista.map(l => enlace(l.url, `${icono} ${esc(l.nombre)}`)).join("") : `<p class="aviso">No hemos encontrado ninguna para este spot todavía.</p>`;
+  const enlaces = (lista, icono) => lista.length ? lista.map(l => enlace(l.url, `${icono} ${esc(l.nombre)}`)).join("") : `<p class="aviso">${t("ninguna")}</p>`;
   const windy = `https://embed.windy.com/embed.html?type=map&lat=${spot.lat}&lon=${spot.lon}&detailLat=${spot.lat}&detailLon=${spot.lon}&zoom=11&overlay=wind&product=ecmwf&level=surface&metricWind=kt&marker=true`;
   const mapa = `https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lon}`;
 
   $("#app").innerHTML = `
-  <button class="volver" onclick="location.hash=''">← Todos los spots</button>
+  <button class="volver" onclick="location.hash=''">${t("volver_lista")}</button>
   <div class="cab">
     <div style="flex:1"><h2>${esc(spot.nombre)}</h2>
-      <div class="sub" style="color:var(--muted)">${esc(spot.zona)} · ${esc(spot.isla)}${regionDe(spot) !== "Canarias" && regionDe(spot) !== spot.isla ? " · " + esc(regionDe(spot)) : ""}</div>
-      ${spot.deportes.map(d => `<span class="etq">${{ windsurf: "🏄 Windsurf", kite: "🪁 Kitesurf", wing: "🪽 Wing foil" }[d]}</span>`).join("")}
-      <span class="etq">Nivel: ${esc(spot.nivel)}</span>
-      <span class="etq">Mejor viento: ${spot.buenos.join(", ")}</span>
+      <div class="sub" style="color:var(--muted)">${esc(spot.zona)} · ${esc(spot.isla)}${regionDe(spot) !== "Canarias" && regionDe(spot) !== spot.isla ? " · " + esc(nombreRegion(regionDe(spot))) : ""}</div>
+      ${spot.deportes.map(d => `<span class="etq">${{ windsurf: "🏄 ", kite: "🪁 ", wing: "🪽 " }[d]}${t("dep_" + d)}</span>`).join("")}
+      <span class="etq">${t("nivel")}: ${esc(nombreNivel(spot.nivel))}</span>
+      <span class="etq">${t("mejor_viento")}: ${spot.buenos.map(dirIdioma).join(", ")}</span>
     </div>
-    <button class="fav ${favoritos.includes(spot.id) ? "on" : ""}" id="favSpot" title="Favorito" style="font-size:28px">★</button>
+    <button class="fav ${favoritos.includes(spot.id) ? "on" : ""}" id="favSpot" title="${t("favorito")}" style="font-size:28px">★</button>
   </div>
-  <p style="margin:8px 0 0">${esc(spot.nota)}</p>
-  ${consejosDe(spot).seguridad ? `<div class="seguridad"><b>⚠️ Aviso de seguridad</b>${esc(consejosDe(spot).seguridad)}</div>` : ""}
-  ${consejosDe(spot).consejos.length ? `<div class="caja consejos"><h3>💡 Consejos</h3><ul>${consejosDe(spot).consejos.map(c => `<li>${esc(c)}</li>`).join("")}</ul>
-    <p class="aviso">Consejos orientativos. Si no conoces el spot, pregunta antes en las escuelas de la zona.</p></div>` : ""}
+  <p style="margin:8px 0 0">${esc(tx.nota)}</p>
+  ${tx.seguridad ? `<div class="seguridad"><b>${t("aviso_seg")}</b>${esc(tx.seguridad)}</div>` : ""}
+  ${tx.consejos.length ? `<div class="caja consejos"><h3>${t("consejos")}</h3><ul>${tx.consejos.map(c => `<li>${esc(c)}</li>`).join("")}</ul>
+    <p class="aviso">${t("consejos_nota")}</p></div>` : ""}
 
-  <div class="caja"><h3>Ahora mismo <small style="color:var(--muted);font-weight:400">(previsión del modelo)</small></h3>
-    <div class="nota-ahora">${notaHtml(evAhora.n)}<span>${evAhora.motivos.length ? esc(evAhora.motivos.join(" · ")) : "condiciones buenas para este spot"}</span></div>
+  <div class="caja"><h3>${t("ahora_mismo")} <small style="color:var(--muted);font-weight:400">${t("prev_modelo")}</small></h3>
+    <div class="nota-ahora">${notaHtml(evAhora.n)}<span>${evAhora.motivos.length ? esc(evAhora.motivos.join(" · ")) : t("cond_buenas")}</span></div>
     <div class="ahora">
-      <div class="dato" style="background:${color(c.wind_speed_10m)};color:#1b1b1b"><div class="n">${conv(c.wind_speed_10m)} <small style="font-size:14px">${u}</small></div><div class="t" style="color:#333">Viento</div></div>
-      <div class="dato"><div class="n">${conv(c.wind_gusts_10m)} <small style="font-size:14px">${u}</small></div><div class="t">Rachas</div></div>
-      <div class="dato"><div class="n">${flecha(c.wind_direction_10m)} ${rumbo(c.wind_direction_10m)}</div><div class="t">Dirección (${Math.round(c.wind_direction_10m)}°) ${dirBuena(spot, c.wind_direction_10m) ? "✅ buena" : ""}</div></div>
-      ${oc ? `<div class="dato"><div class="n">${oc.wave_height?.toFixed(1) ?? "–"} <small style="font-size:14px">m</small></div><div class="t">Olas · ${oc.wave_period ? Math.round(oc.wave_period) + " s" : ""} ${oc.wave_direction != null ? rumbo(oc.wave_direction) : ""}</div></div>` : ""}
-      <div class="dato"><div class="n">${ICONO(c.weather_code)} ${Math.round(c.temperature_2m)}°</div><div class="t">Aire${oc && oc.sea_surface_temperature ? " · agua " + Math.round(oc.sea_surface_temperature) + "°" : ""}</div></div>
+      <div class="dato" style="background:${color(c.wind_speed_10m)};color:#1b1b1b"><div class="n">${conv(c.wind_speed_10m)} <small style="font-size:14px">${u}</small></div><div class="t" style="color:#333">${t("viento")}</div></div>
+      <div class="dato"><div class="n">${conv(c.wind_gusts_10m)} <small style="font-size:14px">${u}</small></div><div class="t">${t("rachas")}</div></div>
+      <div class="dato"><div class="n">${flecha(c.wind_direction_10m)} ${rumbo(c.wind_direction_10m)}</div><div class="t">${t("direccion")} (${Math.round(c.wind_direction_10m)}°) ${dirBuena(spot, c.wind_direction_10m) ? t("buena") : ""}</div></div>
+      ${oc ? `<div class="dato"><div class="n">${oc.wave_height?.toFixed(1) ?? "–"} <small style="font-size:14px">m</small></div><div class="t">${t("olas")} · ${oc.wave_period ? Math.round(oc.wave_period) + " s" : ""} ${oc.wave_direction != null ? rumbo(oc.wave_direction) : ""}</div></div>` : ""}
+      <div class="dato"><div class="n">${ICONO(c.weather_code)} ${Math.round(c.temperature_2m)}°</div><div class="t">${t("aire")}${oc && oc.sea_surface_temperature ? " · " + t("agua") + " " + Math.round(oc.sea_surface_temperature) + "°" : ""}</div></div>
     </div>
   </div>
 
-  <div class="caja"><h3>Previsión por días</h3>
+  <div class="caja"><h3>${t("prev_dias")}</h3>
     <div class="dias">${resumen.map((r, i) => `<button class="dia ${i === diaElegido ? "on" : ""}" data-dia="${i}">
       <div class="d">${nombreDia(r.d, i)}</div><div class="m" style="background:${color(r.max)}">${conv(r.max)}·${conv(r.racha)}</div><div style="margin-top:4px">${notaHtml(r.mejor, true)}</div></button>`).join("")}</div>
-    <p class="aviso">En cada día: viento máximo · racha máxima (${u}) y la mejor nota entre las 8 y las 19 h.</p>
+    <p class="aviso">${t("aviso_dias", { u })}</p>
     <div id="avisosDia"></div>
     <div class="grafica" id="grafica"></div>
     <div class="fila"><span class="aviso" style="margin:0">${sol}</span>
-      <label class="noche"><input type="checkbox" id="noche" ${verNoche ? "checked" : ""}> Ver también la noche</label></div>
+      <label class="noche"><input type="checkbox" id="noche" ${verNoche ? "checked" : ""}> ${t("ver_noche")}</label></div>
     <div class="tabla"><table>
-      <tr><th>Hora</th><th>Nota</th><th>Viento</th><th>Rachas</th><th>Dirección</th><th>Olas</th><th>Periodo</th><th>Dir. ola</th><th>Mar de fondo</th><th>Tiempo</th><th>Lluvia</th></tr>
+      <tr><th>${t("th_hora")}</th><th>${t("th_nota")}</th><th>${t("viento")}</th><th>${t("rachas")}</th><th>${t("direccion")}</th><th>${t("olas")}</th><th>${t("th_periodo")}</th><th>${t("th_dirola")}</th><th>${t("th_fondo")}</th><th>${t("th_tiempo")}</th><th>${t("th_lluvia")}</th></tr>
       ${horas.map(({ t, i }) => {
         const mi = M ? M.time.indexOf(t) : -1;
         const w = H.wind_speed_10m[i], g = H.wind_gusts_10m[i], d = H.wind_direction_10m[i];
@@ -399,24 +413,24 @@ function dibujarSpot(spot) {
       }).join("")}
     </table></div>
     <div class="leyenda">${[[0, "<8"], [8, "8-12"], [12, "12-16"], [16, "16-20"], [20, "20-25"], [25, "25-30"], [30, "30-35"], [35, "35+"]].map(([k, n]) => `<span style="background:${color(k)}">${n} kn</span>`).join("")}</div>
-    <p class="aviso">✓ en verde = la dirección del viento es buena para este spot. La flecha indica hacia dónde sopla el viento.</p>
+    <p class="aviso">${t("leyenda_dir")}</p>
   </div>
 
   <div class="caja" id="cajaMareas"></div>
   <div class="caja" id="cajaReportar"></div>
   <div class="caja" id="cajaReportes"></div>
 
-  <div class="caja enlaces"><h3>🌬️ Anemómetros (viento medido ahora)</h3>
+  <div class="caja enlaces"><h3>${t("anemos")}</h3>
     ${enlaces(spot.anemometros, "📡")}
-    ${enlace(windy, "🗺️ Windy · mapa de viento en directo")}
-    ${enlace(`https://www.windguru.cz/map/?lat=${spot.lat}&lon=${spot.lon}&zoom=11`, "🗺️ Windguru · mapa de previsión")}
-    ${enlace("https://holfuy.com/en/map", "📡 Holfuy · mapa de estaciones")}
+    ${enlace(windy, t("windy"))}
+    ${enlace(`https://www.windguru.cz/map/?lat=${spot.lat}&lon=${spot.lon}&zoom=11`, t("windguru"))}
+    ${enlace("https://holfuy.com/en/map", t("holfuy"))}
   </div>
   <div class="caja enlaces"><h3>📹 Webcams</h3>${enlaces(spot.webcams, "🎥")}
-    <p class="aviso">Las webcams son de otras webs y a veces se caen o se quedan congeladas.</p></div>
-  <div class="caja enlaces"><h3>📍 Cómo llegar</h3>
-    ${enlace(mapa, "🧭 Abrir en Google Maps")}</div>
-  <p class="aviso">📲 = se abre dentro de la app · ↗ = se abre fuera (te explicamos cómo volver).</p>
+    <p class="aviso">${t("webcams_nota")}</p></div>
+  <div class="caja enlaces"><h3>${t("como_llegar")}</h3>
+    ${enlace(mapa, t("gmaps"))}</div>
+  <p class="aviso">${t("leyenda_links")}</p>
   `;
 
   document.querySelectorAll("[data-dia]").forEach(e => e.onclick = () => { diaElegido = +e.dataset.dia; dibujarSpot(spot); });
@@ -456,19 +470,19 @@ function prevision(spot, hora) {
 
 function pintarReportar(spot) {
   const caja = $("#cajaReportar"); if (!caja) return;
-  caja.innerHTML = `<h3>📝 ¿Estás en ${esc(spot.nombre)}? Cuéntanos cómo está</h3>
-    <p class="aviso" style="margin-top:-4px">Con tus reportes la app aprende qué tal acierta la previsión en cada spot.</p>
+  caja.innerHTML = `<h3>${t("rep_tit", { n: esc(spot.nombre) })}</h3>
+    <p class="aviso" style="margin-top:-4px">${t("rep_sub")}</p>
     <div class="form" id="fRep">
-      <label>Hora<input type="time" name="hora" value="${horaAhora(tzDe(spot))}"></label>
-      <label>Viento (nudos)<input type="number" name="viento" min="0" max="80" inputmode="numeric" placeholder="ej. 18"></label>
-      <label>Rachas (nudos)<input type="number" name="rachas" min="0" max="90" inputmode="numeric" placeholder="ej. 24"></label>
-      <label>Dirección<select name="direccion"><option value="">—</option>${["N","NE","E","SE","S","SO","O","NO"].map(d => `<option>${d}</option>`).join("")}</select></label>
-      <label>Estado del mar<select name="mar"><option value="">—</option>${["Plano","Picado (chop)","Olas pequeñas (<1 m)","Olas medianas (1-2 m)","Olas grandes (>2 m)"].map(d => `<option>${d}</option>`).join("")}</select></label>
-      <label>Material que llevas<input name="material" placeholder="ej. vela 4.7 / kite 9 / wing 5"></label>
-      <label class="ancho">¿Qué tal está? <span class="estrellas" id="estrellas">${[1,2,3,4,5].map(n => `<button type="button" data-n="${n}">★</button>`).join("")}</span></label>
-      <label class="ancho">Comentario<textarea name="comentario" rows="2" placeholder="Racheado, mucha gente, medusas, marea alta…"></textarea></label>
-      <label>Tu nombre o apodo<input name="nombre" value="${esc(leer("nombre", ""))}" placeholder="ej. Miki"></label>
-      <div class="ancho"><button class="btn" id="enviarRep">Enviar reporte</button></div>
+      <label>${t("f_hora")}<input type="time" name="hora" value="${horaAhora(tzDe(spot))}"></label>
+      <label>${t("f_viento")}<input type="number" name="viento" min="0" max="80" inputmode="numeric" placeholder="${t("ph_ej")} 18"></label>
+      <label>${t("f_rachas")}<input type="number" name="rachas" min="0" max="90" inputmode="numeric" placeholder="${t("ph_ej")} 24"></label>
+      <label>${t("f_dir")}<select name="direccion"><option value="">—</option>${["N","NE","E","SE","S","SO","O","NO"].map(d => `<option value="${d}">${dirIdioma(d)}</option>`).join("")}</select></label>
+      <label>${t("f_mar")}<select name="mar"><option value="">—</option>${[0, 1, 2, 3, 4].map(k => `<option value="${esc(TXT.es["mar" + k])}">${esc(t("mar" + k))}</option>`).join("")}</select></label>
+      <label>${t("f_material")}<input name="material" placeholder="${t("ph_material")}"></label>
+      <label class="ancho">${t("f_que_tal")} <span class="estrellas" id="estrellas">${[1,2,3,4,5].map(n => `<button type="button" data-n="${n}">★</button>`).join("")}</span></label>
+      <label class="ancho">${t("f_coment")}<textarea name="comentario" rows="2" placeholder="${t("ph_coment")}"></textarea></label>
+      <label>${t("f_nombre")}<input name="nombre" value="${esc(leer("nombre", ""))}" placeholder="${t("ph_ej")} Miki"></label>
+      <div class="ancho"><button class="btn" id="enviarRep">${t("enviar_rep")}</button></div>
     </div><div id="msgRep"></div>`;
   let valoracion = 0;
   caja.querySelectorAll("#estrellas button").forEach(b => b.onclick = () => {
@@ -478,16 +492,16 @@ function pintarReportar(spot) {
   $("#enviarRep").onclick = async () => {
     const f = Object.fromEntries([...caja.querySelectorAll("[name]")].map(e => [e.name, e.value.trim()]));
     const msg = $("#msgRep");
-    if (!f.viento && !valoracion && !f.comentario) { msg.innerHTML = `<div class="msg">Pon al menos el viento, las estrellas o un comentario.</div>`; return; }
-    if (!formListo(CONFIG.reportes)) { msg.innerHTML = `<div class="msg">El envío de reportes todavía no está activado. ¡Muy pronto!</div>`; return; }
+    if (!f.viento && !valoracion && !f.comentario) { msg.innerHTML = `<div class="msg">${t("rep_falta")}</div>`; return; }
+    if (!formListo(CONFIG.reportes)) { msg.innerHTML = `<div class="msg">${t("rep_no_activo")}</div>`; return; }
     guardar("nombre", f.nombre);
     $("#enviarRep").disabled = true;
     try {
       await enviarFormulario(CONFIG.reportes, { ...f, spot: spot.id, fecha: hoyISO(tzDe(spot)), valoracion: valoracion || "", prevision: prevision(spot, f.hora) });
-      msg.innerHTML = `<div class="msg">✅ ¡Gracias${f.nombre ? ", " + esc(f.nombre) : ""}! Tu reporte se ha enviado. Aparecerá aquí en unos minutos.</div>`;
+      msg.innerHTML = `<div class="msg">${t("rep_ok", { n: f.nombre ? ", " + esc(f.nombre) : "" })}</div>`;
       caja.querySelectorAll("input:not([name=nombre]):not([name=hora]), textarea, select").forEach(e => e.value = "");
     } catch (e) {
-      msg.innerHTML = `<div class="msg">No se ha podido enviar. Comprueba la conexión e inténtalo otra vez.</div>`;
+      msg.innerHTML = `<div class="msg">${t("err_envio")}</div>`;
     }
     $("#enviarRep").disabled = false;
   };
@@ -532,25 +546,25 @@ async function cargarReportes() {
 }
 async function pintarReportes(spot) {
   const caja = $("#cajaReportes"); if (!caja) return;
-  if (!CONFIG.reportes.csv) { caja.innerHTML = `<h3>👥 Lo que dice la gente</h3><p class="aviso">Aquí saldrán los reportes de los que estén en el agua.</p>`; return; }
-  caja.innerHTML = `<h3>👥 Lo que dice la gente</h3><p class="aviso">Cargando reportes…</p>`;
+  if (!CONFIG.reportes.csv) { caja.innerHTML = `<h3>${t("gente")}</h3><p class="aviso">${t("gente_cfg")}</p>`; return; }
+  caja.innerHTML = `<h3>${t("gente")}</h3><p class="aviso">${t("gente_cargando")}</p>`;
   try {
     const lista = (await cargarReportes()).filter(r => r.spot === spot.id)
       .sort((a, b) => (b.fecha + b.hora).localeCompare(a.fecha + a.hora)).slice(0, 15);
-    if (!lista.length) { caja.innerHTML = `<h3>👥 Lo que dice la gente</h3><p class="aviso">Todavía no hay reportes de este spot. ¡Sé el primero!</p>`; return; }
+    if (!lista.length) { caja.innerHTML = `<h3>${t("gente")}</h3><p class="aviso">${t("gente_primero")}</p>`; return; }
     const hoy = hoyISO(tzDe(spot));
-    caja.innerHTML = `<h3>👥 Lo que dice la gente</h3>` + lista.map(r => {
+    caja.innerHTML = `<h3>${t("gente")}</h3>` + lista.map(r => {
       const w = parseFloat(r.viento);
-      const cuando = r.fecha === hoy ? "Hoy" : new Date(r.fecha + "T12:00").toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" });
-      return `<div class="reporte"><div class="cab2"><b>${esc(r.nombre || "Anónimo")}</b> · ${cuando} ${esc(r.hora)}
+      const cuando = r.fecha === hoy ? t("hoy") : new Date(r.fecha + "T12:00").toLocaleDateString(localeIdioma(), { weekday: "short", day: "numeric", month: "short" });
+      return `<div class="reporte"><div class="cab2"><b>${esc(r.nombre || t("anonimo"))}</b> · ${cuando} ${esc(r.hora)}
         ${r.valoracion ? `<span style="color:#F2B100">${"★".repeat(+r.valoracion || 0)}</span>` : ""}</div>
         <div style="margin-top:4px">${!isNaN(w) ? `<span class="badge" style="display:inline-block;min-width:0;padding:2px 8px;background:${color(w)}">${conv(w)}${r.rachas ? "·" + conv(parseFloat(r.rachas)) : ""} ${UNIDADES[unidad].c}</span>` : ""}
-        ${r.direccion ? esc(r.direccion) : ""} ${r.mar ? "· " + esc(r.mar) : ""} ${r.material ? "· " + esc(r.material) : ""}</div>
+        ${r.direccion ? esc(dirIdioma(r.direccion)) : ""} ${r.mar ? "· " + esc(r.mar) : ""} ${r.material ? "· " + esc(r.material) : ""}</div>
         ${r.comentario ? `<div style="margin-top:4px">${esc(r.comentario)}</div>` : ""}
-        ${r.prevision ? `<div class="aviso" style="margin-top:2px">Previsión a esa hora: ${esc(r.prevision)}</div>` : ""}</div>`;
+        ${r.prevision ? `<div class="aviso" style="margin-top:2px">${t("prev_hora")} ${esc(r.prevision)}</div>` : ""}</div>`;
     }).join("");
   } catch (e) {
-    caja.innerHTML = `<h3>👥 Lo que dice la gente</h3><p class="aviso">No se han podido cargar los reportes ahora mismo.</p>`;
+    caja.innerHTML = `<h3>${t("gente")}</h3><p class="aviso">${t("gente_error")}</p>`;
   }
 }
 
@@ -558,7 +572,7 @@ async function pintarReportes(spot) {
 // Webs que dejan verse dentro de la app (comprobado el 08-11-2026). Las demás lo prohíben.
 const SE_VEN_DENTRO = ["in2thebeach.es", "fuerteventuraplayas.com", "embed.windy.com", "mangolinkworld.com", "azulkiteboarding.com"];
 const seVeDentro = (url) => { try { const h = new URL(url).hostname; return SE_VEN_DENTRO.some(d => h === d || h.endsWith("." + d)); } catch (e) { return false; } };
-const nombreWeb = (url) => { try { return new URL(url).hostname.replace(/^www\.|^en\.|^es\./, ""); } catch (e) { return "esa web"; } };
+const nombreWeb = (url) => { try { return new URL(url).hostname.replace(/^www\.|^en\.|^es\./, ""); } catch (e) { return t("esa_web"); } };
 const esAppInstalada = () => window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;
 const esIphone = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
 function enlace(url, texto) {
@@ -572,8 +586,8 @@ function abrirVisor(url, titulo) {
   const v = document.createElement("div");
   v.className = "visor";
   v.innerHTML = `<div class="barra-visor">
-      <button class="volver-visor">← Volver a Canelo Wind</button>
-      <a class="fuera-visor" href="${esc(url)}" target="_blank" rel="noopener" title="Abrir en el navegador">↗</a>
+      <button class="volver-visor">${t("volver_app")}</button>
+      <a class="fuera-visor" href="${esc(url)}" target="_blank" rel="noopener" title="${t("abrir_nav")}">↗</a>
     </div>
     <div class="titulo-visor">${esc(titulo)}</div>
     <iframe src="${esc(url)}" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>`;
@@ -591,16 +605,14 @@ window.addEventListener("popstate", () => { cerrarVisor(); cerrarAvisoFuera(); }
 // Aviso antes de salir a una web que no deja verse dentro
 function avisoFuera(url, titulo) {
   if (leer("sinAvisoFuera", false) || !esAppInstalada()) { window.open(url, "_blank", "noopener"); return; }
-  const comoVolver = esIphone()
-    ? `Para volver, toca <b>«◀ Canelo Wind»</b> arriba a la izquierda de la pantalla (junto a la hora).<br>O desliza hacia arriba desde el borde de abajo, para un poco, y elige Canelo Wind.`
-    : `Para volver, pulsa el botón <b>Atrás</b> del móvil o elige Canelo Wind en las apps abiertas.`;
+  const comoVolver = esc(esIphone() ? t("volver_iphone") : t("volver_android"));
   const f = document.createElement("div");
   f.className = "fondo aviso-fuera";
-  f.innerHTML = `<div class="caja"><h3>↗ Se abrirá fuera de la app</h3>
-    <p style="margin-top:0"><b>${esc(nombreWeb(url))}</b> no deja verse dentro de Canelo Wind, así que se abrirá en el navegador.</p>
+  f.innerHTML = `<div class="caja"><h3>${t("fuera_tit")}</h3>
+    <p style="margin-top:0">${t("fuera_txt", { w: "<b>" + esc(nombreWeb(url)) + "</b>" })}</p>
     <p>${comoVolver}</p>
-    <label class="aviso" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="noAvisar"> Ya lo sé, no me lo vuelvas a decir</label>
-    <div class="fila" style="margin-top:12px"><a class="btn" id="abrirFuera" href="${esc(url)}" target="_blank" rel="noopener" style="text-decoration:none">Abrir ${esc(titulo)}</a><button class="btn sec" id="cancelarFuera">Cancelar</button></div></div>`;
+    <label class="aviso" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="noAvisar"> ${t("no_avisar")}</label>
+    <div class="fila" style="margin-top:12px"><a class="btn" id="abrirFuera" href="${esc(url)}" target="_blank" rel="noopener" style="text-decoration:none">${t("abrir")} ${esc(titulo)}</a><button class="btn sec" id="cancelarFuera">${t("cancelar")}</button></div></div>`;
   document.body.appendChild(f);
   const cerrar = () => f.remove();
   f.onclick = (e) => { if (e.target === f) cerrar(); };
@@ -621,14 +633,14 @@ function abrirSugerencias() {
   if (document.querySelector(".fondo")) return;
   const fondo = document.createElement("div");
   fondo.className = "fondo";
-  fondo.innerHTML = `<div class="caja"><h3>💡 Buzón de sugerencias</h3>
-    <p class="aviso" style="margin-top:-4px">Ideas, spots que faltan, una webcam o anemómetro que conozcas, algo que no funciona… Lo lee el equipo de Canelo Wind.</p>
+  fondo.innerHTML = `<div class="caja"><h3>${t("sug_tit")}</h3>
+    <p class="aviso" style="margin-top:-4px">${t("sug_sub")}</p>
     <div class="form" id="fSug">
-      <label class="ancho">¿Qué es?<select name="tipo">${["Idea o mejora","Falta un spot","Webcam o anemómetro","Algo no funciona","Otra cosa"].map(d => `<option>${d}</option>`).join("")}</select></label>
-      <label class="ancho">Tu mensaje<textarea name="mensaje" rows="5" placeholder="Escribe aquí…"></textarea></label>
-      <label>Tu nombre o apodo<input name="nombre" value="${esc(leer("nombre", ""))}"></label>
-      <label>Correo o teléfono (opcional)<input name="contacto" placeholder="por si hay que contestarte"></label>
-      <div class="ancho fila"><button class="btn" id="enviarSug">Enviar</button><button class="btn sec" id="cerrarSug">Cerrar</button></div>
+      <label class="ancho">${t("sug_que")}<select name="tipo">${[0, 1, 2, 3, 4].map(k => `<option value="${esc(TXT.es["tipo" + k])}">${esc(t("tipo" + k))}</option>`).join("")}</select></label>
+      <label class="ancho">${t("sug_msg")}<textarea name="mensaje" rows="5" placeholder="${t("ph_escribe")}"></textarea></label>
+      <label>${t("f_nombre")}<input name="nombre" value="${esc(leer("nombre", ""))}"></label>
+      <label>${t("sug_contacto")}<input name="contacto" placeholder="${t("ph_contacto")}"></label>
+      <div class="ancho fila"><button class="btn" id="enviarSug">${t("enviar")}</button><button class="btn sec" id="cerrarSug">${t("cerrar")}</button></div>
     </div><div id="msgSug"></div></div>`;
   document.body.appendChild(fondo);
   const cerrar = () => fondo.remove();
@@ -637,15 +649,15 @@ function abrirSugerencias() {
   fondo.querySelector("#enviarSug").onclick = async () => {
     const f = Object.fromEntries([...fondo.querySelectorAll("[name]")].map(e => [e.name, e.value.trim()]));
     const msg = fondo.querySelector("#msgSug");
-    if (!f.mensaje) { msg.innerHTML = `<div class="msg">Escribe tu mensaje.</div>`; return; }
-    if (!formListo(CONFIG.sugerencias)) { msg.innerHTML = `<div class="msg">El buzón todavía no está activado. ¡Muy pronto!</div>`; return; }
+    if (!f.mensaje) { msg.innerHTML = `<div class="msg">${t("sug_falta")}</div>`; return; }
+    if (!formListo(CONFIG.sugerencias)) { msg.innerHTML = `<div class="msg">${t("sug_no_activo")}</div>`; return; }
     if (f.nombre) guardar("nombre", f.nombre);
     try {
       await enviarFormulario(CONFIG.sugerencias, f);
       fondo.querySelector(".form").remove();
-      msg.innerHTML = `<div class="msg">✅ ¡Gracias! Hemos recibido tu mensaje.</div><div style="margin-top:10px"><button class="btn sec" id="cerrar2">Cerrar</button></div>`;
+      msg.innerHTML = `<div class="msg">${t("sug_ok")}</div><div style="margin-top:10px"><button class="btn sec" id="cerrar2">${t("cerrar")}</button></div>`;
       fondo.querySelector("#cerrar2").onclick = cerrar;
-    } catch (e) { msg.innerHTML = `<div class="msg">No se ha podido enviar. Comprueba la conexión.</div>`; }
+    } catch (e) { msg.innerHTML = `<div class="msg">${t("sug_err")}</div>`; }
   };
 }
 $("#btnSugerir").onclick = abrirSugerencias;
@@ -664,25 +676,25 @@ function pintarAvisosDia(spot, dia, olaEn) {
   const fuertes = idx.filter(i => H.wind_gusts_10m[i] >= (experto ? 40 : 30));
   if (fuertes.length) {
     const max = Math.max(...fuertes.map(i => H.wind_gusts_10m[i]));
-    avisos.push(`💨 Rachas de hasta ${conv(max)} ${UNIDADES[unidad].c} (${rangos(fuertes.map(hh))}): ${experto ? "muy fuerte incluso para expertos" : "solo para gente con experiencia y material pequeño"}.`);
+    avisos.push(t("a_rachas", { v: conv(max), u: UNIDADES[unidad].c, h: rangos(fuertes.map(hh)), x: experto ? t("a_rachas_exp") : t("a_rachas_norm") }));
   }
   // Muy racheado
   const racheado = idx.filter(i => H.wind_speed_10m[i] >= 12 && H.wind_gusts_10m[i] - H.wind_speed_10m[i] >= 12);
-  if (racheado.length) avisos.push(`🌀 Viento muy racheado (${rangos(racheado.map(hh))}): mucha diferencia entre el viento medio y las rachas.`);
+  if (racheado.length) avisos.push(t("a_rach", { h: rangos(racheado.map(hh)) }));
   // Viento de tierra (off-shore)
   const peligro = consejosDe(spot).peligro || [];
   const off = peligro.length ? idx.filter(i => H.wind_speed_10m[i] >= 6 && enDirecciones(peligro, H.wind_direction_10m[i])) : [];
-  if (off.length) avisos.push(`🚫 Viento de tierra hacia el mar (off-shore) (${rangos(off.map(hh))}): si te pasa algo te aleja de la costa. No salgas esas horas.`);
+  if (off.length) avisos.push(t("a_off", { h: rangos(off.map(hh)) }));
   // Dirección mala con viento
   const mala = idx.filter(i => H.wind_speed_10m[i] >= 12 && !dirBuena(spot, H.wind_direction_10m[i]) && !off.includes(i));
-  if (mala.length >= 3) avisos.push(`🧭 La dirección del viento no es buena para este spot (${rangos(mala.map(hh))}).`);
+  if (mala.length >= 3) avisos.push(t("a_dir", { h: rangos(mala.map(hh)) }));
   // Tormentas
   const tormenta = idx.filter(i => H.weather_code[i] >= 95);
-  if (tormenta.length) avisos.push(`⛈️ Posibles tormentas (${rangos(tormenta.map(hh))}): no salgas al agua con tormenta.`);
+  if (tormenta.length) avisos.push(t("a_torm", { h: rangos(tormenta.map(hh)) }));
   // Olas grandes
   const olas = idx.map(i => olaEn(H.time[i])).filter(x => x != null);
   const maxOla = olas.length ? Math.max(...olas) : 0;
-  if (maxOla >= (experto ? 4 : 2.5)) avisos.push(`🌊 Olas de hasta ${maxOla.toFixed(1).replace(".", ",")} m: entrar y salir del agua será difícil.`);
+  if (maxOla >= (experto ? 4 : 2.5)) avisos.push(t("a_olas", { v: maxOla.toLocaleString(localeIdioma(), { maximumFractionDigits: 1 }) }));
   // Marea baja en spots que necesitan marea alta
   if (consejosDe(spot).marea === "alta" && o && o.minutely_15) {
     const M = o.minutely_15, alt = M.sea_level_height_msl;
@@ -693,14 +705,14 @@ function pintarAvisosDia(spot, dia, olaEn) {
       if (b <= a && b < c) bajas.push(M.time[k[j]].slice(11, 16));
       if (b >= a && b > c) altas.push(M.time[k[j]].slice(11, 16));
     }
-    if (bajas.length) avisos.push(`🏖️ Bajamar a las ${bajas.join(" y ")}: poca agua. Mejor salir cerca de la pleamar${altas.length ? " (" + altas.join(" y ") + ")" : ""}.`);
+    if (bajas.length) avisos.push(t("a_bajamar", { b: bajas.join(" " + t("y") + " "), a: altas.length ? " (" + altas.join(" " + t("y") + " ") + ")" : "" }));
   }
   // Sin viento en todo el día
   const conViento = idx.filter(i => H.wind_speed_10m[i] >= 11);
-  if (!conViento.length) avisos.push(`😴 Poco viento todo el día: no merece la pena ir.`);
+  if (!conViento.length) avisos.push(t("a_sinviento"));
   caja.innerHTML = avisos.length
-    ? `<div class="avisos-dia"><b>⚠️ Avisos según la previsión de este día</b><ul>${avisos.map(a => `<li>${esc(a)}</li>`).join("")}</ul></div>`
-    : `<div class="avisos-dia ok">✅ Sin avisos especiales para este día según la previsión.</div>`;
+    ? `<div class="avisos-dia"><b>${t("avisos_tit")}</b><ul>${avisos.map(a => `<li>${esc(a)}</li>`).join("")}</ul></div>`
+    : `<div class="avisos-dia ok">${t("sin_avisos")}</div>`;
 }
 
 // ---------- Mareas: curva del día con pleamar, bajamar y horas de sol ----------
@@ -709,7 +721,7 @@ function pintarMareas(spot, dia, daily, iDia) {
   const o = cache[spot.id] && cache[spot.id].o;
   const M = o && o.minutely_15;
   const idx = M ? M.time.map((t, i) => t.startsWith(dia) && M.sea_level_height_msl[i] != null ? i : -1).filter(i => i >= 0) : [];
-  if (idx.length < 10) { caja.innerHTML = `<h3>🌊 Mareas</h3><p class="aviso">No hay datos de marea para este spot.</p>`; return; }
+  if (idx.length < 10) { caja.innerHTML = `<h3>${t("mareas")}</h3><p class="aviso">${t("sin_marea")}</p>`; return; }
   const alt = M.sea_level_height_msl, hora = (t) => t.slice(11, 16);
   const minutos = (t) => +t.slice(11, 13) * 60 + +t.slice(14, 16);
 
@@ -766,9 +778,9 @@ function pintarMareas(spot, dia, daily, iDia) {
   }
   s += `</svg>`;
 
-  const resumen = extremos.map(e => `<span class="etq" style="color:${e.tipo === "alta" ? "#2C7BC0" : "#C8423B"};font-weight:700">${e.tipo === "alta" ? "▲ Pleamar" : "▼ Bajamar"} ${hora(M.time[e.i])} · ${alt[e.i].toFixed(1).replace(".", ",")} m</span>`).join(" ");
-  caja.innerHTML = `<h3>🌊 Mareas</h3><div>${resumen}</div>${s}
-    <p class="aviso">Altura del mar en metros. Zona azul: horas de sol${iDia === 0 ? "; línea verde: ahora" : ""}. Previsión aproximada: para navegar, consulta la tabla oficial del puerto.</p>`;
+  const resumen = extremos.map(e => `<span class="etq" style="color:${e.tipo === "alta" ? "#2C7BC0" : "#C8423B"};font-weight:700">${e.tipo === "alta" ? t("pleamar") : t("bajamar")} ${hora(M.time[e.i])} · ${alt[e.i].toLocaleString(localeIdioma(), { minimumFractionDigits: 1, maximumFractionDigits: 1 })} m</span>`).join(" ");
+  caja.innerHTML = `<h3>${t("mareas")}</h3><div>${resumen}</div>${s}
+    <p class="aviso">${t("mareas_nota", { a: iDia === 0 ? t("linea_ahora") : "" })}</p>`;
 }
 
 function grafica(H, dia) {
@@ -787,9 +799,46 @@ function grafica(H, dia) {
     if (n % 3 === 0) s += `<text x="${pad + n * bw + bw / 2}" y="${Ht - 6}" font-size="10" text-anchor="middle" fill="var(--muted)">${H.time[i].slice(11, 13)}h</text>`;
   });
   s += `<polyline fill="none" stroke="var(--brand)" stroke-width="2" points="${idx.map((i, n) => `${pad + n * bw + bw / 2},${y(H.wind_gusts_10m[i])}`).join(" ")}"/>`;
-  s += `</svg><div class="aviso" style="margin-top:2px">Barras: viento medio · línea: rachas (${UNIDADES[unidad].c})</div>`;
+  s += `</svg><div class="aviso" style="margin-top:2px">${t("grafica", { u: UNIDADES[unidad].c })}</div>`;
   $("#grafica").innerHTML = s;
 }
+
+// ---------- Idioma: pantalla de elegir y textos fijos ----------
+function ponerTextosFijos() {
+  document.documentElement.lang = IDIOMA;
+  $("#appSub").textContent = t("app_sub");
+  $("#btnIdioma").textContent = "🌐 " + IDIOMA.toUpperCase();
+  $("#btnIdioma").title = t("idioma");
+  $("#btnSugerir").title = t("t_sug");
+  $("#btnSugerir .txt").textContent = " " + t("sugerencias");
+  $("#btnUnidad").title = t("t_unid");
+  $("#btnUnidad").textContent = UNIDADES[unidad].t;
+  $("#pie1").textContent = t("pie1");
+  $("#pie2").textContent = t("pie2");
+  $("#pieSugerir").textContent = t("pie3");
+  $("#pie4").textContent = t("pie4");
+}
+function elegirIdioma(primeraVez) {
+  if (document.querySelector(".fondo-idioma")) return;
+  const marcado = primeraVez ? idiomaNavegador() : IDIOMA;
+  const f = document.createElement("div");
+  f.className = "fondo fondo-idioma";
+  f.innerHTML = `<div class="caja elige-idioma">
+    <img src="logo.svg" alt="" width="72" height="72">
+    <h2>Canelo Wind</h2>
+    <p class="aviso">${IDIOMAS.map(i => TXT[i.c].elige).join(" · ")}</p>
+    <div class="idiomas">${IDIOMAS.map(i => `<button class="idioma ${i.c === marcado ? "on" : ""}" data-idioma="${i.c}"><span>${i.b}</span>${i.n}</button>`).join("")}</div>
+    ${primeraVez ? "" : `<button class="btn sec" id="cerrarIdioma" style="margin-top:12px">✕</button>`}
+  </div>`;
+  document.body.appendChild(f);
+  f.querySelectorAll("[data-idioma]").forEach(b => b.onclick = () => {
+    IDIOMA = b.dataset.idioma; guardar("idioma", IDIOMA);
+    f.remove(); ponerTextosFijos(); router();
+  });
+  const cerrar = f.querySelector("#cerrarIdioma");
+  if (cerrar) { cerrar.onclick = () => f.remove(); f.onclick = (e) => { if (e.target === f) f.remove(); }; }
+}
+$("#btnIdioma").onclick = () => elegirIdioma(false);
 
 // ---------- Navegación ----------
 function router() {
@@ -799,7 +848,8 @@ function router() {
 }
 window.addEventListener("hashchange", router);
 
-$("#btnUnidad").textContent = UNIDADES[unidad].t;
+ponerTextosFijos();
+if (!idiomaGuardado()) elegirIdioma(true);
 $("#btnUnidad").onclick = () => {
   const orden = ["kn", "kmh", "ms"]; unidad = orden[(orden.indexOf(unidad) + 1) % 3];
   guardar("unidad", unidad); $("#btnUnidad").textContent = UNIDADES[unidad].t;
