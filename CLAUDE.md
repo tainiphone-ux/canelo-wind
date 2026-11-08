@@ -13,6 +13,7 @@ Valentín no es programador: **háblale siempre en español, también en los men
 ## Archivos
 - `index.html` — la app entera (lista de spots, ficha con previsión, reportes, buzón, visor de enlaces).
 - `spots.js` — los spots (37: 20 de Canarias y 17 de península y Baleares). Para añadir uno, copiar un bloque. `buenos` = direcciones de viento buenas. Fuera de Canarias llevan `region` (comunidad) e `isla` = provincia o isla; la hora sale sola (Canarias o península, `tzDe`).
+- `consejos.js` — consejos y aviso de seguridad de cada spot (por id). Al añadir un spot, añadir también aquí sus consejos (y el aviso si hay corrientes, roca, off-shore, poca agua, puerto o zonas balizadas).
 - `config.js` — formularios de Google (reportes y sugerencias), ya conectados.
 - `herramientas/crear_formularios.gs` — el Apps Script que creó los formularios.
 - `logo.svg`, `icono-iphone.png`, `icono-512.png`, `manifest.json` — icono y «Añadir a pantalla de inicio».

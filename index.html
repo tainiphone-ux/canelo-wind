@@ -108,6 +108,12 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 .reporte .cab2 b { color: var(--text); }
 .fondo { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; z-index: 20; overflow-y: auto; }
 .fondo .caja { max-width: 520px; width: 100%; margin: 0; }
+/* Consejos y aviso de seguridad */
+.seguridad { margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: #FDE8E6; color: #8A1F17; border: 1px solid #F3B4AD; font-size: 14px; }
+.seguridad b { display: block; margin-bottom: 4px; font-size: 15px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .seguridad { background: #3A1714; color: #FFC9C2; border-color: #6B2A23; } }
+.consejos ul { margin: 0; padding-left: 20px; }
+.consejos li { margin-bottom: 6px; }
 /* Visor de webs dentro de la app */
 .visor { position: fixed; inset: 0; z-index: 30; background: var(--bg); display: flex; flex-direction: column; }
 .barra-visor { display: flex; gap: 8px; align-items: center; padding: 10px 12px; padding-top: max(10px, env(safe-area-inset-top));
@@ -131,6 +137,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 
 <script src="spots.js"></script>
 <script src="config.js"></script>
+<script src="consejos.js"></script>
 <script>
 // ---------- Utilidades ----------
 const $ = (s) => document.querySelector(s);
@@ -144,6 +151,7 @@ let filtroRegion = leer("region", "Todas"), filtroIsla = "Todas", filtroDeporte 
 const cache = {};
 // Región (Canarias, Andalucía…) y hora local de cada spot
 const regionDe = (s) => s.region || "Canarias";
+const consejosDe = (s) => (typeof CONSEJOS !== "undefined" && CONSEJOS[s.id]) || { consejos: [], seguridad: "" };
 const tzDe = (s) => s.tz || (regionDe(s) === "Canarias" ? "Atlantic/Canary" : "Europe/Madrid");
 
 const PUNTOS = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSO","SO","OSO","O","ONO","NO","NNO"];
@@ -298,6 +306,9 @@ function dibujarSpot(spot) {
     <button class="fav ${favoritos.includes(spot.id) ? "on" : ""}" id="favSpot" title="Favorito" style="font-size:28px">★</button>
   </div>
   <p style="margin:8px 0 0">${esc(spot.nota)}</p>
+  ${consejosDe(spot).seguridad ? `<div class="seguridad"><b>⚠️ Aviso de seguridad</b>${esc(consejosDe(spot).seguridad)}</div>` : ""}
+  ${consejosDe(spot).consejos.length ? `<div class="caja consejos"><h3>💡 Consejos</h3><ul>${consejosDe(spot).consejos.map(c => `<li>${esc(c)}</li>`).join("")}</ul>
+    <p class="aviso">Consejos orientativos. Si no conoces el spot, pregunta antes en las escuelas de la zona.</p></div>` : ""}
 
   <div class="caja"><h3>Ahora mismo <small style="color:var(--muted);font-weight:400">(previsión del modelo)</small></h3>
     <div class="ahora">
