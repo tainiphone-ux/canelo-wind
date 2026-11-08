@@ -26,7 +26,7 @@ const TXT = {
     app_sub: "Viento y olas para windsurf, kite y wing", sugerencias: "Sugerencias", t_sug: "Buzón de sugerencias", t_unid: "Cambiar unidades",
     nudos: "nudos", cargando: "Cargando…",
     pie1: "Previsión: Open-Meteo (modelos meteorológicos). Comprueba siempre el viento medido y el estado del mar antes de salir.",
-    pie2: "¿Falta un spot o algo no va bien?", pie3: "Escríbenos en el buzón de sugerencias", pie4: "📲 Instalar la app en el móvil",
+    pie2: "¿Falta un spot o algo no va bien?", pie3: "Escríbenos en el buzón de sugerencias", pie4: "📲 Instalar la app en el móvil", pie5: "ℹ️ Qué es Canelo Wind",
     buscar: "Buscar spot…", toda: "Toda España", todas: "Todas", todos: "Todos",
     rachas_min: "rachas", ahora_min: "ahora", favorito: "Favorito", favoritos: "★ Mis favoritos", sin_spots: "No hay spots con ese filtro.",
     aviso_lista: "Viento de ahora según el modelo de previsión ({u}). Para el viento medido, entra en el spot y mira «Anemómetros».",
@@ -91,7 +91,7 @@ const TXT = {
     app_sub: "Wind and waves for windsurf, kite and wing", sugerencias: "Suggestions", t_sug: "Suggestion box", t_unid: "Change units",
     nudos: "knots", cargando: "Loading…",
     pie1: "Forecast: Open-Meteo (weather models). Always check the measured wind and the sea before going out.",
-    pie2: "Missing a spot or something not working?", pie3: "Write to us in the suggestion box", pie4: "📲 Install the app on your phone",
+    pie2: "Missing a spot or something not working?", pie3: "Write to us in the suggestion box", pie4: "📲 Install the app on your phone", pie5: "ℹ️ About Canelo Wind",
     buscar: "Search spot…", toda: "All Spain", todas: "All", todos: "All",
     rachas_min: "gusts", ahora_min: "now", favorito: "Favourite", favoritos: "★ My favourites", sin_spots: "No spots match that filter.",
     aviso_lista: "Current wind from the forecast model ({u}). For measured wind, open the spot and check «Anemometers».",
@@ -156,7 +156,7 @@ const TXT = {
     app_sub: "Wind und Wellen für Windsurf, Kite und Wing", sugerencias: "Vorschläge", t_sug: "Vorschlagsbox", t_unid: "Einheiten ändern",
     nudos: "Knoten", cargando: "Wird geladen…",
     pie1: "Vorhersage: Open-Meteo (Wettermodelle). Prüfe vor dem Rausgehen immer den gemessenen Wind und das Meer.",
-    pie2: "Fehlt ein Spot oder funktioniert etwas nicht?", pie3: "Schreib uns in die Vorschlagsbox", pie4: "📲 App auf dem Handy installieren",
+    pie2: "Fehlt ein Spot oder funktioniert etwas nicht?", pie3: "Schreib uns in die Vorschlagsbox", pie4: "📲 App auf dem Handy installieren", pie5: "ℹ️ Was ist Canelo Wind",
     buscar: "Spot suchen…", toda: "Ganz Spanien", todas: "Alle", todos: "Alle",
     rachas_min: "Böen", ahora_min: "jetzt", favorito: "Favorit", favoritos: "★ Meine Favoriten", sin_spots: "Keine Spots mit diesem Filter.",
     aviso_lista: "Aktueller Wind laut Vorhersagemodell ({u}). Für gemessenen Wind öffne den Spot und schau unter «Windmesser».",
@@ -221,7 +221,7 @@ const TXT = {
     app_sub: "Vent et vagues pour windsurf, kite et wing", sugerencias: "Suggestions", t_sug: "Boîte à suggestions", t_unid: "Changer d'unités",
     nudos: "nœuds", cargando: "Chargement…",
     pie1: "Prévisions : Open-Meteo (modèles météo). Vérifie toujours le vent mesuré et l'état de la mer avant de sortir.",
-    pie2: "Il manque un spot ou quelque chose ne marche pas ?", pie3: "Écris-nous dans la boîte à suggestions", pie4: "📲 Installer l'appli sur ton mobile",
+    pie2: "Il manque un spot ou quelque chose ne marche pas ?", pie3: "Écris-nous dans la boîte à suggestions", pie4: "📲 Installer l'appli sur ton mobile", pie5: "ℹ️ Qu'est-ce que Canelo Wind",
     buscar: "Chercher un spot…", toda: "Toute l'Espagne", todas: "Toutes", todos: "Tous",
     rachas_min: "rafales", ahora_min: "maintenant", favorito: "Favori", favoritos: "★ Mes favoris", sin_spots: "Aucun spot avec ce filtre.",
     aviso_lista: "Vent actuel selon le modèle de prévision ({u}). Pour le vent mesuré, ouvre le spot et regarde «Anémomètres».",
@@ -286,7 +286,7 @@ const TXT = {
     app_sub: "Vento e onde per windsurf, kite e wing", sugerencias: "Suggerimenti", t_sug: "Cassetta dei suggerimenti", t_unid: "Cambia unità",
     nudos: "nodi", cargando: "Caricamento…",
     pie1: "Previsioni: Open-Meteo (modelli meteo). Controlla sempre il vento misurato e lo stato del mare prima di uscire.",
-    pie2: "Manca uno spot o qualcosa non funziona?", pie3: "Scrivici nella cassetta dei suggerimenti", pie4: "📲 Installa l'app sul telefono",
+    pie2: "Manca uno spot o qualcosa non funziona?", pie3: "Scrivici nella cassetta dei suggerimenti", pie4: "📲 Installa l'app sul telefono", pie5: "ℹ️ Cos'è Canelo Wind",
     buscar: "Cerca spot…", toda: "Tutta la Spagna", todas: "Tutte", todos: "Tutti",
     rachas_min: "raffiche", ahora_min: "ora", favorito: "Preferito", favoritos: "★ I miei preferiti", sin_spots: "Nessuno spot con questo filtro.",
     aviso_lista: "Vento attuale secondo il modello di previsione ({u}). Per il vento misurato, apri lo spot e guarda «Anemometri».",
@@ -348,7 +348,9 @@ const TXT = {
 
 // ---------- Uso ----------
 const idiomaGuardado = () => { try { const v = localStorage.getItem("cw_idioma"); return v ? JSON.parse(v) : null; } catch (e) { return null; } };
-let IDIOMA = idiomaGuardado() || "es";
+// ?lang=en en la dirección fuerza el idioma sin preguntar (lo usa la landing page)
+const IDIOMA_URL = (() => { try { const l = new URLSearchParams(location.search).get("lang"); return IDIOMAS.some(i => i.c === l) ? l : null; } catch (e) { return null; } })();
+let IDIOMA = IDIOMA_URL || idiomaGuardado() || "es";
 // t("clave", { u: "kn" }) → texto en el idioma elegido (si falta, en español)
 function t(k, vars) {
   let s = (TXT[IDIOMA] && TXT[IDIOMA][k]) ?? TXT.es[k] ?? k;

@@ -152,7 +152,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 <main id="app"><div class="cargando">Cargando…</div></main>
 <footer><span id="pie1"></span><br>
   <span id="pie2"></span> <a href="#" id="pieSugerir"></a>.<br>
-  <a href="instalar.html" id="pie4"></a></footer>
+  <a href="instalar.html" id="pie4"></a> · <a href="landing.html" id="pie5"></a></footer>
 
 <script src="idiomas.js"></script>
 <script src="spots.js"></script>
@@ -817,6 +817,7 @@ function ponerTextosFijos() {
   $("#pie2").textContent = t("pie2");
   $("#pieSugerir").textContent = t("pie3");
   $("#pie4").textContent = t("pie4");
+  $("#pie5").textContent = t("pie5");
 }
 function elegirIdioma(primeraVez) {
   if (document.querySelector(".fondo-idioma")) return;
@@ -849,7 +850,7 @@ function router() {
 window.addEventListener("hashchange", router);
 
 ponerTextosFijos();
-if (!idiomaGuardado()) elegirIdioma(true);
+if (!idiomaGuardado() && !IDIOMA_URL) elegirIdioma(true);
 $("#btnUnidad").onclick = () => {
   const orden = ["kn", "kmh", "ms"]; unidad = orden[(orden.indexOf(unidad) + 1) % 3];
   guardar("unidad", unidad); $("#btnUnidad").textContent = UNIDADES[unidad].t;

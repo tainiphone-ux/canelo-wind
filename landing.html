@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Canelo Wind · Viento, olas y mareas para windsurf, kite y wing</title>
+<meta name="description" content="Previsión de viento, rachas, olas y mareas hora a hora para los spots de windsurf, kitesurf y wing foil de España. Gratis y en 5 idiomas.">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icono-iphone.png">
+<meta name="theme-color" content="#9A4416">
+<meta property="og:title" content="Canelo Wind">
+<meta property="og:description" content="Viento, olas y mareas de tu spot, en un vistazo. Windsurf, kite y wing foil.">
+<meta property="og:image" content="https://tainiphone-ux.github.io/canelo-wind/icono-512.png">
+<style>
+:root {
+  --bg: #F6F1EA; --bg2: #EFE6DA; --card: #FFFFFF; --text: #2A1E16; --muted: #7A6A5E; --line: #E7DDD1;
+  --brand: #B85A22; --brand-a: #E08A3C; --brand-b: #9A4416; --chip: #EFE4D7;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17120E; --bg2: #1E1712; --card: #231B15; --text: #F4EAE0; --muted: #B2A193; --line: #3A2E25;
+    --brand: #E08A3C; --chip: #33281F;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+a { color: var(--brand); }
+.envoltura { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+/* Barra de arriba */
+nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+nav .envoltura { display: flex; align-items: center; gap: 10px; height: 60px; }
+nav .marca { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-weight: 800; font-size: 19px; }
+nav .marca img { width: 34px; height: 34px; border-radius: 9px; }
+nav .der { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.idiomas-nav { position: relative; }
+.idiomas-nav button { border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 10px; padding: 6px 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.menu-idiomas { position: absolute; right: 0; top: 40px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 6px; box-shadow: 0 10px 30px rgba(0,0,0,.15); display: none; min-width: 150px; }
+.menu-idiomas.abierto { display: block; }
+.menu-idiomas button { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 8px 10px; border-radius: 8px; font-size: 15px; }
+.menu-idiomas button:hover, .menu-idiomas button.on { background: var(--chip); }
+.boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; font-weight: 800; border-radius: 14px; padding: 14px 22px; font-size: 17px; cursor: pointer; border: 0; }
+.boton.prin { background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); color: #fff; box-shadow: 0 8px 22px rgba(154,68,22,.3); }
+.boton.sec { background: var(--card); color: var(--text); border: 1px solid var(--line); }
+.boton.peq { padding: 8px 14px; font-size: 14px; border-radius: 10px; }
+
+/* Portada */
+.portada { padding: 56px 0 40px; overflow: hidden; }
+.portada .envoltura { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
+.etiqueta { display: inline-block; background: var(--chip); color: var(--brand); font-weight: 800; font-size: 13px; letter-spacing: .5px; text-transform: uppercase; padding: 6px 12px; border-radius: 999px; }
+h1 { font-size: clamp(36px, 6vw, 60px); line-height: 1.05; margin: 16px 0 14px; letter-spacing: -1px; }
+h1 span { background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.portada p.lema { font-size: 20px; color: var(--muted); margin: 0 0 26px; max-width: 34em; }
+.botones { display: flex; gap: 10px; flex-wrap: wrap; }
+.sellos { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 22px; color: var(--muted); font-size: 15px; font-weight: 600; }
+
+/* Móvil con la app dentro */
+.movil-caja { display: flex; justify-content: center; position: relative; }
+.movil-caja::before { content: ""; position: absolute; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(224,138,60,.35), transparent 65%); top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.movil { position: relative; width: 300px; height: 610px; border-radius: 46px; background: #111; padding: 12px; box-shadow: 0 30px 60px rgba(0,0,0,.3), inset 0 0 0 2px #333; }
+.movil::before { content: ""; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 90px; height: 24px; background: #111; border-radius: 14px; z-index: 2; }
+.movil iframe { width: 100%; height: 100%; border: 0; border-radius: 36px; background: var(--bg); }
+.movil-nota { text-align: center; color: var(--muted); font-size: 13px; margin-top: 10px; }
+
+/* Cifras */
+.cifras { background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); color: #fff; padding: 26px 0; }
+.cifras .envoltura { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center; }
+.cifra b { display: block; font-size: 36px; line-height: 1.1; }
+.cifra span { opacity: .9; font-size: 15px; }
+
+/* Secciones */
+section.bloque { padding: 70px 0; }
+section.bloque.alt { background: var(--bg2); }
+h2 { font-size: clamp(28px, 4vw, 40px); line-height: 1.15; margin: 0 0 10px; letter-spacing: -.5px; }
+.intro { color: var(--muted); font-size: 18px; margin: 0 0 34px; max-width: 40em; }
+.rejilla { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.tarjeta { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 24px; }
+.tarjeta .ico { font-size: 34px; }
+.tarjeta h3 { margin: 10px 0 6px; font-size: 19px; }
+.tarjeta p { margin: 0; color: var(--muted); font-size: 16px; }
+
+/* La nota */
+.notas { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 18px; }
+.notas span { color: #fff; font-weight: 800; border-radius: 10px; padding: 8px 14px; font-size: 16px; }
+.dos { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: center; }
+.aviso-ej { border-radius: 16px; padding: 16px 18px; font-size: 15px; margin-bottom: 12px; }
+.aviso-ej.seg { background: #FDE8E6; color: #8A1F17; border: 1px solid #F3B4AD; }
+.aviso-ej.dia { background: #FFF4D6; color: #6B4A00; border: 1px solid #F2D58A; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .aviso-ej.seg { background: #3A1714; color: #FFC9C2; border-color: #6B2A23; }
+  :root:not([data-theme="light"]) .aviso-ej.dia { background: #3A2E10; color: #FFE1A0; border-color: #6B5520; } }
+.aviso-ej b { display: block; margin-bottom: 4px; }
+
+/* Spots */
+.regiones { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.region { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
+.region b { display: flex; justify-content: space-between; align-items: baseline; font-size: 17px; }
+.region b em { font-style: normal; color: var(--brand); font-size: 22px; }
+.region div { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+/* Instalar */
+.pasos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: paso; margin-bottom: 26px; }
+.paso { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 22px; counter-increment: paso; }
+.paso::before { content: counter(paso); display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); color: #fff; font-weight: 800; margin-bottom: 10px; }
+.paso h3 { margin: 0 0 4px; font-size: 18px; }
+.paso p { margin: 0; color: var(--muted); font-size: 15px; }
+
+/* Dedicatoria */
+.dedicatoria { text-align: center; max-width: 720px; margin: 0 auto; }
+.dedicatoria .grande { font-size: 56px; }
+.dedicatoria p { font-size: 19px; color: var(--muted); }
+.dedicatoria blockquote { margin: 18px 0 0; font-size: 22px; font-weight: 700; color: var(--text); }
+
+/* Final */
+.final { text-align: center; background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); color: #fff; border-radius: 28px; padding: 48px 24px; margin: 0 0 60px; }
+.final h2 { color: #fff; }
+.final p { opacity: .92; font-size: 18px; margin: 0 0 24px; }
+.final .boton.prin { background: #fff; color: var(--brand-b); }
+.final .boton.sec { background: rgba(255,255,255,.15); color: #fff; border-color: rgba(255,255,255,.4); }
+footer { border-top: 1px solid var(--line); padding: 26px 0 40px; color: var(--muted); font-size: 14px; text-align: center; }
+footer a { color: var(--muted); }
+
+/* Móvil y tableta */
+@media (max-width: 900px) {
+  .portada .envoltura, .dos { grid-template-columns: 1fr; }
+  .portada { padding-top: 34px; }
+  .rejilla, .pasos { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .envoltura { padding: 0 16px; }
+  .rejilla, .pasos { grid-template-columns: 1fr; }
+  .cifras .envoltura { grid-template-columns: 1fr 1fr; row-gap: 18px; }
+  section.bloque { padding: 50px 0; }
+  .portada p.lema { font-size: 18px; }
+  nav .boton.peq { display: none; }
+  .movil { width: 270px; height: 550px; }
+  .movil-caja::before { width: 320px; height: 320px; }
+  .botones .boton { flex: 1 1 100%; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="envoltura">
+    <a class="marca" href="#"><img src="logo.svg" alt="">Canelo Wind</a>
+    <div class="der">
+      <div class="idiomas-nav">
+        <button id="btnIdioma" aria-haspopup="true">🌐 ES</button>
+        <div class="menu-idiomas" id="menuIdiomas"></div>
+      </div>
+      <a class="boton prin peq" href="./" data-t="abrir_corto">Abrir la app</a>
+    </div>
+  </div>
+</nav>
+
+<header class="portada">
+  <div class="envoltura">
+    <div>
+      <span class="etiqueta" data-t="etiqueta">Windsurf · Kitesurf · Wing foil</span>
+      <h1 data-t="titulo">El viento de tu spot, <span>en un vistazo</span></h1>
+      <p class="lema" data-t="lema"></p>
+      <div class="botones">
+        <a class="boton prin" href="./" data-t="abrir">🪁 Abrir Canelo Wind</a>
+        <a class="boton sec" href="instalar.html" data-t="instalar">📲 Instalar en el móvil</a>
+      </div>
+      <div class="sellos" data-t="sellos"></div>
+    </div>
+    <div>
+      <div class="movil-caja"><div class="movil"><iframe id="appDemo" title="Canelo Wind" loading="lazy"></iframe></div></div>
+      <div class="movil-nota" data-t="demo_nota">La app de verdad, funcionando: tócala.</div>
+    </div>
+  </div>
+</header>
+
+<div class="cifras">
+  <div class="envoltura">
+    <div class="cifra"><b id="nSpots">37</b><span data-t="c_spots">spots en España</span></div>
+    <div class="cifra"><b id="nRegiones">9</b><span data-t="c_regiones">regiones</span></div>
+    <div class="cifra"><b>7</b><span data-t="c_dias">días de previsión hora a hora</span></div>
+    <div class="cifra"><b>5</b><span data-t="c_idiomas">idiomas</span></div>
+  </div>
+</div>
+
+<section class="bloque">
+  <div class="envoltura">
+    <h2 data-t="f_tit">Todo lo que miras antes de salir al agua</h2>
+    <p class="intro" data-t="f_intro"></p>
+    <div class="rejilla" id="funciones"></div>
+  </div>
+</section>
+
+<section class="bloque alt">
+  <div class="envoltura dos">
+    <div>
+      <h2 data-t="n_tit">¿Merece la pena ir hoy?</h2>
+      <p class="intro" data-t="n_intro"></p>
+      <div class="notas" id="notas"></div>
+      <p data-t="n_extra" style="color:var(--muted)"></p>
+    </div>
+    <div>
+      <div class="aviso-ej seg"><b data-t="ej_seg_tit"></b><span data-t="ej_seg"></span></div>
+      <div class="aviso-ej dia"><b data-t="ej_dia_tit"></b><span data-t="ej_dia"></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="bloque">
+  <div class="envoltura">
+    <h2 data-t="s_tit">Los spots</h2>
+    <p class="intro" data-t="s_intro"></p>
+    <div class="regiones" id="regiones"></div>
+  </div>
+</section>
+
+<section class="bloque alt" id="instalar">
+  <div class="envoltura">
+    <h2 data-t="i_tit">Tenla en tu móvil en un minuto</h2>
+    <p class="intro" data-t="i_intro"></p>
+    <div class="pasos">
+      <div class="paso"><h3 data-t="i1_t"></h3><p data-t="i1"></p></div>
+      <div class="paso"><h3 data-t="i2_t"></h3><p data-t="i2"></p></div>
+      <div class="paso"><h3 data-t="i3_t"></h3><p data-t="i3"></p></div>
+    </div>
+    <a class="boton sec" href="instalar.html" data-t="i_mas">Ver las instrucciones paso a paso →</a>
+  </div>
+</section>
+
+<section class="bloque">
+  <div class="envoltura dedicatoria">
+    <div class="grande">🤙</div>
+    <h2 data-t="d_tit">Hecha para Miki «el Canelo»</h2>
+    <p data-t="d_txt"></p>
+    <blockquote data-t="d_frase"></blockquote>
+  </div>
+</section>
+
+<div class="envoltura">
+  <div class="final">
+    <h2 data-t="fin_tit">¿Hay viento hoy?</h2>
+    <p data-t="fin_txt">Ábrela y lo sabrás en dos segundos.</p>
+    <div class="botones" style="justify-content:center">
+      <a class="boton prin" href="./" data-t="abrir">🪁 Abrir Canelo Wind</a>
+      <a class="boton sec" href="instalar.html" data-t="instalar">📲 Instalar en el móvil</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="envoltura">
+    <div data-t="pie"></div>
+    <div style="margin-top:6px"><a href="./">Canelo Wind</a> · <a href="instalar.html" data-t="pie_inst">Instalar</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></div>
+  </div>
+</footer>
+
+<script src="idiomas.js"></script>
+<script src="spots.js"></script>
+<script>
+// Textos de la landing en los 5 idiomas de la app
+const L = {
+  es: {
+    abrir_corto: "Abrir la app", etiqueta: "Windsurf · Kitesurf · Wing foil",
+    titulo: "El viento de tu spot, <span>en un vistazo</span>",
+    lema: "Viento, rachas, olas y mareas hora a hora para los mejores spots de España. Con una nota que te dice si merece la pena ir y avisos de seguridad de cada sitio.",
+    abrir: "🪁 Abrir Canelo Wind", instalar: "📲 Instalar en el móvil",
+    sellos: "<span>✓ Gratis</span><span>✓ Sin registro</span><span>✓ iPhone y Android</span>",
+    demo_nota: "La app de verdad, funcionando: tócala.",
+    c_spots: "spots en España", c_regiones: "regiones", c_dias: "días de previsión hora a hora", c_idiomas: "idiomas",
+    f_tit: "Todo lo que miras antes de salir al agua", f_intro: "En una sola app, sin saltar de web en web.",
+    funciones: [
+      ["🌬️", "Viento hora a hora", "Viento, rachas y dirección para los próximos 7 días, con colores para verlo de un vistazo."],
+      ["🌊", "Olas y mareas", "Altura, periodo y mar de fondo, y la curva de la marea con la pleamar, la bajamar y las horas de sol."],
+      ["✅", "Nota de cada hora", "De «muy malo» a «muy bueno», según el viento, la dirección que le va a ese spot, las rachas y las olas."],
+      ["⚠️", "Avisos y consejos", "Aviso de seguridad de cada spot y avisos que cambian con la previsión: rachas, off-shore, tormentas, marea baja…"],
+      ["📡", "Anemómetros y webcams", "Viento medido ahora y cámaras en directo de cada zona, con Windy y Windguru a un toque."],
+      ["👥", "Reportes de la gente", "Los que están en el agua cuentan cómo está de verdad. Así la app aprende a acertar más."],
+    ],
+    n_tit: "¿Merece la pena ir hoy?", n_intro: "Cada hora de cada spot lleva una nota calculada con la previsión:",
+    n_extra: "Tiene en cuenta si el viento es flojo o excesivo, si la dirección le va a ese spot, si es racheado, si hay mucha ola para su nivel o tormenta. Los spots de expertos aguantan más viento antes de bajar la nota.",
+    ej_seg_tit: "⚠️ Aviso de seguridad (Sotavento)", ej_seg: "Con la marea bajando la laguna se vacía rápido: puedes quedarte sin agua y golpear el fondo con la quilla o el foil.",
+    ej_dia_tit: "⚠️ Avisos según la previsión del día", ej_dia: "💨 Rachas de hasta 33 nudos (7–15 h): solo para gente con experiencia. · 🏖️ Bajamar a las 18:00: mejor salir cerca de la pleamar (12:00).",
+    s_tit: "Los spots", s_intro: "De El Médano a Tarifa, del Mar Menor al Empordà. Y vamos a por más: Europa y el mundo.",
+    i_tit: "Tenla en tu móvil en un minuto", i_intro: "No hace falta App Store ni Google Play: se instala desde el navegador y se actualiza sola.",
+    i1_t: "Abre el enlace", i1: "En Safari (iPhone) o Chrome (Android).", i2_t: "Compartir o menú ⋮", i2: "Pulsa el botón de compartir ⬆️ o los tres puntos.",
+    i3_t: "Añadir a pantalla de inicio", i3: "Y ya tienes el icono de Canelo Wind como una app más.",
+    i_mas: "Ver las instrucciones paso a paso →",
+    d_tit: "Hecha para Miki «el Canelo»", d_txt: "Canelo Wind nació pensando en un amigo que vive mirando el viento. Por eso el color canela del logo, la ola y el ala de wing.",
+    d_frase: "«Mira el viento, elige el spot y al agua.»",
+    fin_tit: "¿Hay viento hoy?", fin_txt: "Ábrela y lo sabrás en dos segundos.",
+    pie: "Previsión de Open-Meteo (modelos meteorológicos). Comprueba siempre el viento medido y el estado del mar antes de salir.", pie_inst: "Instalar",
+  },
+  en: {
+    abrir_corto: "Open the app", etiqueta: "Windsurf · Kitesurf · Wing foil",
+    titulo: "Your spot's wind, <span>at a glance</span>",
+    lema: "Hour-by-hour wind, gusts, waves and tides for the best spots in Spain. With a rating that tells you if it's worth going and safety warnings for each spot.",
+    abrir: "🪁 Open Canelo Wind", instalar: "📲 Install on your phone",
+    sellos: "<span>✓ Free</span><span>✓ No sign-up</span><span>✓ iPhone and Android</span>",
+    demo_nota: "The real app, working: try it.",
+    c_spots: "spots in Spain", c_regiones: "regions", c_dias: "days of hourly forecast", c_idiomas: "languages",
+    f_tit: "Everything you check before hitting the water", f_intro: "In one app, without jumping from site to site.",
+    funciones: [
+      ["🌬️", "Hourly wind", "Wind, gusts and direction for the next 7 days, colour-coded so you see it at a glance."],
+      ["🌊", "Waves and tides", "Height, period and swell, plus the tide curve with high tide, low tide and daylight hours."],
+      ["✅", "A rating for every hour", "From «very bad» to «very good», based on the wind, the right direction for that spot, gusts and waves."],
+      ["⚠️", "Warnings and tips", "A safety warning for each spot and warnings that change with the forecast: gusts, offshore wind, storms, low tide…"],
+      ["📡", "Anemometers and webcams", "Wind measured right now and live cams for each area, with Windy and Windguru one tap away."],
+      ["👥", "Reports from riders", "People on the water say how it really is. That way the app learns to be more accurate."],
+    ],
+    n_tit: "Is it worth going today?", n_intro: "Every hour at every spot gets a rating calculated from the forecast:",
+    n_extra: "It considers whether the wind is too light or too strong, whether the direction suits that spot, whether it's gusty, whether there are too many waves for its level or a storm. Expert spots take more wind before the rating drops.",
+    ej_seg_tit: "⚠️ Safety warning (Sotavento)", ej_seg: "As the tide drops the lagoon empties fast: you can run out of water and hit the bottom with your fin or foil.",
+    ej_dia_tit: "⚠️ Warnings from the day's forecast", ej_dia: "💨 Gusts up to 33 knots (7–15 h): only for experienced riders. · 🏖️ Low tide at 18:00: better to go out near high tide (12:00).",
+    s_tit: "The spots", s_intro: "From El Médano to Tarifa, from the Mar Menor to the Empordà. And more to come: Europe and the world.",
+    i_tit: "On your phone in one minute", i_intro: "No App Store or Google Play needed: it installs from the browser and updates itself.",
+    i1_t: "Open the link", i1: "In Safari (iPhone) or Chrome (Android).", i2_t: "Share or menu ⋮", i2: "Tap the share button ⬆️ or the three dots.",
+    i3_t: "Add to Home Screen", i3: "And you have the Canelo Wind icon like any other app.",
+    i_mas: "See the step-by-step instructions →",
+    d_tit: "Made for Miki «el Canelo»", d_txt: "Canelo Wind was born thinking of a friend who lives watching the wind. That's why the logo is cinnamon-coloured (canela), with a wave and a wing.",
+    d_frase: "«Check the wind, pick the spot, hit the water.»",
+    fin_tit: "Is there wind today?", fin_txt: "Open it and you'll know in two seconds.",
+    pie: "Forecast by Open-Meteo (weather models). Always check the measured wind and the sea before going out.", pie_inst: "Install",
+  },
+  de: {
+    abrir_corto: "App öffnen", etiqueta: "Windsurf · Kitesurf · Wingfoil",
+    titulo: "Der Wind an deinem Spot, <span>auf einen Blick</span>",
+    lema: "Wind, Böen, Wellen und Gezeiten Stunde für Stunde für die besten Spots Spaniens. Mit einer Bewertung, die dir sagt, ob es sich lohnt, und Sicherheitshinweisen für jeden Spot.",
+    abrir: "🪁 Canelo Wind öffnen", instalar: "📲 Auf dem Handy installieren",
+    sellos: "<span>✓ Kostenlos</span><span>✓ Ohne Anmeldung</span><span>✓ iPhone und Android</span>",
+    demo_nota: "Die echte App, live: probier sie aus.",
+    c_spots: "Spots in Spanien", c_regiones: "Regionen", c_dias: "Tage Vorhersage pro Stunde", c_idiomas: "Sprachen",
+    f_tit: "Alles, was du vor dem Rausgehen checkst", f_intro: "In einer App, ohne von Seite zu Seite zu springen.",
+    funciones: [
+      ["🌬️", "Wind pro Stunde", "Wind, Böen und Richtung für die nächsten 7 Tage, farbig, damit du es auf einen Blick siehst."],
+      ["🌊", "Wellen und Gezeiten", "Höhe, Periode und Dünung, dazu die Gezeitenkurve mit Hoch- und Niedrigwasser und Tageslicht."],
+      ["✅", "Bewertung jeder Stunde", "Von «sehr schlecht» bis «sehr gut», je nach Wind, passender Richtung für den Spot, Böen und Wellen."],
+      ["⚠️", "Hinweise und Tipps", "Sicherheitshinweis für jeden Spot und Hinweise, die sich mit der Vorhersage ändern: Böen, ablandiger Wind, Gewitter, Niedrigwasser…"],
+      ["📡", "Windmesser und Webcams", "Aktuell gemessener Wind und Live-Kameras jeder Gegend, mit Windy und Windguru einen Tipp entfernt."],
+      ["👥", "Berichte der Leute", "Wer auf dem Wasser ist, sagt, wie es wirklich ist. So lernt die App, genauer zu werden."],
+    ],
+    n_tit: "Lohnt es sich heute?", n_intro: "Jede Stunde an jedem Spot bekommt eine Bewertung aus der Vorhersage:",
+    n_extra: "Sie berücksichtigt, ob der Wind zu schwach oder zu stark ist, ob die Richtung zum Spot passt, ob er böig ist, ob es zu viele Wellen für das Niveau gibt oder ein Gewitter. Expertenspots vertragen mehr Wind, bevor die Bewertung sinkt.",
+    ej_seg_tit: "⚠️ Sicherheitshinweis (Sotavento)", ej_seg: "Bei fallendem Wasser leert sich die Lagune schnell: du kannst auf dem Trockenen landen und mit Finne oder Foil aufsetzen.",
+    ej_dia_tit: "⚠️ Hinweise laut Tagesvorhersage", ej_dia: "💨 Böen bis 33 Knoten (7–15 h): nur für Erfahrene. · 🏖️ Niedrigwasser um 18:00: besser rund um Hochwasser rausgehen (12:00).",
+    s_tit: "Die Spots", s_intro: "Von El Médano bis Tarifa, vom Mar Menor bis zum Empordà. Und es kommen mehr: Europa und die Welt.",
+    i_tit: "In einer Minute auf deinem Handy", i_intro: "Kein App Store oder Google Play nötig: sie wird aus dem Browser installiert und aktualisiert sich selbst.",
+    i1_t: "Link öffnen", i1: "In Safari (iPhone) oder Chrome (Android).", i2_t: "Teilen oder Menü ⋮", i2: "Tippe auf Teilen ⬆️ oder auf die drei Punkte.",
+    i3_t: "Zum Home-Bildschirm", i3: "Und schon hast du das Canelo-Wind-Symbol wie jede andere App.",
+    i_mas: "Schritt-für-Schritt-Anleitung ansehen →",
+    d_tit: "Gemacht für Miki «el Canelo»", d_txt: "Canelo Wind entstand für einen Freund, der ständig den Wind beobachtet. Deshalb das zimtfarbene Logo (canela) mit Welle und Wing.",
+    d_frase: "«Wind checken, Spot wählen, ab ins Wasser.»",
+    fin_tit: "Gibt es heute Wind?", fin_txt: "Öffne sie und du weißt es in zwei Sekunden.",
+    pie: "Vorhersage von Open-Meteo (Wettermodelle). Prüfe vor dem Rausgehen immer den gemessenen Wind und das Meer.", pie_inst: "Installieren",
+  },
+  fr: {
+    abrir_corto: "Ouvrir l'appli", etiqueta: "Windsurf · Kitesurf · Wingfoil",
+    titulo: "Le vent de ton spot, <span>en un coup d'œil</span>",
+    lema: "Vent, rafales, vagues et marées heure par heure pour les meilleurs spots d'Espagne. Avec une note qui te dit si ça vaut le coup d'y aller et des avertissements de sécurité pour chaque spot.",
+    abrir: "🪁 Ouvrir Canelo Wind", instalar: "📲 Installer sur ton mobile",
+    sellos: "<span>✓ Gratuit</span><span>✓ Sans inscription</span><span>✓ iPhone et Android</span>",
+    demo_nota: "La vraie appli, en direct : essaie-la.",
+    c_spots: "spots en Espagne", c_regiones: "régions", c_dias: "jours de prévisions heure par heure", c_idiomas: "langues",
+    f_tit: "Tout ce que tu regardes avant d'aller sur l'eau", f_intro: "Dans une seule appli, sans sauter de site en site.",
+    funciones: [
+      ["🌬️", "Vent heure par heure", "Vent, rafales et direction pour les 7 prochains jours, en couleurs pour tout voir d'un coup d'œil."],
+      ["🌊", "Vagues et marées", "Hauteur, période et houle, plus la courbe de marée avec la marée haute, la marée basse et les heures de jour."],
+      ["✅", "Une note pour chaque heure", "De «très mauvais» à «très bon», selon le vent, la bonne direction pour ce spot, les rafales et les vagues."],
+      ["⚠️", "Avertissements et conseils", "Avertissement de sécurité pour chaque spot et alertes qui changent avec les prévisions : rafales, offshore, orages, marée basse…"],
+      ["📡", "Anémomètres et webcams", "Vent mesuré en ce moment et caméras en direct de chaque zone, avec Windy et Windguru en un geste."],
+      ["👥", "Rapports des riders", "Ceux qui sont sur l'eau racontent comment c'est vraiment. Ainsi l'appli apprend à être plus juste."],
+    ],
+    n_tit: "Ça vaut le coup d'y aller aujourd'hui ?", n_intro: "Chaque heure de chaque spot reçoit une note calculée à partir des prévisions :",
+    n_extra: "Elle tient compte d'un vent trop faible ou trop fort, de la direction qui convient au spot, des rafales, de trop de vagues pour son niveau ou d'un orage. Les spots pour experts supportent plus de vent avant que la note baisse.",
+    ej_seg_tit: "⚠️ Avertissement de sécurité (Sotavento)", ej_seg: "Quand la marée descend, la lagune se vide vite : tu peux te retrouver sans eau et taper le fond avec l'aileron ou le foil.",
+    ej_dia_tit: "⚠️ Alertes selon les prévisions du jour", ej_dia: "💨 Rafales jusqu'à 33 nœuds (7–15 h) : réservé aux riders expérimentés. · 🏖️ Marée basse à 18:00 : mieux vaut sortir autour de la marée haute (12:00).",
+    s_tit: "Les spots", s_intro: "D'El Médano à Tarifa, de la Mar Menor à l'Empordà. Et d'autres arrivent : l'Europe et le monde.",
+    i_tit: "Sur ton mobile en une minute", i_intro: "Pas besoin d'App Store ni de Google Play : elle s'installe depuis le navigateur et se met à jour toute seule.",
+    i1_t: "Ouvre le lien", i1: "Dans Safari (iPhone) ou Chrome (Android).", i2_t: "Partager ou menu ⋮", i2: "Touche le bouton de partage ⬆️ ou les trois points.",
+    i3_t: "Sur l'écran d'accueil", i3: "Et tu as l'icône de Canelo Wind comme n'importe quelle appli.",
+    i_mas: "Voir les instructions pas à pas →",
+    d_tit: "Faite pour Miki «el Canelo»", d_txt: "Canelo Wind est née en pensant à un ami qui passe sa vie à regarder le vent. D'où le logo couleur cannelle (canela), avec une vague et une aile de wing.",
+    d_frase: "«Regarde le vent, choisis le spot, et à l'eau.»",
+    fin_tit: "Y a-t-il du vent aujourd'hui ?", fin_txt: "Ouvre-la et tu le sauras en deux secondes.",
+    pie: "Prévisions Open-Meteo (modèles météo). Vérifie toujours le vent mesuré et l'état de la mer avant de sortir.", pie_inst: "Installer",
+  },
+  it: {
+    abrir_corto: "Apri l'app", etiqueta: "Windsurf · Kitesurf · Wing foil",
+    titulo: "Il vento del tuo spot, <span>a colpo d'occhio</span>",
+    lema: "Vento, raffiche, onde e maree ora per ora per i migliori spot della Spagna. Con un voto che ti dice se vale la pena andare e avvisi di sicurezza per ogni spot.",
+    abrir: "🪁 Apri Canelo Wind", instalar: "📲 Installa sul telefono",
+    sellos: "<span>✓ Gratis</span><span>✓ Senza registrazione</span><span>✓ iPhone e Android</span>",
+    demo_nota: "L'app vera, funzionante: provala.",
+    c_spots: "spot in Spagna", c_regiones: "regioni", c_dias: "giorni di previsioni ora per ora", c_idiomas: "lingue",
+    f_tit: "Tutto quello che guardi prima di entrare in acqua", f_intro: "In un'unica app, senza saltare da un sito all'altro.",
+    funciones: [
+      ["🌬️", "Vento ora per ora", "Vento, raffiche e direzione per i prossimi 7 giorni, a colori per capirlo a colpo d'occhio."],
+      ["🌊", "Onde e maree", "Altezza, periodo e mare lungo, più la curva della marea con alta e bassa marea e le ore di luce."],
+      ["✅", "Un voto per ogni ora", "Da «pessimo» a «ottimo», in base al vento, alla direzione giusta per quello spot, alle raffiche e alle onde."],
+      ["⚠️", "Avvisi e consigli", "Avviso di sicurezza per ogni spot e avvisi che cambiano con le previsioni: raffiche, offshore, temporali, bassa marea…"],
+      ["📡", "Anemometri e webcam", "Vento misurato in questo momento e webcam in diretta di ogni zona, con Windy e Windguru a portata di tocco."],
+      ["👥", "Segnalazioni della gente", "Chi è in acqua racconta com'è davvero. Così l'app impara a essere più precisa."],
+    ],
+    n_tit: "Vale la pena andare oggi?", n_intro: "Ogni ora di ogni spot ha un voto calcolato dalle previsioni:",
+    n_extra: "Tiene conto se il vento è troppo debole o troppo forte, se la direzione va bene per quello spot, se è rafficato, se ci sono troppe onde per il suo livello o un temporale. Gli spot per esperti reggono più vento prima che il voto scenda.",
+    ej_seg_tit: "⚠️ Avviso di sicurezza (Sotavento)", ej_seg: "Con la marea che scende la laguna si svuota in fretta: puoi restare senz'acqua e toccare il fondo con la pinna o il foil.",
+    ej_dia_tit: "⚠️ Avvisi secondo le previsioni del giorno", ej_dia: "💨 Raffiche fino a 33 nodi (7–15 h): solo per chi ha esperienza. · 🏖️ Bassa marea alle 18:00: meglio uscire vicino all'alta marea (12:00).",
+    s_tit: "Gli spot", s_intro: "Da El Médano a Tarifa, dal Mar Menor all'Empordà. E ne arriveranno altri: Europa e mondo.",
+    i_tit: "Sul tuo telefono in un minuto", i_intro: "Non servono App Store né Google Play: si installa dal browser e si aggiorna da sola.",
+    i1_t: "Apri il link", i1: "In Safari (iPhone) o Chrome (Android).", i2_t: "Condividi o menu ⋮", i2: "Tocca il tasto condividi ⬆️ o i tre puntini.",
+    i3_t: "Aggiungi alla schermata Home", i3: "E hai l'icona di Canelo Wind come qualsiasi app.",
+    i_mas: "Vedi le istruzioni passo per passo →",
+    d_tit: "Fatta per Miki «el Canelo»", d_txt: "Canelo Wind è nata pensando a un amico che vive guardando il vento. Per questo il logo color cannella (canela), con un'onda e un'ala da wing.",
+    d_frase: "«Guarda il vento, scegli lo spot e in acqua.»",
+    fin_tit: "C'è vento oggi?", fin_txt: "Aprila e lo saprai in due secondi.",
+    pie: "Previsioni di Open-Meteo (modelli meteo). Controlla sempre il vento misurato e lo stato del mare prima di uscire.", pie_inst: "Installa",
+  },
+};
+
+const COLORES_NOTA = ["#C8423B", "#E8793A", "#D9A520", "#5FA83A", "#16924F"];
+let idioma = IDIOMA_URL || idiomaGuardado() || idiomaNavegador();
+if (!L[idioma]) idioma = "es";
+
+function pintar() {
+  const x = L[idioma];
+  IDIOMA = idioma;
+  document.documentElement.lang = idioma;
+  document.querySelectorAll("[data-t]").forEach(e => { if (typeof x[e.dataset.t] === "string") e.innerHTML = x[e.dataset.t]; });
+  // Funciones
+  document.getElementById("funciones").innerHTML = x.funciones.map(([ico, tit, txt]) =>
+    `<div class="tarjeta"><div class="ico">${ico}</div><h3>${tit}</h3><p>${txt}</p></div>`).join("");
+  // Notas, con los nombres de la app
+  document.getElementById("notas").innerHTML = [0, 1, 2, 3, 4].map(n => `<span style="background:${COLORES_NOTA[n]}">${t("n" + n)}</span>`).join("");
+  // Spots por región (sale solo de spots.js)
+  const regiones = {};
+  SPOTS.forEach(s => { const r = s.region || "Canarias"; (regiones[r] = regiones[r] || []).push(s.nombre.replace(/\s*\(.*\)$/, "")); });
+  document.getElementById("regiones").innerHTML = Object.entries(regiones).map(([r, lista]) =>
+    `<div class="region"><b>${t("reg_" + r)} <em>${lista.length}</em></b><div>${lista.join(" · ")}</div></div>`).join("");
+  document.getElementById("nSpots").textContent = SPOTS.length;
+  document.getElementById("nRegiones").textContent = Object.keys(regiones).length;
+  // Selector de idioma
+  document.getElementById("btnIdioma").textContent = "🌐 " + idioma.toUpperCase();
+  document.getElementById("menuIdiomas").innerHTML = IDIOMAS.map(i => `<button data-i="${i.c}" class="${i.c === idioma ? "on" : ""}">${i.b} ${i.n}</button>`).join("");
+  document.querySelectorAll("[data-i]").forEach(b => b.onclick = () => {
+    idioma = b.dataset.i;
+    try { localStorage.setItem("cw_idioma", JSON.stringify(idioma)); } catch (e) {}
+    document.getElementById("menuIdiomas").classList.remove("abierto");
+    pintar();
+  });
+  // La app de verdad dentro del móvil, en el mismo idioma
+  document.getElementById("appDemo").src = "./?lang=" + idioma;
+}
+document.getElementById("btnIdioma").onclick = (e) => { e.stopPropagation(); document.getElementById("menuIdiomas").classList.toggle("abierto"); };
+document.addEventListener("click", () => document.getElementById("menuIdiomas").classList.remove("abierto"));
+pintar();
+</script>
+</body>
+</html>
