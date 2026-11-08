@@ -46,6 +46,9 @@ main { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
 .chip { border: 0; background: var(--chip); color: var(--text); padding: 6px 12px; border-radius: 999px; cursor: pointer; font-size: 13px; }
 .chip.on { background: var(--brand); color: #fff; }
+.chips.desliza { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.chips.desliza::-webkit-scrollbar { display: none; }
+.chips.desliza .chip { flex: 0 0 auto; }
 h2.isla { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin: 18px 0 8px; }
 .lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
 .spot { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; cursor: pointer; display: flex; gap: 10px; align-items: center; }
@@ -242,10 +245,11 @@ async function viento(spot) {
   const u = `https://api.open-meteo.com/v1/forecast?latitude=${spot.lat}&longitude=${spot.lon}` +
     `&hourly=wind_speed_10m,wind_gusts_10m,wind_direction_10m,temperature_2m,weather_code,precipitation_probability` +
     `&current=wind_speed_10m,wind_gusts_10m,wind_direction_10m,temperature_2m,weather_code` +
-    `&daily=sunrise,sunset&wind_speed_unit=kn&timezone=${encodeURIComponent(tzDe(spot))}&forecast_days=7&cell_selection=sea`;
+    `&daily=sunrise,sunset&wind_speed_unit=kn&timezone=${encodeURIComponent(tzDe(spot))}&forecast_days=7&cell_selection=${spot.interior ? "land" : "sea"}`;
   const r = await fetch(u); if (!r.ok) throw new Error("viento " + r.status); return r.json();
 }
 async function olas(spot) {
+  if (spot.interior) return null; // embalse: sin olas ni mareas
   const u = `https://marine-api.open-meteo.com/v1/marine?latitude=${spot.lat}&longitude=${spot.lon}` +
     `&hourly=wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_period,swell_wave_direction` +
     `&minutely_15=sea_level_height_msl&current=wave_height,wave_period,wave_direction,sea_surface_temperature&timezone=${encodeURIComponent(tzDe(spot))}&forecast_days=7`;
@@ -253,11 +257,15 @@ async function olas(spot) {
 }
 // Viento de ahora en todos los spots de una vez (para la lista)
 async function vientoAhoraTodos() {
-  const lat = SPOTS.map(s => s.lat).join(","), lon = SPOTS.map(s => s.lon).join(",");
-  const u = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-    `&current=wind_speed_10m,wind_gusts_10m,wind_direction_10m,weather_code&wind_speed_unit=kn&timezone=auto&cell_selection=sea`;
-  const r = await fetch(u); const j = await r.json();
-  (Array.isArray(j) ? j : [j]).forEach((d, i) => { if (SPOTS[i]) SPOTS[i].ahora = d.current; });
+  const grupos = [SPOTS.filter(s => !s.interior), SPOTS.filter(s => s.interior)];
+  await Promise.all(grupos.map(async (lista, k) => {
+    if (!lista.length) return;
+    const lat = lista.map(s => s.lat).join(","), lon = lista.map(s => s.lon).join(",");
+    const u = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+      `&current=wind_speed_10m,wind_gusts_10m,wind_direction_10m,weather_code&wind_speed_unit=kn&timezone=auto&cell_selection=${k ? "land" : "sea"}`;
+    const r = await fetch(u); const j = await r.json();
+    (Array.isArray(j) ? j : [j]).forEach((d, i) => { if (lista[i]) lista[i].ahora = d.current; });
+  }));
 }
 
 // ---------- Pantalla: lista de spots ----------
@@ -290,7 +298,7 @@ function pintarLista() {
   };
 
   let html = `<input class="buscar" id="buscar" placeholder="${t("buscar")}" value="${esc(textoBuscar)}">
-    <div class="chips">${regiones.map(r => `<button class="chip ${r === filtroRegion ? "on" : ""}" data-region="${esc(r)}">${r === "Todas" ? t("toda") : esc(nombreRegion(r))}</button>`).join("")}</div>
+    <div class="chips desliza">${regiones.map(r => `<button class="chip ${r === filtroRegion ? "on" : ""}" data-region="${esc(r)}">${r === "Todas" ? t("toda") : esc(nombreRegion(r))}</button>`).join("")}</div>
     ${islas.length > 2 ? `<div class="chips">${islas.map(i => `<button class="chip ${i === filtroIsla ? "on" : ""}" data-isla="${esc(i)}">${i === "Todas" ? t("todas") : esc(i)}</button>`).join("")}</div>` : ""}
     <div class="chips">${deportes.map(([k, n]) => `<button class="chip ${k === filtroDeporte ? "on" : ""}" data-dep="${k}">${n}</button>`).join("")}</div>`;
   const favs = visibles.filter(s => favoritos.includes(s.id));
@@ -721,6 +729,7 @@ function pintarMareas(spot, dia, daily, iDia) {
   const o = cache[spot.id] && cache[spot.id].o;
   const M = o && o.minutely_15;
   const idx = M ? M.time.map((t, i) => t.startsWith(dia) && M.sea_level_height_msl[i] != null ? i : -1).filter(i => i >= 0) : [];
+  if (spot.interior) { caja.innerHTML = `<h3>${t("mareas")}</h3><p class="aviso">${t("embalse")}</p>`; return; }
   if (idx.length < 10) { caja.innerHTML = `<h3>${t("mareas")}</h3><p class="aviso">${t("sin_marea")}</p>`; return; }
   const alt = M.sea_level_height_msl, hora = (t) => t.slice(11, 16);
   const minutos = (t) => +t.slice(11, 13) * 60 + +t.slice(14, 16);

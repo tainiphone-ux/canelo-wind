@@ -377,4 +377,138 @@ const CONSEJOS = {
     consejos: ["Playa de La Salve: con viento del este acelera por efecto embudo.", "Mira la marea: sube y baja más de 3 metros."],
     seguridad: "Con marea baja la playa se hace enorme y con marea alta queda poca arena: calcula bien la vuelta.",
   },
+
+  // ---------- PENÍNSULA: LOTE 2 (08-11-2026) ----------
+  "zahara": {
+    consejos: ["Con levante el viento sale de la sierra y llega racheado.", "Con poniente, agua más bonita y viento más limpio."],
+    seguridad: "Con levante, viento hacia fuera en parte de la playa: no te alejes de la orilla.",
+  },
+  "camposoto": {
+    consejos: ["Mejor con poniente: viento de lado y constante.", "Es parque natural: no dejes nada en la playa."],
+    seguridad: "Al sur, la punta del Boquerón tiene corrientes con la marea: no te acerques.",
+  },
+  "cortadura": {
+    consejos: ["Funciona con poniente, de lado a la playa.", "En verano hay zona balizada para kite."],
+    seguridad: "Playa urbana con muchos bañistas en verano: solo por la zona de kite.",
+  },
+  "chipiona": {
+    consejos: ["Mira la marea: cambia mucho la playa.", "Con poniente el viento entra limpio del mar."],
+    seguridad: "Corrientes cerca de la desembocadura del Guadalquivir: no te alejes hacia el norte.",
+  },
+  "isla-canela": {
+    consejos: ["La térmica entra a mediodía en verano.", "Mira la marea: la playa cambia mucho."],
+    seguridad: "Corrientes en la desembocadura del Guadiana: no te acerques al río.",
+  },
+  "el-portil": {
+    consejos: ["Mejor con la térmica del suroeste en verano.", "Hay escuelas de kite en la zona."],
+    seguridad: "",
+  },
+  "guadalmar": {
+    consejos: ["Funciona con poniente y con levante.", "Está junto a un paraje natural: respeta las zonas protegidas."],
+    seguridad: "Cerca del aeropuerto de Málaga: vuela el kite solo en la zona permitida.",
+  },
+  "torre-del-mar": {
+    consejos: ["Con poniente el viento entra de lado.", "En verano hay zona de kite balizada."],
+    seguridad: "Playa con muchos bañistas en verano: solo por la zona de kite.",
+  },
+  "playa-granada": {
+    consejos: ["Funciona con poniente y con levante.", "Playa de grava fina: usa escarpines."],
+    seguridad: "",
+  },
+  "balerma": {
+    consejos: ["Mejor con poniente.", "Playa de arena y grava: usa escarpines."],
+    seguridad: "",
+  },
+  "roquetas": {
+    consejos: ["Hay escuelas de kite en la zona.", "Funciona con poniente y con levante."],
+    seguridad: "En verano hay muchos bañistas: solo por la zona de kite.",
+  },
+  "la-manga": {
+    consejos: ["Agua plana: ideal para aprender y para wing.", "La térmica entra casi a diario en verano."],
+    seguridad: "Poca profundidad: con foil cuidado con el fondo.",
+  },
+  "bolnuevo": {
+    consejos: ["La térmica del sur entra por la tarde.", "Agua clara y fondo de arena."],
+    seguridad: "",
+  },
+  "cullera": {
+    consejos: ["La térmica entra a mediodía.", "Hay escuelas en la zona."],
+    seguridad: "En verano solo en las zonas balizadas.",
+  },
+  "denia": {
+    consejos: ["La térmica del este entra a mediodía.", "Playa larga de arena."],
+    seguridad: "En verano solo en las zonas balizadas para kite.",
+  },
+  "la-mata": {
+    consejos: ["Térmica casi diaria en verano.", "Hay escuelas de kite en la zona."],
+    seguridad: "",
+  },
+  "benicassim": {
+    consejos: ["La térmica entra a mediodía.", "Playa de arena con fondo suave."],
+    seguridad: "En verano solo en las zonas balizadas.",
+  },
+  "lescala": {
+    consejos: ["Con tramontana sopla fuerte.", "En verano entra la térmica del sur."],
+    seguridad: "Con tramontana el viento sopla hacia fuera: no te alejes.",
+  },
+  "riumar": {
+    consejos: ["Playas enormes con mucho espacio.", "Lleva repelente: hay mosquitos."],
+    seguridad: "Corrientes cerca de la desembocadura del Ebro: no te acerques.",
+  },
+  "torredembarra": {
+    consejos: ["El garbí entra a partir de mediodía.", "Hay escuelas en la zona."],
+    seguridad: "En verano solo en los pasillos balizados.",
+  },
+  "son-serra": {
+    consejos: ["Con viento del norte y nordeste entran olas.", "Fondo de arena con alguna roca."],
+    seguridad: "Rocas en algunos tramos de la orilla: entra por la zona de arena.",
+  },
+  "palma": {
+    consejos: ["El embat entra casi cada tarde de verano.", "Hay escuelas de kite en la zona."],
+    seguridad: "Cerca del aeropuerto de Palma: kite solo en la zona permitida.",
+  },
+  "son-bou": {
+    consejos: ["Funciona con viento del sur, que entra de lado.", "En verano hay zona de lanzamiento para kite."],
+    seguridad: "Playa muy turística en verano: solo por la zona habilitada.",
+  },
+  "san-xurxo": {
+    consejos: ["Con nordeste el viento entra de lado.", "Agua fría: neopreno de 4/3 o 5/4."],
+    seguridad: "Olas y corrientes fuertes: solo con experiencia.",
+  },
+  "traba": {
+    consejos: ["Con nordeste en verano funciona casi a diario.", "Agua fría: neopreno grueso."],
+    seguridad: "Atlántico abierto: olas y corrientes. No salgas solo.",
+  },
+  "corrubedo": {
+    consejos: ["Con la nortada de verano sopla casi a diario.", "Es parque natural: respeta las dunas."],
+    seguridad: "Olas y corrientes del Atlántico: no salgas solo.",
+  },
+  "liencres": {
+    consejos: ["Mira la marea: sube y baja más de 3 metros.", "Es parque natural: respeta las dunas."],
+    seguridad: "Corrientes en la desembocadura del Pas: no te acerques.",
+  },
+  "orinon": {
+    consejos: ["Dentro de la ría el agua está más plana.", "Mira la marea: sube y baja más de 3 metros."],
+    seguridad: "Corriente en la ría con la marea: no te metas en el canal.",
+  },
+  "zarautz": {
+    consejos: ["Con viento del norte entran olas.", "En verano hay restricciones por los bañistas."],
+    seguridad: "Olas y corrientes del Cantábrico: no salgas solo.",
+  },
+  "hondarribia": {
+    consejos: ["Dentro de la bahía el agua está más plana.", "Mira la marea: cambia mucho el fondo."],
+    seguridad: "Corriente del Bidasoa con la marea y barcos del puerto: mira bien antes de cruzar.",
+  },
+  "santillana": {
+    consejos: ["La térmica entra por la tarde en primavera y verano.", "Agua dulce: sin olas, perfecto para aprender."],
+    seguridad: "Con el embalse bajo aparecen piedras y troncos: mira el fondo.",
+  },
+  "embalse-ebro": {
+    consejos: ["Mucho espacio y agua plana.", "Agua fría: neopreno casi todo el año."],
+    seguridad: "Zona aislada: no salgas solo y avisa a alguien en tierra.",
+  },
+  "ullibarri": {
+    consejos: ["Agua plana: bueno para aprender.", "Hay playas habilitadas y club náutico."],
+    seguridad: "Respeta las zonas de baño y las de navegación.",
+  },
 };
