@@ -180,7 +180,7 @@ async function viento(spot) {
 async function olas(spot) {
   const u = `https://marine-api.open-meteo.com/v1/marine?latitude=${spot.lat}&longitude=${spot.lon}` +
     `&hourly=wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_period,swell_wave_direction` +
-    `&current=wave_height,wave_period,wave_direction,sea_surface_temperature&timezone=${encodeURIComponent(tzDe(spot))}&forecast_days=7`;
+    `&minutely_15=sea_level_height_msl&current=wave_height,wave_period,wave_direction,sea_surface_temperature&timezone=${encodeURIComponent(tzDe(spot))}&forecast_days=7`;
   const r = await fetch(u); if (!r.ok) throw new Error("olas " + r.status); return r.json();
 }
 // Viento de ahora en todos los spots de una vez (para la lista)
@@ -336,12 +336,14 @@ function dibujarSpot(spot) {
     <p class="aviso">✓ en verde = la dirección del viento es buena para este spot. La flecha indica hacia dónde sopla el viento.</p>
   </div>
 
+  <div class="caja" id="cajaMareas"></div>
   <div class="caja" id="cajaReportar"></div>
   <div class="caja" id="cajaReportes"></div>
 
   <div class="caja enlaces"><h3>🌬️ Anemómetros (viento medido ahora)</h3>
     ${enlaces(spot.anemometros, "📡")}
     ${enlace(windy, "🗺️ Windy · mapa de viento en directo")}
+    ${enlace(`https://www.windguru.cz/map/?lat=${spot.lat}&lon=${spot.lon}&zoom=11`, "🗺️ Windguru · mapa de previsión")}
     ${enlace("https://holfuy.com/en/map", "📡 Holfuy · mapa de estaciones")}
   </div>
   <div class="caja enlaces"><h3>📹 Webcams</h3>${enlaces(spot.webcams, "🎥")}
@@ -358,6 +360,7 @@ function dibujarSpot(spot) {
     guardar("favoritos", favoritos); dibujarSpot(spot);
   };
   grafica(H, dia);
+  pintarMareas(spot, dia, v.daily, diaElegido);
   pintarReportar(spot);
   pintarReportes(spot);
 }
@@ -486,7 +489,7 @@ async function pintarReportes(spot) {
 
 // ---------- Enlaces de fuera (webcams, anemómetros, mapas) ----------
 // Webs que dejan verse dentro de la app (comprobado el 08-11-2026). Las demás lo prohíben.
-const SE_VEN_DENTRO = ["in2thebeach.es", "fuerteventuraplayas.com", "embed.windy.com", "mangolinkworld.com"];
+const SE_VEN_DENTRO = ["in2thebeach.es", "fuerteventuraplayas.com", "embed.windy.com", "mangolinkworld.com", "azulkiteboarding.com"];
 const seVeDentro = (url) => { try { const h = new URL(url).hostname; return SE_VEN_DENTRO.some(d => h === d || h.endsWith("." + d)); } catch (e) { return false; } };
 const nombreWeb = (url) => { try { return new URL(url).hostname.replace(/^www\.|^en\.|^es\./, ""); } catch (e) { return "esa web"; } };
 const esAppInstalada = () => window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;
@@ -582,6 +585,74 @@ $("#btnSugerir").onclick = abrirSugerencias;
 $("#pieSugerir").onclick = (e) => { e.preventDefault(); abrirSugerencias(); };
 
 // Gráfica del día: barras de viento y línea de rachas
+// ---------- Mareas: curva del día con pleamar, bajamar y horas de sol ----------
+function pintarMareas(spot, dia, daily, iDia) {
+  const caja = $("#cajaMareas"); if (!caja) return;
+  const o = cache[spot.id] && cache[spot.id].o;
+  const M = o && o.minutely_15;
+  const idx = M ? M.time.map((t, i) => t.startsWith(dia) && M.sea_level_height_msl[i] != null ? i : -1).filter(i => i >= 0) : [];
+  if (idx.length < 10) { caja.innerHTML = `<h3>🌊 Mareas</h3><p class="aviso">No hay datos de marea para este spot.</p>`; return; }
+  const alt = M.sea_level_height_msl, hora = (t) => t.slice(11, 16);
+  const minutos = (t) => +t.slice(11, 13) * 60 + +t.slice(14, 16);
+
+  // Pleamares y bajamares: puntos más altos y más bajos de la curva
+  const extremos = [];
+  for (let k = 1; k < idx.length - 1; k++) {
+    const a = alt[idx[k - 1]], b = alt[idx[k]], c = alt[idx[k + 1]];
+    if (b >= a && b > c) extremos.push({ tipo: "alta", i: idx[k] });
+    else if (b <= a && b < c) extremos.push({ tipo: "baja", i: idx[k] });
+  }
+  const vals = idx.map(i => alt[i]);
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  if (hi - lo < 0.6) { const m = (hi + lo) / 2; lo = m - 0.3; hi = m + 0.3; }
+  lo -= 0.25; hi += 0.35;
+
+  const W = 400, Ht = 190, pl = 30, pr = 8, pt = 26, pb = 22;
+  const x = (t) => pl + (minutos(t) / 1440) * (W - pl - pr);
+  const y = (v) => pt + (hi - v) / (hi - lo) * (Ht - pt - pb);
+  let s = `<svg viewBox="0 0 ${W} ${Ht}" role="img" aria-label="Marea del día" style="width:100%;max-width:640px;height:auto;display:block;margin:6px auto 0">`;
+
+  // Noche en gris, día en azul claro (con la salida y puesta de sol)
+  const salida = daily && daily.sunrise[iDia], puesta = daily && daily.sunset[iDia];
+  s += `<rect x="${pl}" y="${pt}" width="${W - pl - pr}" height="${Ht - pt - pb}" fill="var(--chip)"/>`;
+  if (salida && puesta) {
+    s += `<rect x="${x(salida)}" y="${pt}" width="${x(puesta) - x(salida)}" height="${Ht - pt - pb}" fill="#9fd3f0" opacity=".35"/>`;
+    s += `<text x="${x(salida)}" y="${pt - 8}" font-size="12" text-anchor="middle" fill="#D9A520">☀️↑ ${hora(salida)}</text>`;
+    s += `<text x="${x(puesta)}" y="${pt - 8}" font-size="12" text-anchor="middle" fill="#D9A520">☀️↓ ${hora(puesta)}</text>`;
+  }
+  // Líneas de altura
+  for (let v = Math.ceil(lo * 2) / 2; v <= hi; v += 0.5) {
+    s += `<line x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>`;
+    s += `<text x="${pl - 4}" y="${y(v) + 4}" font-size="10" text-anchor="end" fill="var(--muted)">${v.toFixed(1).replace(".", ",")}</text>`;
+  }
+  // Agua y curva
+  const pts = idx.map(i => `${x(M.time[i]).toFixed(1)},${y(alt[i]).toFixed(1)}`);
+  s += `<polygon points="${pl},${Ht - pb} ${pts.join(" ")} ${x(M.time[idx[idx.length - 1]]).toFixed(1)},${Ht - pb}" fill="#4FB3E8" opacity=".25"/>`;
+  s += `<polyline points="${pts.join(" ")}" fill="none" stroke="#2C9AD6" stroke-width="3"/>`;
+  // Hora de ahora (solo hoy)
+  if (iDia === 0) {
+    const ahora = new Date().toLocaleTimeString("es-ES", { timeZone: tzDe(spot), hour: "2-digit", minute: "2-digit" });
+    const xa = x("0000-00-00T" + ahora);
+    s += `<line x1="${xa}" x2="${xa}" y1="${pt}" y2="${Ht - pb}" stroke="#7BC043" stroke-width="2"/>`;
+  }
+  // Pleamar en azul, bajamar en rojo
+  extremos.forEach(e => {
+    const cx = x(M.time[e.i]), cy = y(alt[e.i]), col = e.tipo === "alta" ? "#2C7BC0" : "#C8423B";
+    s += `<circle cx="${cx}" cy="${cy}" r="6" fill="${col}"/>`;
+    s += `<text x="${cx}" y="${e.tipo === "alta" ? cy - 12 : cy + 20}" font-size="13" font-weight="700" text-anchor="middle" fill="${col}">${hora(M.time[e.i])}</text>`;
+  });
+  // Eje de horas
+  for (let hh = 0; hh <= 24; hh += 3) {
+    const xx = pl + (hh / 24) * (W - pl - pr);
+    s += `<text x="${xx}" y="${Ht - 6}" font-size="10" text-anchor="middle" fill="var(--muted)">${hh}h</text>`;
+  }
+  s += `</svg>`;
+
+  const resumen = extremos.map(e => `<span class="etq" style="color:${e.tipo === "alta" ? "#2C7BC0" : "#C8423B"};font-weight:700">${e.tipo === "alta" ? "▲ Pleamar" : "▼ Bajamar"} ${hora(M.time[e.i])} · ${alt[e.i].toFixed(1).replace(".", ",")} m</span>`).join(" ");
+  caja.innerHTML = `<h3>🌊 Mareas</h3><div>${resumen}</div>${s}
+    <p class="aviso">Altura del mar en metros. Zona azul: horas de sol${iDia === 0 ? "; línea verde: ahora" : ""}. Previsión aproximada: para navegar, consulta la tabla oficial del puerto.</p>`;
+}
+
 function grafica(H, dia) {
   const idx = H.time.map((t, i) => t.startsWith(dia) ? i : -1).filter(i => i >= 0);
   const W = 720, Ht = 160, pad = 24, bw = (W - pad * 2) / idx.length;

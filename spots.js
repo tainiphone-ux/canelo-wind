@@ -19,6 +19,7 @@ const SPOTS = [
     buenos: ["NE", "E", "N"], nivel: "Todos los niveles",
     nota: "El spot más conocido de Tenerife. Alisio del NE casi todo el año, agua bastante plana dentro de la bahía.",
     anemometros: [
+      { nombre: "Azul Kiteboarding · cámara y anemómetro El Médano", url: "https://www.azulkiteboarding.com/es/el-medano-live" },
       { nombre: "Windfinder · El Médano", url: "https://www.windfinder.com/report/el_medano" },
       ESTACIONES.tfs,
     ],
@@ -34,6 +35,7 @@ const SPOTS = [
     buenos: ["NE", "E", "N"], nivel: "Avanzado (olas)",
     nota: "Spot de olas y viento fuerte, sede del PWA. Fondo de roca: cuidado con la marea baja.",
     anemometros: [
+      { nombre: "Azul Kiteboarding · cámara y anemómetro El Médano", url: "https://www.azulkiteboarding.com/es/el-medano-live" },
       { nombre: "Windfinder · El Médano", url: "https://www.windfinder.com/report/el_medano" },
       ESTACIONES.tfs,
     ],
@@ -46,7 +48,10 @@ const SPOTS = [
     lat: 28.030, lon: -16.553, deportes: ["kite", "wing"],
     buenos: ["NE", "E"], nivel: "Intermedio",
     nota: "Playa larga al otro lado de Montaña Roja. Zona de kite (respeta las zonas de baño).",
-    anemometros: [ESTACIONES.tfs],
+    anemometros: [
+      { nombre: "Azul Kiteboarding · cámara y anemómetro El Médano", url: "https://www.azulkiteboarding.com/es/el-medano-live" },
+      ESTACIONES.tfs,
+    ],
     webcams: [
       { nombre: "Skyline · El Médano - La Tejita", url: "https://www.skylinewebcams.com/es/webcam/espana/canarias/santa-cruz-de-tenerife/el-medano-playa-la-tejita.html" },
     ],
@@ -58,6 +63,7 @@ const SPOTS = [
     buenos: ["NE", "N", "E"], nivel: "Iniciación / intermedio",
     nota: "Agua plana al abrigo del puerto, a 10 minutos de El Médano. Varias escuelas enseñan aquí wing y windsurf.",
     anemometros: [
+      { nombre: "Azul Kiteboarding · cámara y anemómetro El Médano", url: "https://www.azulkiteboarding.com/es/el-medano-live" },
       { nombre: "Windfinder · Aeropuerto Tenerife Sur", url: "https://www.windfinder.com/report/el_medano" },
       ESTACIONES.tfs,
     ],
@@ -88,6 +94,17 @@ const SPOTS = [
     ],
     webcams: [
       { nombre: "Windfinder · webcams Güímar", url: "https://www.windfinder.com/webcams/gueimar_strand" },
+    ],
+  },
+
+  {
+    id: "playa-troya", nombre: "Playa de Troya (Las Américas)", isla: "Tenerife", zona: "Adeje / Arona",
+    lat: 28.077, lon: -16.739, deportes: ["wing", "windsurf"],
+    buenos: ["O", "SO", "NO", "S"], nivel: "Intermedio",
+    nota: "Costa oeste del sur de Tenerife, más de olas que de viento. Con el alisio del NE el viento sopla de tierra hacia el mar (off-shore): peligroso. Mejor con viento del oeste o del sur.",
+    anemometros: [ESTACIONES.tfs],
+    webcams: [
+      { nombre: "Skyline · Playa de Troya", url: "https://www.skylinewebcams.com/es/webcam/espana/canarias/santa-cruz-de-tenerife/playa-troya.html" },
     ],
   },
 
