@@ -22,10 +22,10 @@ Valentín no es programador: **háblale siempre en español, también en los men
 - Previsión: Open-Meteo (forecast + marine), gratis y sin clave. Viento en nudos, km/h o m/s.
 - Viento medido: solo enlaces (AEMET de los aeropuertos con `k=can`, Windfinder, Holfuy). aviationweather.gov no deja leerse desde la web (sin CORS).
 - Reportes y sugerencias: formularios de Google en la cuenta tainiphone@gmail.com. La hoja de reportes está compartida «solo ver» y la app la lee (gviz CSV); la de sugerencias es privada.
-- Enlaces: los que dejan verse dentro (`SE_VEN_DENTRO` en index.html: in2thebeach, fuerteventuraplayas, embed.windy.com) se abren en un visor con «← Volver a Canelo Wind»; los demás muestran antes cómo volver (en el iPhone instalado no hay botón atrás). Al añadir un enlace nuevo, comprobar con curl si manda `X-Frame-Options` o `frame-ancestors`.
+- Enlaces: los que dejan verse dentro (`SE_VEN_DENTRO` en index.html: in2thebeach, fuerteventuraplayas, embed.windy.com, mangolinkworld) se abren en un visor con «← Volver a Canelo Wind»; los demás muestran antes cómo volver (en el iPhone instalado no hay botón atrás). Al añadir un enlace nuevo, comprobar con curl si manda `X-Frame-Options` o `frame-ancestors`.
 - Probar en el Mac: `python3 -m http.server 8765 --bind 127.0.0.1` desde esta carpeta y abrir http://127.0.0.1:8765.
 
 ## Pendiente / ideas
 - Ampliar a Europa y mundo (España hecha el 08-11-2026). Windfinder corta si se le piden muchas páginas seguidas (error 429): comprobar enlaces despacio.
-- En `PROYECTOS CLAUDE/Wing Foil` hay un Word «Aplicación para wing foil.docx» (22-10-2026), probablemente la idea inicial: revisarlo con Valentín.
+- Del Word «PROYECTOS CLAUDE/Wing Foil/Aplicación para wing foil.docx» (22-10-2026) falta, a la espera de su sí: gráfica de mareas (curva del día con pleamar/bajamar y sol), spots Punta del Hidalgo y Playa de Troya (webcams Skyline), anemómetro de Azul Kiteboarding en El Médano (https://www.azulkiteboarding.com/es/el-medano-live) y mapa de Windguru.
 - No probado aún en un iPhone de verdad: el visor de webcams y el aviso de volver.
