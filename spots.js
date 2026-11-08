@@ -5,10 +5,10 @@
 
 const ESTACIONES = {
   // Estaciones oficiales de AEMET y aeropuertos (viento medido de verdad)
-  tfs:  { nombre: "AEMET · Aeropuerto Tenerife Sur", url: "https://www.aemet.es/es/eltiempo/observacion/ultimosdatos?k=coo&l=C429I&w=0&datos=det" },
-  gcl:  { nombre: "AEMET · Aeropuerto de Gran Canaria", url: "https://www.aemet.es/es/eltiempo/observacion/ultimosdatos?k=coo&l=C649I&w=0&datos=det" },
-  fue:  { nombre: "AEMET · Aeropuerto de Fuerteventura", url: "https://www.aemet.es/es/eltiempo/observacion/ultimosdatos?k=coo&l=C249I&w=0&datos=det" },
-  lzt:  { nombre: "AEMET · Aeropuerto de Lanzarote", url: "https://www.aemet.es/es/eltiempo/observacion/ultimosdatos?k=coo&l=C029O&w=0&datos=det" },
+  tfs:  { nombre: "AEMET · Aeropuerto Tenerife Sur", url: "https://www.aemet.es/es/eltiempo/observacion/ultimosdatos?k=can&l=C429I&datos=det" },
+  gcl:  { nombre: "AEMET · Aeropuerto de Gran Canaria", url: "https://www.aemet.es/es/eltiempo/observacion/ultimosdatos?k=can&l=C649I&datos=det" },
+  fue:  { nombre: "AEMET · Aeropuerto de Fuerteventura", url: "https://www.aemet.es/es/eltiempo/observacion/ultimosdatos?k=can&l=C249I&datos=det" },
+  lzt:  { nombre: "AEMET · Aeropuerto de Lanzarote", url: "https://www.aemet.es/es/eltiempo/observacion/ultimosdatos?k=can&l=C029O&datos=det" },
 };
 
 const SPOTS = [
@@ -164,7 +164,8 @@ const SPOTS = [
       ESTACIONES.fue,
     ],
     webcams: [
-      { nombre: "Baltic Live Cam · El Cotillo", url: "https://balticlivecam.com/cameras/spain/canary-islands/el-cotillo/" },
+      { nombre: "El Cotillo · Piedra Playa", url: "https://www.fuerteventuraplayas.com/en/?p=2310" },
+      { nombre: "Windfinder · webcams El Cotillo", url: "https://www.windfinder.com/webcams/fuerteventura_el_cotillo" },
     ],
   },
 

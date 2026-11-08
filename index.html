@@ -108,6 +108,14 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 .reporte .cab2 b { color: var(--text); }
 .fondo { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; z-index: 20; overflow-y: auto; }
 .fondo .caja { max-width: 520px; width: 100%; margin: 0; }
+/* Visor de webs dentro de la app */
+.visor { position: fixed; inset: 0; z-index: 30; background: var(--bg); display: flex; flex-direction: column; }
+.barra-visor { display: flex; gap: 8px; align-items: center; padding: 10px 12px; padding-top: max(10px, env(safe-area-inset-top));
+  background: linear-gradient(135deg, #E08A3C, #9A4416); }
+.volver-visor { flex: 1; border: 0; background: #fff; color: #9A4416; font-weight: 800; font-size: 17px; padding: 12px; border-radius: 12px; cursor: pointer; }
+.fuera-visor { color: #fff; text-decoration: none; font-size: 22px; padding: 8px 12px; background: rgba(255,255,255,.18); border-radius: 12px; }
+.titulo-visor { padding: 6px 12px; font-size: 13px; color: var(--muted); border-bottom: 1px solid var(--line); }
+.visor iframe { flex: 1; width: 100%; border: 0; background: #fff; }
 </style>
 </head>
 <body>
@@ -262,8 +270,8 @@ function dibujarSpot(spot) {
   const nombreDia = (d, i) => i === 0 ? "Hoy" : i === 1 ? "Mañana" : new Date(d + "T12:00").toLocaleDateString("es-ES", { weekday: "short", day: "numeric" });
   const sol = v.daily ? `☀️ ${v.daily.sunrise[diaElegido].slice(11)} – ${v.daily.sunset[diaElegido].slice(11)}` : "";
 
-  const enlaces = (lista, icono) => lista.length ? lista.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${icono} ${esc(l.nombre)}<span>↗</span></a>`).join("") : `<p class="aviso">No hemos encontrado ninguna para este spot todavía.</p>`;
-  const windy = `https://www.windy.com/?${spot.lat},${spot.lon},12`;
+  const enlaces = (lista, icono) => lista.length ? lista.map(l => enlace(l.url, `${icono} ${esc(l.nombre)}`)).join("") : `<p class="aviso">No hemos encontrado ninguna para este spot todavía.</p>`;
+  const windy = `https://embed.windy.com/embed.html?type=map&lat=${spot.lat}&lon=${spot.lon}&detailLat=${spot.lat}&detailLon=${spot.lon}&zoom=11&overlay=wind&product=ecmwf&level=surface&metricWind=kt&marker=true`;
   const mapa = `https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lon}`;
 
   $("#app").innerHTML = `
@@ -321,13 +329,14 @@ function dibujarSpot(spot) {
 
   <div class="caja enlaces"><h3>🌬️ Anemómetros (viento medido ahora)</h3>
     ${enlaces(spot.anemometros, "📡")}
-    <a href="${windy}" target="_blank" rel="noopener">🗺️ Windy · mapa de viento y estaciones cercanas<span>↗</span></a>
-    <a href="https://holfuy.com/en/map" target="_blank" rel="noopener">📡 Holfuy · mapa de estaciones<span>↗</span></a>
+    ${enlace(windy, "🗺️ Windy · mapa de viento en directo")}
+    ${enlace("https://holfuy.com/en/map", "📡 Holfuy · mapa de estaciones")}
   </div>
   <div class="caja enlaces"><h3>📹 Webcams</h3>${enlaces(spot.webcams, "🎥")}
     <p class="aviso">Las webcams son de otras webs y a veces se caen o se quedan congeladas.</p></div>
   <div class="caja enlaces"><h3>📍 Cómo llegar</h3>
-    <a href="${mapa}" target="_blank" rel="noopener">🧭 Abrir en Google Maps<span>↗</span></a></div>
+    ${enlace(mapa, "🧭 Abrir en Google Maps")}</div>
+  <p class="aviso">📲 = se abre dentro de la app · ↗ = se abre fuera (te explicamos cómo volver).</p>
   `;
 
   document.querySelectorAll("[data-dia]").forEach(e => e.onclick = () => { diaElegido = +e.dataset.dia; dibujarSpot(spot); });
@@ -462,6 +471,68 @@ async function pintarReportes(spot) {
     caja.innerHTML = `<h3>👥 Lo que dice la gente</h3><p class="aviso">No se han podido cargar los reportes ahora mismo.</p>`;
   }
 }
+
+// ---------- Enlaces de fuera (webcams, anemómetros, mapas) ----------
+// Webs que dejan verse dentro de la app (comprobado el 08-11-2026). Las demás lo prohíben.
+const SE_VEN_DENTRO = ["in2thebeach.es", "fuerteventuraplayas.com", "embed.windy.com"];
+const seVeDentro = (url) => { try { const h = new URL(url).hostname; return SE_VEN_DENTRO.some(d => h === d || h.endsWith("." + d)); } catch (e) { return false; } };
+const nombreWeb = (url) => { try { return new URL(url).hostname.replace(/^www\.|^en\.|^es\./, ""); } catch (e) { return "esa web"; } };
+const esAppInstalada = () => window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;
+const esIphone = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
+function enlace(url, texto) {
+  const dentro = seVeDentro(url);
+  return `<a href="${esc(url)}" target="_blank" rel="noopener" class="ext" data-dentro="${dentro ? 1 : 0}">${texto}<span>${dentro ? "📲" : "↗"}</span></a>`;
+}
+
+// Visor dentro de la app, con botón grande para volver
+function abrirVisor(url, titulo) {
+  cerrarVisor(true);
+  const v = document.createElement("div");
+  v.className = "visor";
+  v.innerHTML = `<div class="barra-visor">
+      <button class="volver-visor">← Volver a Canelo Wind</button>
+      <a class="fuera-visor" href="${esc(url)}" target="_blank" rel="noopener" title="Abrir en el navegador">↗</a>
+    </div>
+    <div class="titulo-visor">${esc(titulo)}</div>
+    <iframe src="${esc(url)}" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+  document.body.appendChild(v);
+  document.body.style.overflow = "hidden";
+  v.querySelector(".volver-visor").onclick = () => history.back();
+  history.pushState({ visor: true }, "");
+}
+function cerrarVisor(sinHistorial) {
+  const v = document.querySelector(".visor"); if (!v) return;
+  v.remove(); document.body.style.overflow = "";
+}
+window.addEventListener("popstate", () => { cerrarVisor(); cerrarAvisoFuera(); });
+
+// Aviso antes de salir a una web que no deja verse dentro
+function avisoFuera(url, titulo) {
+  if (leer("sinAvisoFuera", false) || !esAppInstalada()) { window.open(url, "_blank", "noopener"); return; }
+  const comoVolver = esIphone()
+    ? `Para volver, toca <b>«◀ Canelo Wind»</b> arriba a la izquierda de la pantalla (junto a la hora).<br>O desliza hacia arriba desde el borde de abajo, para un poco, y elige Canelo Wind.`
+    : `Para volver, pulsa el botón <b>Atrás</b> del móvil o elige Canelo Wind en las apps abiertas.`;
+  const f = document.createElement("div");
+  f.className = "fondo aviso-fuera";
+  f.innerHTML = `<div class="caja"><h3>↗ Se abrirá fuera de la app</h3>
+    <p style="margin-top:0"><b>${esc(nombreWeb(url))}</b> no deja verse dentro de Canelo Wind, así que se abrirá en el navegador.</p>
+    <p>${comoVolver}</p>
+    <label class="aviso" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="noAvisar"> Ya lo sé, no me lo vuelvas a decir</label>
+    <div class="fila" style="margin-top:12px"><a class="btn" id="abrirFuera" href="${esc(url)}" target="_blank" rel="noopener" style="text-decoration:none">Abrir ${esc(titulo)}</a><button class="btn sec" id="cancelarFuera">Cancelar</button></div></div>`;
+  document.body.appendChild(f);
+  const cerrar = () => f.remove();
+  f.onclick = (e) => { if (e.target === f) cerrar(); };
+  f.querySelector("#cancelarFuera").onclick = cerrar;
+  f.querySelector("#abrirFuera").onclick = () => { if (f.querySelector("#noAvisar").checked) guardar("sinAvisoFuera", true); setTimeout(cerrar, 300); };
+}
+function cerrarAvisoFuera() { const f = document.querySelector(".aviso-fuera"); if (f) f.remove(); }
+
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a.ext"); if (!a) return;
+  e.preventDefault();
+  const titulo = a.childNodes[0].textContent.trim();
+  if (a.dataset.dentro === "1") abrirVisor(a.href, titulo); else avisoFuera(a.href, titulo.replace(/^\S+\s/, ""));
+});
 
 // ---------- Buzón de sugerencias ----------
 function abrirSugerencias() {
