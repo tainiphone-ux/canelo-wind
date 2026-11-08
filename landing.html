@@ -24,9 +24,21 @@
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+html { background: var(--bg); }
+body { margin: 0; background: transparent; color: var(--text); font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 a { color: var(--brand); }
 .envoltura { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+/* Vídeo de fondo difuminado (wing foil, windsurf y kite alternando) */
+.fondo-video { position: fixed; inset: 0; z-index: -2; overflow: hidden; background: #123447; }
+.fondo-video video { position: absolute; top: -40px; left: -40px; width: calc(100% + 80px); height: calc(100% + 80px); object-fit: cover;
+  filter: blur(4px) saturate(1.25) brightness(1.05); opacity: 0; transition: opacity 1.6s ease; }
+.fondo-video video.on { opacity: 1; }
+.velo { position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 12%, transparent) 0%, color-mix(in srgb, var(--bg) 30%, transparent) 50%, color-mix(in srgb, var(--bg) 55%, transparent) 100%); }
+.deporte-ahora { position: fixed; left: 16px; bottom: 16px; z-index: 5; background: rgba(0,0,0,.45); color: #fff; backdrop-filter: blur(6px);
+  border-radius: 999px; padding: 6px 14px; font-size: 14px; font-weight: 700; transition: opacity .4s; }
+@media (prefers-reduced-motion: reduce) { .fondo-video video { transition: none; } }
 
 /* Barra de arriba */
 nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
@@ -47,11 +59,13 @@ nav .der { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 
 /* Portada */
 .portada { padding: 56px 0 40px; overflow: hidden; }
+.portada .texto { background: color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 28px; padding: 28px; border: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
+@media (max-width: 600px) { .portada .texto { padding: 20px; border-radius: 22px; } }
 .portada .envoltura { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
 .etiqueta { display: inline-block; background: var(--chip); color: var(--brand); font-weight: 800; font-size: 13px; letter-spacing: .5px; text-transform: uppercase; padding: 6px 12px; border-radius: 999px; }
-h1 { font-size: clamp(36px, 6vw, 60px); line-height: 1.05; margin: 16px 0 14px; letter-spacing: -1px; }
+h1 { text-shadow: 0 2px 18px color-mix(in srgb, var(--bg) 70%, transparent); font-size: clamp(36px, 6vw, 60px); line-height: 1.05; margin: 16px 0 14px; letter-spacing: -1px; }
 h1 span { background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.portada p.lema { font-size: 20px; color: var(--muted); margin: 0 0 26px; max-width: 34em; }
+.portada p.lema { font-size: 20px; color: var(--text); opacity: .85; font-weight: 500; margin: 0 0 26px; max-width: 34em; }
 .botones { display: flex; gap: 10px; flex-wrap: wrap; }
 .sellos { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 22px; color: var(--muted); font-size: 15px; font-weight: 600; }
 
@@ -64,18 +78,18 @@ h1 span { background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); -
 .movil-nota { text-align: center; color: var(--muted); font-size: 13px; margin-top: 10px; }
 
 /* Cifras */
-.cifras { background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); color: #fff; padding: 26px 0; }
+.cifras { background: linear-gradient(135deg, rgba(224,138,60,.88), rgba(154,68,22,.88)); backdrop-filter: blur(6px); color: #fff; padding: 26px 0; }
 .cifras .envoltura { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center; }
 .cifra b { display: block; font-size: 36px; line-height: 1.1; }
 .cifra span { opacity: .9; font-size: 15px; }
 
 /* Secciones */
-section.bloque { padding: 70px 0; }
-section.bloque.alt { background: var(--bg2); }
+section.bloque { padding: 70px 0; background: color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+section.bloque.alt { background: color-mix(in srgb, var(--bg2) 80%, transparent); }
 h2 { font-size: clamp(28px, 4vw, 40px); line-height: 1.15; margin: 0 0 10px; letter-spacing: -.5px; }
 .intro { color: var(--muted); font-size: 18px; margin: 0 0 34px; max-width: 40em; }
 .rejilla { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.tarjeta { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 24px; }
+.tarjeta { background: color-mix(in srgb, var(--card) 90%, transparent); border: 1px solid var(--line); border-radius: 20px; padding: 24px; }
 .tarjeta .ico { font-size: 34px; }
 .tarjeta h3 { margin: 10px 0 6px; font-size: 19px; }
 .tarjeta p { margin: 0; color: var(--muted); font-size: 16px; }
@@ -117,7 +131,7 @@ h2 { font-size: clamp(28px, 4vw, 40px); line-height: 1.15; margin: 0 0 10px; let
 .final p { opacity: .92; font-size: 18px; margin: 0 0 24px; }
 .final .boton.prin { background: #fff; color: var(--brand-b); }
 .final .boton.sec { background: rgba(255,255,255,.15); color: #fff; border-color: rgba(255,255,255,.4); }
-footer { border-top: 1px solid var(--line); padding: 26px 0 40px; color: var(--muted); font-size: 14px; text-align: center; }
+footer { background: color-mix(in srgb, var(--bg) 85%, transparent); border-top: 1px solid var(--line); padding: 26px 0 40px; color: var(--muted); font-size: 14px; text-align: center; }
 footer a { color: var(--muted); }
 
 /* Móvil y tableta */
@@ -140,6 +154,13 @@ footer a { color: var(--muted); }
 </style>
 </head>
 <body>
+<div class="fondo-video" aria-hidden="true">
+  <video muted playsinline loop preload="auto" poster="videos/wing.jpg" data-dep="wing"><source src="videos/wing.mp4" type="video/mp4"></video>
+  <video muted playsinline loop preload="metadata" poster="videos/windsurf.jpg" data-dep="windsurf"><source src="videos/windsurf.mp4" type="video/mp4"></video>
+  <video muted playsinline loop preload="metadata" poster="videos/kite.jpg" data-dep="kite"><source src="videos/kite.mp4" type="video/mp4"></video>
+</div>
+<div class="velo"></div>
+<div class="deporte-ahora" id="deporteAhora" aria-hidden="true">🪽 Wing foil</div>
 
 <nav>
   <div class="envoltura">
@@ -156,7 +177,7 @@ footer a { color: var(--muted); }
 
 <header class="portada">
   <div class="envoltura">
-    <div>
+    <div class="texto">
       <span class="etiqueta" data-t="etiqueta">Windsurf · Kitesurf · Wing foil</span>
       <h1 data-t="titulo">El viento de tu spot, <span>en un vistazo</span></h1>
       <p class="lema" data-t="lema"></p>
@@ -249,7 +270,7 @@ footer a { color: var(--muted); }
 <footer>
   <div class="envoltura">
     <div data-t="pie"></div>
-    <div style="margin-top:6px"><a href="./">Canelo Wind</a> · <a href="instalar.html" data-t="pie_inst">Instalar</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></div>
+    <div style="margin-top:6px"><a href="./">Canelo Wind</a> · <a href="instalar.html" data-t="pie_inst">Instalar</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> · <span data-t="videos">Vídeos</span>: <a href="https://www.pexels.com/" target="_blank" rel="noopener">Pexels</a> (David Pickup, SuperClaudio)</div>
   </div>
 </footer>
 
@@ -287,7 +308,7 @@ const L = {
     d_tit: "Hecha para Miki «el Canelo»", d_txt: "Canelo Wind nació pensando en un amigo que vive mirando el viento. Por eso el color canela del logo, la ola y el ala de wing.",
     d_frase: "«Mira el viento, elige el spot y al agua.»",
     fin_tit: "¿Hay viento hoy?", fin_txt: "Ábrela y lo sabrás en dos segundos.",
-    pie: "Previsión de Open-Meteo (modelos meteorológicos). Comprueba siempre el viento medido y el estado del mar antes de salir.", pie_inst: "Instalar",
+    pie: "Previsión de Open-Meteo (modelos meteorológicos). Comprueba siempre el viento medido y el estado del mar antes de salir.", pie_inst: "Instalar", videos: "Vídeos",
   },
   en: {
     abrir_corto: "Open the app", etiqueta: "Windsurf · Kitesurf · Wing foil",
@@ -318,7 +339,7 @@ const L = {
     d_tit: "Made for Miki «el Canelo»", d_txt: "Canelo Wind was born thinking of a friend who lives watching the wind. That's why the logo is cinnamon-coloured (canela), with a wave and a wing.",
     d_frase: "«Check the wind, pick the spot, hit the water.»",
     fin_tit: "Is there wind today?", fin_txt: "Open it and you'll know in two seconds.",
-    pie: "Forecast by Open-Meteo (weather models). Always check the measured wind and the sea before going out.", pie_inst: "Install",
+    pie: "Forecast by Open-Meteo (weather models). Always check the measured wind and the sea before going out.", pie_inst: "Install", videos: "Videos",
   },
   de: {
     abrir_corto: "App öffnen", etiqueta: "Windsurf · Kitesurf · Wingfoil",
@@ -349,7 +370,7 @@ const L = {
     d_tit: "Gemacht für Miki «el Canelo»", d_txt: "Canelo Wind entstand für einen Freund, der ständig den Wind beobachtet. Deshalb das zimtfarbene Logo (canela) mit Welle und Wing.",
     d_frase: "«Wind checken, Spot wählen, ab ins Wasser.»",
     fin_tit: "Gibt es heute Wind?", fin_txt: "Öffne sie und du weißt es in zwei Sekunden.",
-    pie: "Vorhersage von Open-Meteo (Wettermodelle). Prüfe vor dem Rausgehen immer den gemessenen Wind und das Meer.", pie_inst: "Installieren",
+    pie: "Vorhersage von Open-Meteo (Wettermodelle). Prüfe vor dem Rausgehen immer den gemessenen Wind und das Meer.", pie_inst: "Installieren", videos: "Videos",
   },
   fr: {
     abrir_corto: "Ouvrir l'appli", etiqueta: "Windsurf · Kitesurf · Wingfoil",
@@ -380,7 +401,7 @@ const L = {
     d_tit: "Faite pour Miki «el Canelo»", d_txt: "Canelo Wind est née en pensant à un ami qui passe sa vie à regarder le vent. D'où le logo couleur cannelle (canela), avec une vague et une aile de wing.",
     d_frase: "«Regarde le vent, choisis le spot, et à l'eau.»",
     fin_tit: "Y a-t-il du vent aujourd'hui ?", fin_txt: "Ouvre-la et tu le sauras en deux secondes.",
-    pie: "Prévisions Open-Meteo (modèles météo). Vérifie toujours le vent mesuré et l'état de la mer avant de sortir.", pie_inst: "Installer",
+    pie: "Prévisions Open-Meteo (modèles météo). Vérifie toujours le vent mesuré et l'état de la mer avant de sortir.", pie_inst: "Installer", videos: "Vidéos",
   },
   it: {
     abrir_corto: "Apri l'app", etiqueta: "Windsurf · Kitesurf · Wing foil",
@@ -411,7 +432,7 @@ const L = {
     d_tit: "Fatta per Miki «el Canelo»", d_txt: "Canelo Wind è nata pensando a un amico che vive guardando il vento. Per questo il logo color cannella (canela), con un'onda e un'ala da wing.",
     d_frase: "«Guarda il vento, scegli lo spot e in acqua.»",
     fin_tit: "C'è vento oggi?", fin_txt: "Aprila e lo saprai in due secondi.",
-    pie: "Previsioni di Open-Meteo (modelli meteo). Controlla sempre il vento misurato e lo stato del mare prima di uscire.", pie_inst: "Installa",
+    pie: "Previsioni di Open-Meteo (modelli meteo). Controlla sempre il vento misurato e lo stato del mare prima di uscire.", pie_inst: "Installa", videos: "Video",
   },
 };
 
@@ -451,6 +472,30 @@ function pintar() {
 document.getElementById("btnIdioma").onclick = (e) => { e.stopPropagation(); document.getElementById("menuIdiomas").classList.toggle("abierto"); };
 document.addEventListener("click", () => document.getElementById("menuIdiomas").classList.remove("abierto"));
 pintar();
+
+// ---------- Vídeos de fondo: se van alternando con un fundido ----------
+const videos = [...document.querySelectorAll(".fondo-video video")];
+const ICONOS = { wing: "🪽", windsurf: "🏄", kite: "🪁" };
+let actual = 0;
+const sinMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function etiquetaDeporte() {
+  const d = videos[actual].dataset.dep;
+  document.getElementById("deporteAhora").textContent = ICONOS[d] + " " + t("dep_" + d);
+}
+function mostrarVideo(i) {
+  actual = i;
+  videos.forEach((v, k) => {
+    if (k === i) { v.classList.add("on"); if (!sinMovimiento) { try { v.currentTime = 0; } catch (e) {} v.play().catch(() => {}); } }
+    else { v.classList.remove("on"); setTimeout(() => { if (!v.classList.contains("on")) v.pause(); }, 1800); }
+  });
+  // Ir cargando el siguiente para que no se quede en negro
+  const sig = videos[(i + 1) % videos.length]; if (sig.preload !== "auto") { sig.preload = "auto"; sig.load(); }
+  etiquetaDeporte();
+}
+mostrarVideo(0);
+if (!sinMovimiento) setInterval(() => mostrarVideo((actual + 1) % videos.length), 7000);
+// Al cambiar de idioma, la etiqueta del deporte también
+document.getElementById("menuIdiomas").addEventListener("click", () => setTimeout(etiquetaDeporte, 0));
 </script>
 </body>
 </html>

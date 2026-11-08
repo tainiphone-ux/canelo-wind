@@ -6,7 +6,7 @@ Valentín no es programador: **háblale siempre en español, también en los men
 
 ## Dónde está
 - Web: https://tainiphone-ux.github.io/canelo-wind/ (GitHub Pages). Instrucciones de instalación: `instalar.html` (en los 5 idiomas, con su propio diccionario `T` dentro; usa el idioma guardado de la app).
-- Landing page (presentación): https://tainiphone-ux.github.io/canelo-wind/landing.html — `landing.html`, 5 idiomas (diccionario `L` dentro), móvil con la app real en un iframe (`./?lang=xx`: `?lang=` fuerza el idioma sin preguntar), nº de spots y regiones salen solos de spots.js. Enlazada desde el pie de la app («ℹ️ Qué es Canelo Wind»).
+- Landing page (presentación): https://tainiphone-ux.github.io/canelo-wind/landing.html — `landing.html`, 5 idiomas (diccionario `L` dentro), móvil con la app real en un iframe (`./?lang=xx`: `?lang=` fuerza el idioma sin preguntar), nº de spots y regiones salen solos de spots.js. Enlazada desde el pie de la app («ℹ️ Qué es Canelo Wind»). Fondo: vídeos difuminados que se alternan cada 7 s (`videos/wing.mp4`, `windsurf.mp4`, `kite.mp4` + sus .jpg; de Pexels, licencia libre; autores David Pickup y SuperClaudio; comprimidos con `avconvert -p Preset640x480`, 6-8 s). Con «reducir movimiento» se queda la imagen fija.
 - Repositorio público: https://github.com/tainiphone-ux/canelo-wind (cuenta `tainiphone-ux`, rama `main`).
 - Historial git fuera de iCloud: `Historial Canelo Wind.nosync` (el `.git` de la carpeta apunta ahí). `gh repo …` no lo reconoce; `git` sí.
 - **Publicar un cambio:** `git add -A && git commit -m "…" && git push` desde esta carpeta (mensaje en español, terminar con la línea Co-Authored-By). La web se actualiza en ~1 minuto. Valentín ya dio permiso para publicarla (08-11-2026).
