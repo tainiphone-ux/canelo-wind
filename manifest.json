@@ -1,0 +1,14 @@
+{
+  "name": "Canelo Wind",
+  "short_name": "Canelo Wind",
+  "description": "Viento y olas para windsurf, kite y wing foil",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F6F1EA",
+  "theme_color": "#9A4416",
+  "icons": [
+    { "src": "icono-iphone.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icono-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "logo.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
