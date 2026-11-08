@@ -578,7 +578,7 @@ async function pintarReportes(spot) {
 
 // ---------- Enlaces de fuera (webcams, anemómetros, mapas) ----------
 // Webs que dejan verse dentro de la app (comprobado el 08-11-2026). Las demás lo prohíben.
-const SE_VEN_DENTRO = ["in2thebeach.es", "fuerteventuraplayas.com", "embed.windy.com", "mangolinkworld.com", "azulkiteboarding.com"];
+const SE_VEN_DENTRO = ["in2thebeach.es", "fuerteventuraplayas.com", "embed.windy.com", "mangolinkworld.com", "azulkiteboarding.com", "bergfex.at"];
 const seVeDentro = (url) => { try { const h = new URL(url).hostname; return SE_VEN_DENTRO.some(d => h === d || h.endsWith("." + d)); } catch (e) { return false; } };
 const nombreWeb = (url) => { try { return new URL(url).hostname.replace(/^www\.|^en\.|^es\./, ""); } catch (e) { return t("esa_web"); } };
 const esAppInstalada = () => window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;

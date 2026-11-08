@@ -19,6 +19,7 @@ const SPOTS = [
     buenos: ["NE", "E", "N"], nivel: "Todos los niveles",
     nota: "El spot más conocido de Tenerife. Alisio del NE casi todo el año, agua bastante plana dentro de la bahía.",
     anemometros: [
+      { nombre: "Estación de El Cabezo (bergfex) · viento en directo", url: "https://cabezo.bergfex.at/" },
       { nombre: "Azul Kiteboarding · cámara y anemómetro El Médano", url: "https://www.azulkiteboarding.com/es/el-medano-live" },
       { nombre: "Windfinder · El Médano", url: "https://www.windfinder.com/report/el_medano" },
       ESTACIONES.tfs,
@@ -35,6 +36,7 @@ const SPOTS = [
     buenos: ["NE", "E", "N"], nivel: "Avanzado (olas)",
     nota: "Spot de olas y viento fuerte, sede del PWA. Fondo de roca: cuidado con la marea baja.",
     anemometros: [
+      { nombre: "Estación de El Cabezo (bergfex) · viento en directo", url: "https://cabezo.bergfex.at/" },
       { nombre: "Azul Kiteboarding · cámara y anemómetro El Médano", url: "https://www.azulkiteboarding.com/es/el-medano-live" },
       { nombre: "Windfinder · El Médano", url: "https://www.windfinder.com/report/el_medano" },
       ESTACIONES.tfs,
