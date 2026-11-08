@@ -11,6 +11,12 @@ Valentín no es programador: **háblale siempre en español, también en los men
 - Historial git fuera de iCloud: `Historial Canelo Wind.nosync` (el `.git` de la carpeta apunta ahí). `gh repo …` no lo reconoce; `git` sí.
 - **Publicar un cambio:** `git add -A && git commit -m "…" && git push` desde esta carpeta (mensaje en español, terminar con la línea Co-Authored-By). La web se actualiza en ~1 minuto. Valentín ya dio permiso para publicarla (08-11-2026).
 
+## Cuentas del proyecto (sin contraseñas: esas las guarda Valentín)
+- Correo de Canelo Wind: **windcanelo@gmail.com** (Gmail creado por Valentín el 08-11-2026). Úsalo para todo lo de Canelo Wind (GoatCounter, Instagram, patrocinadores…).
+- GoatCounter (visitas): https://canelowind.goatcounter.com — cuenta windcanelo@gmail.com.
+- GitHub: cuenta `tainiphone-ux` (repo canelo-wind).
+- Formularios de Google (reportes y sugerencias): cuenta tainiphone@gmail.com.
+
 ## Archivos
 - `index.html` — la app entera (lista de spots, ficha con previsión, reportes, buzón, visor de enlaces).
 - `spots.js` — los spots (93: 29 de Canarias y 64 del resto de España; 12 regiones; 3 embalses de interior con `interior: true` = sin olas ni mareas y viento con cell_selection=land). Para añadir uno, copiar un bloque. `buenos` = direcciones de viento buenas. Fuera de Canarias llevan `region` (comunidad) e `isla` = provincia o isla; la hora sale sola (Canarias o península, `tzDe`).
