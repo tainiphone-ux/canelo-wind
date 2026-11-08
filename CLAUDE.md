@@ -5,7 +5,7 @@ App web de viento, rachas y olas para windsurf, kitesurf y wing foil. La hace Va
 Valentín no es programador: **háblale siempre en español, también en los mensajes mientras trabajas**, claro y sin jerga. Al acabar, dile en pocas líneas qué has hecho y qué tiene que probar. No pongas enlaces en negrita (al copiarlos se llevan los asteriscos).
 
 ## Dónde está
-- Web: https://tainiphone-ux.github.io/canelo-wind/ (GitHub Pages). Instrucciones de instalación: `instalar.html`.
+- Web: https://tainiphone-ux.github.io/canelo-wind/ (GitHub Pages). Instrucciones de instalación: `instalar.html` (en los 5 idiomas, con su propio diccionario `T` dentro; usa el idioma guardado de la app).
 - Repositorio público: https://github.com/tainiphone-ux/canelo-wind (cuenta `tainiphone-ux`, rama `main`).
 - Historial git fuera de iCloud: `Historial Canelo Wind.nosync` (el `.git` de la carpeta apunta ahí). `gh repo …` no lo reconoce; `git` sí.
 - **Publicar un cambio:** `git add -A && git commit -m "…" && git push` desde esta carpeta (mensaje en español, terminar con la línea Co-Authored-By). La web se actualiza en ~1 minuto. Valentín ya dio permiso para publicarla (08-11-2026).
@@ -30,7 +30,6 @@ Valentín no es programador: **háblale siempre en español, también en los men
 - Probar en el Mac: `python3 -m http.server 8765 --bind 127.0.0.1` desde esta carpeta y abrir http://127.0.0.1:8765.
 
 ## Pendiente / ideas
-- `instalar.html` sigue solo en español.
 - Ampliar a Europa y mundo (España hecha el 08-11-2026). Windfinder corta si se le piden muchas páginas seguidas (error 429): comprobar enlaces despacio.
 - Del Word «PROYECTOS CLAUDE/Wing Foil/Aplicación para wing foil.docx» ya está todo (08-11-2026): mareas (Open-Meteo `sea_level_height_msl` cada 15 min, `pintarMareas`), Playa de Troya, Azul Kiteboarding y Windguru. Punta del Hidalgo NO: Valentín no lo quiere.
 - No probado aún en un iPhone de verdad: el visor de webcams y el aviso de volver.

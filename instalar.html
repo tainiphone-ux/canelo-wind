@@ -18,6 +18,9 @@ header { text-align: center; padding: 28px 16px 22px; padding-top: max(28px, env
 header img { width: 84px; height: 84px; border-radius: 20px; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
 header h1 { margin: 12px 0 4px; font-size: 26px; }
 header p { margin: 0; opacity: .9; }
+.banderas { display: flex; justify-content: center; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
+.banderas button { border: 0; background: rgba(255,255,255,.18); color: #fff; border-radius: 10px; padding: 6px 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.banderas button.on { background: #fff; color: #9A4416; }
 main { max-width: 620px; margin: 0 auto; padding: 16px 16px 40px; }
 .tabs { display: flex; gap: 8px; margin: 4px 0 14px; }
 .tab { flex: 1; border: 0; background: var(--chip); color: var(--text); padding: 12px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; }
@@ -43,8 +46,9 @@ ul.lista li { margin-bottom: 6px; }
 <body>
 <header>
   <img src="icono-iphone.png" alt="">
-  <h1>Instalar Canelo Wind</h1>
-  <p>Ten la app en tu móvil en 1 minuto. Gratis, sin App Store.</p>
+  <h1 data-t="titulo">Instalar Canelo Wind</h1>
+  <p data-t="sub">Ten la app en tu móvil en 1 minuto. Gratis, sin App Store.</p>
+  <div class="banderas" id="banderas"></div>
 </header>
 <main>
   <div class="tabs">
@@ -53,61 +57,187 @@ ul.lista li { margin-bottom: 6px; }
   </div>
 
   <section class="caja" data-panel="iphone">
-    <h2>En el iPhone</h2>
+    <h2 data-t="en_iphone">En el iPhone</h2>
     <ol class="pasos">
-      <li><b>Abre la app en Safari</b>Tiene que ser Safari (la brújula azul), no Chrome ni Instagram ni WhatsApp. Si te llegó el enlace por WhatsApp, pulsa los tres puntos o el botón de compartir y elige «Abrir en Safari».</li>
-      <li><b>Pulsa el botón de compartir</b>Es el cuadrado con una flecha hacia arriba <span class="icono">⬆️</span>, abajo en el centro de la pantalla (en algunos iPhone está arriba a la derecha).</li>
-      <li><b>Pulsa «Añadir a pantalla de inicio»</b>Baja un poco en la lista hasta verlo <span class="icono">➕</span>. Si no aparece, baja del todo, pulsa «Editar acciones…» y actívalo.</li>
-      <li><b>Pulsa «Añadir»</b>Arriba a la derecha. Deja el nombre «Canelo Wind».</li>
-      <li><b>¡Listo!</b>En tu pantalla de inicio tienes el icono color canela con la ola. Se abre como cualquier app.</li>
+      <li data-t="i1"></li>
+      <li data-t="i2"></li>
+      <li data-t="i3"></li>
+      <li data-t="i4"></li>
+      <li data-t="i5"></li>
     </ol>
   </section>
 
   <section class="caja" data-panel="android" hidden>
-    <h2>En Android</h2>
+    <h2 data-t="en_android">En Android</h2>
     <ol class="pasos">
-      <li><b>Abre la app en Chrome</b>Si te llegó el enlace por WhatsApp, pulsa los tres puntos y elige «Abrir en Chrome».</li>
-      <li><b>Pulsa el menú</b>Los tres puntos <span class="icono">⋮</span> arriba a la derecha.</li>
-      <li><b>Pulsa «Instalar aplicación» o «Añadir a pantalla de inicio»</b>Según el móvil sale uno u otro; los dos sirven.</li>
-      <li><b>Confirma con «Instalar» o «Añadir»</b></li>
-      <li><b>¡Listo!</b>El icono de Canelo Wind aparece en tu pantalla de inicio o entre tus aplicaciones.</li>
+      <li data-t="a1"></li>
+      <li data-t="a2"></li>
+      <li data-t="a3"></li>
+      <li data-t="a4"></li>
+      <li data-t="a5"></li>
     </ol>
   </section>
 
   <section class="caja">
-    <h2>Abrir la app</h2>
-    <a class="boton" href="./">🪁 Abrir Canelo Wind</a>
+    <h2 data-t="abrir_tit">Abrir la app</h2>
+    <a class="boton" href="./" data-t="abrir_btn">🪁 Abrir Canelo Wind</a>
     <div class="enlace">
       <input id="url" readonly value="https://tainiphone-ux.github.io/canelo-wind/">
-      <button id="copiar">Copiar</button>
+      <button id="copiar" data-t="copiar">Copiar</button>
     </div>
-    <p class="nota" style="margin-bottom:0">Copia este enlace para pasárselo a quien quieras.</p>
+    <p class="nota" style="margin-bottom:0" data-t="copiar_nota">Copia este enlace para pasárselo a quien quieras.</p>
   </section>
 
   <section class="caja">
-    <h2>Bueno saber</h2>
+    <h2 data-t="saber_tit">Bueno saber</h2>
     <ul class="lista">
-      <li>Es gratis y no hace falta cuenta.</li>
-      <li>Se actualiza sola: al abrirla siempre tienes la última versión.</li>
-      <li>Necesita internet para cargar la previsión.</li>
-      <li>Si estás en el agua, manda tu reporte desde el spot: así la app mejora para todos. 🤙</li>
-      <li>¿Ideas o falta un spot? Usa el botón 💡 de la app.</li>
+      <li data-t="s1"></li>
+      <li data-t="s2"></li>
+      <li data-t="s3"></li>
+      <li data-t="s4"></li>
+      <li data-t="s5"></li>
     </ul>
   </section>
 </main>
 <script>
-  const ponerSO = (so) => {
-    document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.dataset.so === so));
-    document.querySelectorAll("[data-panel]").forEach(p => p.hidden = p.dataset.panel !== so);
-  };
-  document.querySelectorAll(".tab").forEach(t => t.onclick = () => ponerSO(t.dataset.so));
-  if (/android/i.test(navigator.userAgent)) ponerSO("android");
-  document.getElementById("copiar").onclick = async (e) => {
-    const url = document.getElementById("url");
-    try { await navigator.clipboard.writeText(url.value); } catch (err) { url.select(); document.execCommand("copy"); }
-    e.target.textContent = "¡Copiado!";
-    setTimeout(() => e.target.textContent = "Copiar", 2000);
-  };
+// Textos de esta página en los 5 idiomas de la app (pueden llevar iconos en HTML)
+const ICO_COMPARTIR = '<span class="icono">⬆️</span>', ICO_MAS = '<span class="icono">➕</span>', ICO_MENU = '<span class="icono">⋮</span>';
+const IDIOMAS = [["es", "🇪🇸", "ES"], ["en", "🇬🇧", "EN"], ["de", "🇩🇪", "DE"], ["fr", "🇫🇷", "FR"], ["it", "🇮🇹", "IT"]];
+const T = {
+  es: {
+    titulo: "Instalar Canelo Wind", sub: "Ten la app en tu móvil en 1 minuto. Gratis, sin App Store.",
+    en_iphone: "En el iPhone", en_android: "En Android",
+    i1: "<b>Abre la app en Safari</b>Tiene que ser Safari (la brújula azul), no Chrome ni Instagram ni WhatsApp. Si te llegó el enlace por WhatsApp, pulsa los tres puntos o el botón de compartir y elige «Abrir en Safari».",
+    i2: `<b>Pulsa el botón de compartir</b>Es el cuadrado con una flecha hacia arriba ${ICO_COMPARTIR}, abajo en el centro de la pantalla (en algunos iPhone está arriba a la derecha).`,
+    i3: `<b>Pulsa «Añadir a pantalla de inicio»</b>Baja un poco en la lista hasta verlo ${ICO_MAS}. Si no aparece, baja del todo, pulsa «Editar acciones…» y actívalo.`,
+    i4: "<b>Pulsa «Añadir»</b>Arriba a la derecha. Deja el nombre «Canelo Wind».",
+    i5: "<b>¡Listo!</b>En tu pantalla de inicio tienes el icono color canela con la ola. Se abre como cualquier app.",
+    a1: "<b>Abre la app en Chrome</b>Si te llegó el enlace por WhatsApp, pulsa los tres puntos y elige «Abrir en Chrome».",
+    a2: `<b>Pulsa el menú</b>Los tres puntos ${ICO_MENU} arriba a la derecha.`,
+    a3: "<b>Pulsa «Instalar aplicación» o «Añadir a pantalla de inicio»</b>Según el móvil sale uno u otro; los dos sirven.",
+    a4: "<b>Confirma con «Instalar» o «Añadir»</b>",
+    a5: "<b>¡Listo!</b>El icono de Canelo Wind aparece en tu pantalla de inicio o entre tus aplicaciones.",
+    abrir_tit: "Abrir la app", abrir_btn: "🪁 Abrir Canelo Wind", copiar: "Copiar", copiado: "¡Copiado!",
+    copiar_nota: "Copia este enlace para pasárselo a quien quieras.",
+    saber_tit: "Bueno saber",
+    s1: "Es gratis y no hace falta cuenta.", s2: "Se actualiza sola: al abrirla siempre tienes la última versión.",
+    s3: "Necesita internet para cargar la previsión.", s4: "Si estás en el agua, manda tu reporte desde el spot: así la app mejora para todos. 🤙",
+    s5: "¿Ideas o falta un spot? Usa el botón 💡 de la app.",
+  },
+  en: {
+    titulo: "Install Canelo Wind", sub: "Get the app on your phone in 1 minute. Free, no App Store.",
+    en_iphone: "On iPhone", en_android: "On Android",
+    i1: "<b>Open the app in Safari</b>It must be Safari (the blue compass), not Chrome, Instagram or WhatsApp. If you got the link on WhatsApp, tap the three dots or the share button and choose «Open in Safari».",
+    i2: `<b>Tap the share button</b>It's the square with an arrow pointing up ${ICO_SHARE()}, at the bottom centre of the screen (on some iPhones it's at the top right).`,
+    i3: `<b>Tap «Add to Home Screen»</b>Scroll down the list a little until you see it ${ICO_MAS}. If it's not there, scroll to the bottom, tap «Edit Actions…» and turn it on.`,
+    i4: "<b>Tap «Add»</b>At the top right. Keep the name «Canelo Wind».",
+    i5: "<b>Done!</b>On your home screen you'll have the cinnamon-coloured icon with the wave. It opens like any other app.",
+    a1: "<b>Open the app in Chrome</b>If you got the link on WhatsApp, tap the three dots and choose «Open in Chrome».",
+    a2: `<b>Tap the menu</b>The three dots ${ICO_MENU} at the top right.`,
+    a3: "<b>Tap «Install app» or «Add to Home screen»</b>Depending on the phone you'll see one or the other; both work.",
+    a4: "<b>Confirm with «Install» or «Add»</b>",
+    a5: "<b>Done!</b>The Canelo Wind icon appears on your home screen or among your apps.",
+    abrir_tit: "Open the app", abrir_btn: "🪁 Open Canelo Wind", copiar: "Copy", copiado: "Copied!",
+    copiar_nota: "Copy this link to share it with anyone you like.",
+    saber_tit: "Good to know",
+    s1: "It's free and you don't need an account.", s2: "It updates itself: when you open it you always have the latest version.",
+    s3: "It needs internet to load the forecast.", s4: "If you're on the water, send your report from the spot: it makes the app better for everyone. 🤙",
+    s5: "Ideas or a missing spot? Use the 💡 button in the app.",
+  },
+  de: {
+    titulo: "Canelo Wind installieren", sub: "Hol dir die App in 1 Minute aufs Handy. Kostenlos, ohne App Store.",
+    en_iphone: "Auf dem iPhone", en_android: "Auf Android",
+    i1: "<b>Öffne die App in Safari</b>Es muss Safari sein (der blaue Kompass), nicht Chrome, Instagram oder WhatsApp. Wenn du den Link per WhatsApp bekommen hast, tippe auf die drei Punkte oder auf Teilen und wähle «In Safari öffnen».",
+    i2: `<b>Tippe auf Teilen</b>Das ist das Quadrat mit dem Pfeil nach oben ${ICO_SHARE()}, unten in der Mitte des Bildschirms (bei manchen iPhones oben rechts).`,
+    i3: `<b>Tippe auf «Zum Home-Bildschirm»</b>Scroll in der Liste etwas nach unten, bis du es siehst ${ICO_MAS}. Wenn es fehlt, scroll ganz nach unten, tippe auf «Aktionen bearbeiten…» und aktiviere es.`,
+    i4: "<b>Tippe auf «Hinzufügen»</b>Oben rechts. Lass den Namen «Canelo Wind».",
+    i5: "<b>Fertig!</b>Auf deinem Home-Bildschirm hast du das zimtfarbene Symbol mit der Welle. Es öffnet sich wie jede andere App.",
+    a1: "<b>Öffne die App in Chrome</b>Wenn du den Link per WhatsApp bekommen hast, tippe auf die drei Punkte und wähle «In Chrome öffnen».",
+    a2: `<b>Tippe auf das Menü</b>Die drei Punkte ${ICO_MENU} oben rechts.`,
+    a3: "<b>Tippe auf «App installieren» oder «Zum Startbildschirm hinzufügen»</b>Je nach Handy erscheint das eine oder das andere; beides funktioniert.",
+    a4: "<b>Bestätige mit «Installieren» oder «Hinzufügen»</b>",
+    a5: "<b>Fertig!</b>Das Symbol von Canelo Wind erscheint auf deinem Startbildschirm oder bei deinen Apps.",
+    abrir_tit: "App öffnen", abrir_btn: "🪁 Canelo Wind öffnen", copiar: "Kopieren", copiado: "Kopiert!",
+    copiar_nota: "Kopiere diesen Link, um ihn mit wem du willst zu teilen.",
+    saber_tit: "Gut zu wissen",
+    s1: "Sie ist kostenlos und du brauchst kein Konto.", s2: "Sie aktualisiert sich selbst: beim Öffnen hast du immer die neueste Version.",
+    s3: "Sie braucht Internet, um die Vorhersage zu laden.", s4: "Wenn du auf dem Wasser bist, schick deinen Bericht vom Spot: so wird die App für alle besser. 🤙",
+    s5: "Ideen oder fehlt ein Spot? Nutze den 💡-Knopf in der App.",
+  },
+  fr: {
+    titulo: "Installer Canelo Wind", sub: "L'appli sur ton mobile en 1 minute. Gratuite, sans App Store.",
+    en_iphone: "Sur iPhone", en_android: "Sur Android",
+    i1: "<b>Ouvre l'appli dans Safari</b>Ce doit être Safari (la boussole bleue), pas Chrome, Instagram ou WhatsApp. Si tu as reçu le lien par WhatsApp, touche les trois points ou le bouton de partage et choisis «Ouvrir dans Safari».",
+    i2: `<b>Touche le bouton de partage</b>C'est le carré avec une flèche vers le haut ${ICO_SHARE()}, en bas au centre de l'écran (sur certains iPhone, en haut à droite).`,
+    i3: `<b>Touche «Sur l'écran d'accueil»</b>Descends un peu dans la liste jusqu'à le voir ${ICO_MAS}. S'il n'apparaît pas, descends tout en bas, touche «Modifier les actions…» et active-le.`,
+    i4: "<b>Touche «Ajouter»</b>En haut à droite. Garde le nom «Canelo Wind».",
+    i5: "<b>C'est fait !</b>Sur ton écran d'accueil tu as l'icône couleur cannelle avec la vague. Elle s'ouvre comme n'importe quelle appli.",
+    a1: "<b>Ouvre l'appli dans Chrome</b>Si tu as reçu le lien par WhatsApp, touche les trois points et choisis «Ouvrir dans Chrome».",
+    a2: `<b>Touche le menu</b>Les trois points ${ICO_MENU} en haut à droite.`,
+    a3: "<b>Touche «Installer l'application» ou «Ajouter à l'écran d'accueil»</b>Selon le téléphone, c'est l'un ou l'autre ; les deux marchent.",
+    a4: "<b>Confirme avec «Installer» ou «Ajouter»</b>",
+    a5: "<b>C'est fait !</b>L'icône de Canelo Wind apparaît sur ton écran d'accueil ou parmi tes applis.",
+    abrir_tit: "Ouvrir l'appli", abrir_btn: "🪁 Ouvrir Canelo Wind", copiar: "Copier", copiado: "Copié !",
+    copiar_nota: "Copie ce lien pour le partager avec qui tu veux.",
+    saber_tit: "Bon à savoir",
+    s1: "C'est gratuit et il ne faut pas de compte.", s2: "Elle se met à jour toute seule : à l'ouverture tu as toujours la dernière version.",
+    s3: "Il faut internet pour charger les prévisions.", s4: "Si tu es sur l'eau, envoie ton rapport depuis le spot : l'appli s'améliore pour tout le monde. 🤙",
+    s5: "Des idées ou il manque un spot ? Utilise le bouton 💡 de l'appli.",
+  },
+  it: {
+    titulo: "Installa Canelo Wind", sub: "L'app sul tuo telefono in 1 minuto. Gratis, senza App Store.",
+    en_iphone: "Su iPhone", en_android: "Su Android",
+    i1: "<b>Apri l'app in Safari</b>Deve essere Safari (la bussola blu), non Chrome, Instagram o WhatsApp. Se hai ricevuto il link su WhatsApp, tocca i tre puntini o il tasto condividi e scegli «Apri in Safari».",
+    i2: `<b>Tocca il tasto condividi</b>È il quadrato con la freccia verso l'alto ${ICO_SHARE()}, in basso al centro dello schermo (su alcuni iPhone è in alto a destra).`,
+    i3: `<b>Tocca «Aggiungi alla schermata Home»</b>Scorri un po' l'elenco finché lo vedi ${ICO_MAS}. Se non c'è, scorri fino in fondo, tocca «Modifica azioni…» e attivalo.`,
+    i4: "<b>Tocca «Aggiungi»</b>In alto a destra. Lascia il nome «Canelo Wind».",
+    i5: "<b>Fatto!</b>Nella schermata Home hai l'icona color cannella con l'onda. Si apre come qualsiasi app.",
+    a1: "<b>Apri l'app in Chrome</b>Se hai ricevuto il link su WhatsApp, tocca i tre puntini e scegli «Apri in Chrome».",
+    a2: `<b>Tocca il menu</b>I tre puntini ${ICO_MENU} in alto a destra.`,
+    a3: "<b>Tocca «Installa app» o «Aggiungi a schermata Home»</b>A seconda del telefono compare l'uno o l'altro; vanno bene tutti e due.",
+    a4: "<b>Conferma con «Installa» o «Aggiungi»</b>",
+    a5: "<b>Fatto!</b>L'icona di Canelo Wind compare nella schermata Home o tra le tue app.",
+    abrir_tit: "Apri l'app", abrir_btn: "🪁 Apri Canelo Wind", copiar: "Copia", copiado: "Copiato!",
+    copiar_nota: "Copia questo link per mandarlo a chi vuoi.",
+    saber_tit: "Buono a sapersi",
+    s1: "È gratis e non serve un account.", s2: "Si aggiorna da sola: quando la apri hai sempre l'ultima versione.",
+    s3: "Serve internet per caricare le previsioni.", s4: "Se sei in acqua, manda la tua segnalazione dallo spot: così l'app migliora per tutti. 🤙",
+    s5: "Idee o manca uno spot? Usa il tasto 💡 dell'app.",
+  },
+};
+function ICO_SHARE() { return ICO_COMPARTIR; }
+
+// Idioma: el elegido en la app (se guarda en este navegador); si no, el del móvil
+const leerIdioma = () => { try { const v = localStorage.getItem("cw_idioma"); return v ? JSON.parse(v) : null; } catch (e) { return null; } };
+let idioma = leerIdioma() || (navigator.language || "es").slice(0, 2).toLowerCase();
+if (!T[idioma]) idioma = "es";
+
+function pintar() {
+  const tx = T[idioma];
+  document.documentElement.lang = idioma;
+  document.title = tx.titulo;
+  document.querySelectorAll("[data-t]").forEach(e => { e.innerHTML = tx[e.dataset.t]; });
+  document.getElementById("banderas").innerHTML = IDIOMAS.map(([c, b, n]) => `<button data-i="${c}" class="${c === idioma ? "on" : ""}">${b} ${n}</button>`).join("");
+  document.querySelectorAll("[data-i]").forEach(b => b.onclick = () => {
+    idioma = b.dataset.i;
+    try { localStorage.setItem("cw_idioma", JSON.stringify(idioma)); } catch (e) {}
+    pintar();
+  });
+}
+pintar();
+
+const ponerSO = (so) => {
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.dataset.so === so));
+  document.querySelectorAll("[data-panel]").forEach(p => p.hidden = p.dataset.panel !== so);
+};
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => ponerSO(t.dataset.so));
+if (/android/i.test(navigator.userAgent)) ponerSO("android");
+document.getElementById("copiar").onclick = async (e) => {
+  const url = document.getElementById("url");
+  try { await navigator.clipboard.writeText(url.value); } catch (err) { url.select(); document.execCommand("copy"); }
+  e.target.textContent = T[idioma].copiado;
+  setTimeout(() => e.target.textContent = T[idioma].copiar, 2000);
+};
 </script>
 </body>
 </html>
