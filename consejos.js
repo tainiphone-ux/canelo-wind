@@ -1,5 +1,7 @@
 // Consejos y avisos de seguridad de cada spot (por su id de spots.js).
 // consejos: lista de frases cortas. seguridad: aviso en rojo (solo si hace falta).
+// peligro: direcciones de viento de tierra (off-shore): esas horas salen «Muy malo» con aviso.
+// marea: "alta" si el spot necesita marea alta: avisa de la hora de la bajamar.
 // Son orientativos: siempre conviene preguntar en las escuelas de la zona.
 
 const CONSEJOS = {
@@ -18,6 +20,7 @@ const CONSEJOS = {
       "Mira la gráfica de mareas: con marea alta hay más agua sobre la roca.",
       "Spot de olas: material pequeño y tabla de olas.",
     ],
+    marea: "alta",
     seguridad: "Fondo de roca y olas: solo para gente con experiencia. Con marea baja queda muy poca agua sobre la roca.",
   },
   "la-tejita": {
@@ -47,6 +50,7 @@ const CONSEJOS = {
       "Para wing, mejor con marea alta (mira la gráfica de mareas).",
       "Hay duchas al norte de la playa y se aparca fácil.",
     ],
+    marea: "alta",
     seguridad: "Con marea baja aparecen piedras cerca de la orilla: cuidado al entrar y salir, sobre todo con foil.",
   },
   "playa-troya": {
@@ -54,6 +58,7 @@ const CONSEJOS = {
       "Funciona los pocos días de viento del oeste o del sur.",
       "Es zona de surf: respeta a los surfistas y a los bañistas.",
     ],
+    peligro: ["NE", "N", "E"],
     seguridad: "Con el alisio del NE aquí el viento sopla de tierra hacia el mar (off-shore): si te pasa algo, te aleja de la costa. No salgas con viento del NE.",
   },
 
@@ -95,6 +100,7 @@ const CONSEJOS = {
       "Dentro de la laguna el agua es plana y poco profunda: perfecto para aprender.",
       "El viento acelera mucho en verano: lleva material pequeño.",
     ],
+    marea: "alta",
     seguridad: "Con la marea bajando la laguna se vacía rápido: puedes quedarte sin agua y golpear el fondo con la quilla o el foil. Fuera de la laguna el viento sopla hacia fuera (side-off) y te aleja de la costa.",
   },
   "risco-del-paso": {
@@ -151,6 +157,7 @@ const CONSEJOS = {
     consejos: [
       "Mejor con viento del este o del sureste, que sopla de lado a la playa.",
     ],
+    peligro: ["N", "NE"],
     seguridad: "Con viento del N o NE sopla de tierra hacia el mar (off-shore): no salgas. Está junto al aeropuerto: infórmate de dónde está permitido volar el kite.",
   },
 

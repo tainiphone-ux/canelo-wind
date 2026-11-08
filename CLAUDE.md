@@ -13,7 +13,7 @@ Valentín no es programador: **háblale siempre en español, también en los men
 ## Archivos
 - `index.html` — la app entera (lista de spots, ficha con previsión, reportes, buzón, visor de enlaces).
 - `spots.js` — los spots (37: 20 de Canarias y 17 de península y Baleares). Para añadir uno, copiar un bloque. `buenos` = direcciones de viento buenas. Fuera de Canarias llevan `region` (comunidad) e `isla` = provincia o isla; la hora sale sola (Canarias o península, `tzDe`).
-- `consejos.js` — consejos y aviso de seguridad de cada spot (por id). Al añadir un spot, añadir también aquí sus consejos (y el aviso si hay corrientes, roca, off-shore, poca agua, puerto o zonas balizadas).
+- `consejos.js` — consejos y aviso de seguridad de cada spot (por id); `peligro` = direcciones off-shore (salen «Muy malo» y aviso) y `marea: "alta"` = avisa de la bajamar. Al añadir un spot, añadir también aquí sus consejos (y el aviso si hay corrientes, roca, off-shore, poca agua, puerto o zonas balizadas).
 - `config.js` — formularios de Google (reportes y sugerencias), ya conectados.
 - `herramientas/crear_formularios.gs` — el Apps Script que creó los formularios.
 - `logo.svg`, `icono-iphone.png`, `icono-512.png`, `manifest.json` — icono y «Añadir a pantalla de inicio».
@@ -24,6 +24,7 @@ Valentín no es programador: **háblale siempre en español, también en los men
 - Viento medido: solo enlaces (AEMET de los aeropuertos con `k=can`, Windfinder, Holfuy). aviationweather.gov no deja leerse desde la web (sin CORS).
 - Reportes y sugerencias: formularios de Google en la cuenta tainiphone@gmail.com. La hoja de reportes está compartida «solo ver» y la app la lee (gviz CSV); la de sugerencias es privada.
 - Enlaces: los que dejan verse dentro (`SE_VEN_DENTRO` en index.html: in2thebeach, fuerteventuraplayas, embed.windy.com, mangolinkworld, azulkiteboarding) se abren en un visor con «← Volver a Canelo Wind»; los demás muestran antes cómo volver (en el iPhone instalado no hay botón atrás). Al añadir un enlace nuevo, comprobar con curl si manda `X-Frame-Options` o `frame-ancestors`.
+- Nota de cada hora (`evaluar` en index.html): Muy malo / Malo / Regular / Bueno / Muy bueno según viento (8–28 kn ideal; en spots de «Experto» hasta 38), dirección buena del spot, rachas (racha − viento ≥ 12), olas (≥2 m malo en spots de aprender) y tormenta. Sale en la lista, en «Ahora mismo», en cada día y en cada hora. `pintarAvisosDia` saca avisos según la previsión del día elegido.
 - Probar en el Mac: `python3 -m http.server 8765 --bind 127.0.0.1` desde esta carpeta y abrir http://127.0.0.1:8765.
 
 ## Pendiente / ideas

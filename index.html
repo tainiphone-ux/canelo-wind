@@ -108,6 +108,17 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 .reporte .cab2 b { color: var(--text); }
 .fondo { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; z-index: 20; overflow-y: auto; }
 .fondo .caja { max-width: 520px; width: 100%; margin: 0; }
+/* Notas y avisos del día */
+.nota { display: inline-block; color: #fff; font-weight: 800; border-radius: 8px; padding: 4px 10px; font-size: 15px; white-space: nowrap; }
+.nota.peq { font-size: 11px; padding: 2px 7px; border-radius: 6px; font-weight: 700; }
+.nota-ahora { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: -2px 0 12px; font-size: 14px; color: var(--muted); }
+.nota-ahora .nota { font-size: 18px; padding: 6px 14px; }
+.avisos-dia { margin: 10px 0; padding: 10px 14px; border-radius: 12px; background: #FFF4D6; color: #6B4A00; border: 1px solid #F2D58A; font-size: 14px; }
+.avisos-dia ul { margin: 6px 0 0; padding-left: 20px; }
+.avisos-dia li { margin-bottom: 4px; }
+.avisos-dia.ok { background: #E6F5EC; color: #1E6B3F; border-color: #A8DDBC; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .avisos-dia { background: #3A2E10; color: #FFE1A0; border-color: #6B5520; }
+  :root:not([data-theme="light"]) .avisos-dia.ok { background: #12301F; color: #A8E6C0; border-color: #2A6040; } }
 /* Consejos y aviso de seguridad */
 .seguridad { margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: #FDE8E6; color: #8A1F17; border: 1px solid #F3B4AD; font-size: 14px; }
 .seguridad b { display: block; margin-bottom: 4px; font-size: 15px; }
@@ -158,7 +169,43 @@ const PUNTOS = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSO","SO","OSO","
 const rumbo = (g) => PUNTOS[Math.round(((g % 360) / 22.5)) % 16];
 // Dirección "buena" del spot: N, NE, E... aceptamos ±30° alrededor
 const GRADOS = { N: 0, NE: 45, E: 90, SE: 135, S: 180, SO: 225, O: 270, NO: 315 };
-const dirBuena = (spot, g) => spot.buenos.some(d => { const dif = Math.abs(((g - GRADOS[d]) + 540) % 360 - 180); return dif <= 30; });
+const enDirecciones = (lista, g) => lista.some(d => Math.abs(((g - GRADOS[d]) + 540) % 360 - 180) <= 30);
+const dirBuena = (spot, g) => enDirecciones(spot.buenos, g);
+
+// ---------- Nota de cada hora: muy malo, malo, regular, bueno, muy bueno ----------
+const NOTAS = [
+  { t: "Muy malo", c: "#C8423B" }, { t: "Malo", c: "#E8793A" }, { t: "Regular", c: "#D9A520" },
+  { t: "Bueno", c: "#5FA83A" }, { t: "Muy bueno", c: "#16924F" },
+];
+const notaHtml = (n, peq) => `<span class="nota${peq ? " peq" : ""}" style="background:${NOTAS[n].c}">${NOTAS[n].t}</span>`;
+// w, g: viento y rachas (nudos) · d: dirección · ola: metros (o null) · codigo: tiempo (95+ = tormenta)
+function evaluar(spot, w, g, d, ola, codigo) {
+  const experto = /experto/i.test(spot.nivel), aprender = /iniciaci|todos/i.test(spot.nivel);
+  const motivos = [];
+  let n;
+  if (w < 8) { n = 0; motivos.push("casi sin viento"); }
+  else if (w < 11) { n = 1; motivos.push("viento flojo"); }
+  else if (w < 14) { n = 2; motivos.push("viento justo"); }
+  else if (w < 18) n = 3;
+  else if (w <= (experto ? 38 : 28)) n = 4;
+  else if (w <= (experto ? 45 : 34)) { n = 3; motivos.push("viento muy fuerte"); }
+  else if (w <= (experto ? 50 : 40)) { n = 1; motivos.push("viento excesivo"); }
+  else { n = 0; motivos.push("viento peligroso"); }
+  const peligro = consejosDe(spot).peligro || [];
+  if (w >= 6 && peligro.length && enDirecciones(peligro, d)) { n = 0; motivos.push("viento de tierra (off-shore): peligroso"); }
+  else if (w >= 8 && !dirBuena(spot, d)) { n = Math.min(n, 1); motivos.push("dirección mala para este spot"); }
+  if (w >= 12 && g - w >= 12) { n = Math.max(0, n - 1); motivos.push("muy racheado"); }
+  if (ola != null && aprender && ola >= 2) { n = Math.max(0, n - 1); motivos.push("mucha ola para este spot"); }
+  if (ola != null && ola >= 3.5 && !experto) { n = Math.max(0, n - 1); motivos.push("olas grandes"); }
+  if (codigo >= 95) { n = 0; motivos.push("tormenta"); }
+  return { n, motivos };
+}
+// Agrupa horas seguidas: [12,13,14,17] → "12–15 h y 17 h"
+function rangos(horas) {
+  const r = [];
+  horas.forEach(hh => { const u = r[r.length - 1]; if (u && hh === u[1] + 1) u[1] = hh; else r.push([hh, hh]); });
+  return r.map(([a, b]) => a === b ? `${a} h` : `${a}–${b + 1} h`).join(", ");
+}
 
 const conv = (kn) => Math.round(kn * UNIDADES[unidad].f);
 // Colores por fuerza del viento (en nudos)
@@ -195,7 +242,7 @@ async function olas(spot) {
 async function vientoAhoraTodos() {
   const lat = SPOTS.map(s => s.lat).join(","), lon = SPOTS.map(s => s.lon).join(",");
   const u = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-    `&current=wind_speed_10m,wind_gusts_10m,wind_direction_10m&wind_speed_unit=kn&timezone=auto&cell_selection=sea`;
+    `&current=wind_speed_10m,wind_gusts_10m,wind_direction_10m,weather_code&wind_speed_unit=kn&timezone=auto&cell_selection=sea`;
   const r = await fetch(u); const j = await r.json();
   (Array.isArray(j) ? j : [j]).forEach((d, i) => { if (SPOTS[i]) SPOTS[i].ahora = d.current; });
 }
@@ -223,7 +270,8 @@ function pintarLista() {
     return `<div class="spot" data-id="${s.id}">
       ${badge}
       <div class="info"><b>${esc(s.nombre)}</b><div class="sub">${esc(s.zona)} · ${esc(s.isla)}</div>
-      <div class="sub">${s.deportes.map(d => ({ windsurf: "🏄 windsurf", kite: "🪁 kite", wing: "🪽 wing" }[d])).join(" · ")}</div></div>
+      <div class="sub">${s.deportes.map(d => ({ windsurf: "🏄 windsurf", kite: "🪁 kite", wing: "🪽 wing" }[d])).join(" · ")}</div>
+      ${a ? `<div style="margin-top:4px">${notaHtml(evaluar(s, a.wind_speed_10m, a.wind_gusts_10m, a.wind_direction_10m, null, a.weather_code || 0).n, true)} <span class="sub">ahora</span></div>` : ""}</div>
       <button class="fav ${favoritos.includes(s.id) ? "on" : ""}" data-fav="${s.id}" title="Favorito">★</button>
     </div>`;
   };
@@ -278,11 +326,15 @@ function dibujarSpot(spot) {
   const u = UNIDADES[unidad].c;
   const c = v.current, oc = o && o.current;
 
+  // Altura de ola a una hora concreta (o null)
+  const olaEn = (t) => { const mi = M ? M.time.indexOf(t) : -1; return mi >= 0 && M.wave_height[mi] != null ? M.wave_height[mi] : null; };
+  const evAhora = evaluar(spot, c.wind_speed_10m, c.wind_gusts_10m, c.wind_direction_10m, oc ? oc.wave_height : null, c.weather_code);
   // Agrupar horas por día
   const dias = [...new Set(H.time.map(t => t.slice(0, 10)))];
   const resumen = dias.map(d => {
     const idx = H.time.map((t, i) => t.startsWith(d) && +t.slice(11, 13) >= 8 && +t.slice(11, 13) <= 19 ? i : -1).filter(i => i >= 0);
-    return { d, max: Math.max(...idx.map(i => H.wind_speed_10m[i])), racha: Math.max(...idx.map(i => H.wind_gusts_10m[i])) };
+    const mejor = Math.max(...idx.map(i => evaluar(spot, H.wind_speed_10m[i], H.wind_gusts_10m[i], H.wind_direction_10m[i], olaEn(H.time[i]), H.weather_code[i]).n));
+    return { d, max: Math.max(...idx.map(i => H.wind_speed_10m[i])), racha: Math.max(...idx.map(i => H.wind_gusts_10m[i])), mejor };
   });
   if (diaElegido >= dias.length) diaElegido = 0;
   const dia = dias[diaElegido];
@@ -311,6 +363,7 @@ function dibujarSpot(spot) {
     <p class="aviso">Consejos orientativos. Si no conoces el spot, pregunta antes en las escuelas de la zona.</p></div>` : ""}
 
   <div class="caja"><h3>Ahora mismo <small style="color:var(--muted);font-weight:400">(previsión del modelo)</small></h3>
+    <div class="nota-ahora">${notaHtml(evAhora.n)}<span>${evAhora.motivos.length ? esc(evAhora.motivos.join(" · ")) : "condiciones buenas para este spot"}</span></div>
     <div class="ahora">
       <div class="dato" style="background:${color(c.wind_speed_10m)};color:#1b1b1b"><div class="n">${conv(c.wind_speed_10m)} <small style="font-size:14px">${u}</small></div><div class="t" style="color:#333">Viento</div></div>
       <div class="dato"><div class="n">${conv(c.wind_gusts_10m)} <small style="font-size:14px">${u}</small></div><div class="t">Rachas</div></div>
@@ -322,13 +375,14 @@ function dibujarSpot(spot) {
 
   <div class="caja"><h3>Previsión por días</h3>
     <div class="dias">${resumen.map((r, i) => `<button class="dia ${i === diaElegido ? "on" : ""}" data-dia="${i}">
-      <div class="d">${nombreDia(r.d, i)}</div><div class="m" style="background:${color(r.max)}">${conv(r.max)}·${conv(r.racha)}</div></button>`).join("")}</div>
-    <p class="aviso">En cada día: viento máximo · racha máxima entre las 8 y las 19 h (${u}).</p>
+      <div class="d">${nombreDia(r.d, i)}</div><div class="m" style="background:${color(r.max)}">${conv(r.max)}·${conv(r.racha)}</div><div style="margin-top:4px">${notaHtml(r.mejor, true)}</div></button>`).join("")}</div>
+    <p class="aviso">En cada día: viento máximo · racha máxima (${u}) y la mejor nota entre las 8 y las 19 h.</p>
+    <div id="avisosDia"></div>
     <div class="grafica" id="grafica"></div>
     <div class="fila"><span class="aviso" style="margin:0">${sol}</span>
       <label class="noche"><input type="checkbox" id="noche" ${verNoche ? "checked" : ""}> Ver también la noche</label></div>
     <div class="tabla"><table>
-      <tr><th>Hora</th><th>Viento</th><th>Rachas</th><th>Dirección</th><th>Olas</th><th>Periodo</th><th>Dir. ola</th><th>Mar de fondo</th><th>Tiempo</th><th>Lluvia</th></tr>
+      <tr><th>Hora</th><th>Nota</th><th>Viento</th><th>Rachas</th><th>Dirección</th><th>Olas</th><th>Periodo</th><th>Dir. ola</th><th>Mar de fondo</th><th>Tiempo</th><th>Lluvia</th></tr>
       ${horas.map(({ t, i }) => {
         const mi = M ? M.time.indexOf(t) : -1;
         const w = H.wind_speed_10m[i], g = H.wind_gusts_10m[i], d = H.wind_direction_10m[i];
@@ -336,7 +390,8 @@ function dibujarSpot(spot) {
         const per = mi >= 0 && M.wave_period[mi] != null ? Math.round(M.wave_period[mi]) + " s" : "–";
         const dola = mi >= 0 && M.wave_direction[mi] != null ? flecha(M.wave_direction[mi]) + " " + rumbo(M.wave_direction[mi]) : "–";
         const fondo = mi >= 0 && M.swell_wave_height[mi] != null ? M.swell_wave_height[mi].toFixed(1) + " m · " + Math.round(M.swell_wave_period[mi] || 0) + " s" : "–";
-        return `<tr class="${dirBuena(spot, d) ? "ok" : ""}"><td>${t.slice(11, 16)}</td>
+        const ev = evaluar(spot, w, g, d, olaEn(t), H.weather_code[i]);
+        return `<tr class="${dirBuena(spot, d) ? "ok" : ""}"><td>${t.slice(11, 16)}</td><td title="${esc(ev.motivos.join(", "))}">${notaHtml(ev.n, true)}</td>
           <td class="v" style="background:${color(w)}">${conv(w)}</td><td class="v" style="background:${color(g)}">${conv(g)}</td>
           <td class="dir">${flecha(d)} ${rumbo(d)}${dirBuena(spot, d) ? " ✓" : ""}</td>
           <td>${ola}</td><td>${per}</td><td>${dola}</td><td>${fondo}</td>
@@ -372,6 +427,7 @@ function dibujarSpot(spot) {
   };
   grafica(H, dia);
   pintarMareas(spot, dia, v.daily, diaElegido);
+  pintarAvisosDia(spot, dia, olaEn);
   pintarReportar(spot);
   pintarReportes(spot);
 }
@@ -596,6 +652,57 @@ $("#btnSugerir").onclick = abrirSugerencias;
 $("#pieSugerir").onclick = (e) => { e.preventDefault(); abrirSugerencias(); };
 
 // Gráfica del día: barras de viento y línea de rachas
+// ---------- Avisos que cambian según la previsión del día elegido ----------
+function pintarAvisosDia(spot, dia, olaEn) {
+  const caja = $("#avisosDia"); if (!caja) return;
+  const { v, o } = cache[spot.id], H = v.hourly;
+  const experto = /experto/i.test(spot.nivel);
+  const idx = H.time.map((t, i) => t.startsWith(dia) && +t.slice(11, 13) >= 7 && +t.slice(11, 13) <= 20 ? i : -1).filter(i => i >= 0);
+  const hh = (i) => +H.time[i].slice(11, 13);
+  const avisos = [];
+  // Viento o rachas muy fuertes
+  const fuertes = idx.filter(i => H.wind_gusts_10m[i] >= (experto ? 40 : 30));
+  if (fuertes.length) {
+    const max = Math.max(...fuertes.map(i => H.wind_gusts_10m[i]));
+    avisos.push(`💨 Rachas de hasta ${conv(max)} ${UNIDADES[unidad].c} (${rangos(fuertes.map(hh))}): ${experto ? "muy fuerte incluso para expertos" : "solo para gente con experiencia y material pequeño"}.`);
+  }
+  // Muy racheado
+  const racheado = idx.filter(i => H.wind_speed_10m[i] >= 12 && H.wind_gusts_10m[i] - H.wind_speed_10m[i] >= 12);
+  if (racheado.length) avisos.push(`🌀 Viento muy racheado (${rangos(racheado.map(hh))}): mucha diferencia entre el viento medio y las rachas.`);
+  // Viento de tierra (off-shore)
+  const peligro = consejosDe(spot).peligro || [];
+  const off = peligro.length ? idx.filter(i => H.wind_speed_10m[i] >= 6 && enDirecciones(peligro, H.wind_direction_10m[i])) : [];
+  if (off.length) avisos.push(`🚫 Viento de tierra hacia el mar (off-shore) (${rangos(off.map(hh))}): si te pasa algo te aleja de la costa. No salgas esas horas.`);
+  // Dirección mala con viento
+  const mala = idx.filter(i => H.wind_speed_10m[i] >= 12 && !dirBuena(spot, H.wind_direction_10m[i]) && !off.includes(i));
+  if (mala.length >= 3) avisos.push(`🧭 La dirección del viento no es buena para este spot (${rangos(mala.map(hh))}).`);
+  // Tormentas
+  const tormenta = idx.filter(i => H.weather_code[i] >= 95);
+  if (tormenta.length) avisos.push(`⛈️ Posibles tormentas (${rangos(tormenta.map(hh))}): no salgas al agua con tormenta.`);
+  // Olas grandes
+  const olas = idx.map(i => olaEn(H.time[i])).filter(x => x != null);
+  const maxOla = olas.length ? Math.max(...olas) : 0;
+  if (maxOla >= (experto ? 4 : 2.5)) avisos.push(`🌊 Olas de hasta ${maxOla.toFixed(1).replace(".", ",")} m: entrar y salir del agua será difícil.`);
+  // Marea baja en spots que necesitan marea alta
+  if (consejosDe(spot).marea === "alta" && o && o.minutely_15) {
+    const M = o.minutely_15, alt = M.sea_level_height_msl;
+    const k = M.time.map((t, i) => t.startsWith(dia) && alt[i] != null ? i : -1).filter(i => i >= 0);
+    const bajas = [], altas = [];
+    for (let j = 1; j < k.length - 1; j++) {
+      const a = alt[k[j - 1]], b = alt[k[j]], c = alt[k[j + 1]];
+      if (b <= a && b < c) bajas.push(M.time[k[j]].slice(11, 16));
+      if (b >= a && b > c) altas.push(M.time[k[j]].slice(11, 16));
+    }
+    if (bajas.length) avisos.push(`🏖️ Bajamar a las ${bajas.join(" y ")}: poca agua. Mejor salir cerca de la pleamar${altas.length ? " (" + altas.join(" y ") + ")" : ""}.`);
+  }
+  // Sin viento en todo el día
+  const conViento = idx.filter(i => H.wind_speed_10m[i] >= 11);
+  if (!conViento.length) avisos.push(`😴 Poco viento todo el día: no merece la pena ir.`);
+  caja.innerHTML = avisos.length
+    ? `<div class="avisos-dia"><b>⚠️ Avisos según la previsión de este día</b><ul>${avisos.map(a => `<li>${esc(a)}</li>`).join("")}</ul></div>`
+    : `<div class="avisos-dia ok">✅ Sin avisos especiales para este día según la previsión.</div>`;
+}
+
 // ---------- Mareas: curva del día con pleamar, bajamar y horas de sol ----------
 function pintarMareas(spot, dia, daily, iDia) {
   const caja = $("#cajaMareas"); if (!caja) return;
