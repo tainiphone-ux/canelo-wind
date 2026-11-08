@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Instalar Canelo Wind</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icono-iphone.png">
+<meta name="theme-color" content="#9A4416">
+<style>
+:root { --bg: #F6F1EA; --card: #FFFFFF; --text: #2A1E16; --muted: #7A6A5E; --line: #E7DDD1; --brand: #B85A22; --chip: #EFE4D7; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #17120E; --card: #231B15; --text: #F4EAE0; --muted: #B2A193; --line: #3A2E25; --brand: #E08A3C; --chip: #33281F; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+header { text-align: center; padding: 28px 16px 22px; padding-top: max(28px, env(safe-area-inset-top)); background: linear-gradient(135deg, #E08A3C, #9A4416); color: #fff; }
+header img { width: 84px; height: 84px; border-radius: 20px; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+header h1 { margin: 12px 0 4px; font-size: 26px; }
+header p { margin: 0; opacity: .9; }
+main { max-width: 620px; margin: 0 auto; padding: 16px 16px 40px; }
+.tabs { display: flex; gap: 8px; margin: 4px 0 14px; }
+.tab { flex: 1; border: 0; background: var(--chip); color: var(--text); padding: 12px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; }
+.tab.on { background: var(--brand); color: #fff; }
+.caja { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; margin-bottom: 14px; }
+.caja h2 { margin: 0 0 12px; font-size: 19px; }
+ol.pasos { list-style: none; padding: 0; margin: 0; counter-reset: paso; }
+ol.pasos li { counter-increment: paso; position: relative; padding: 0 0 18px 50px; }
+ol.pasos li:last-child { padding-bottom: 0; }
+ol.pasos li::before { content: counter(paso); position: absolute; left: 0; top: -2px; width: 34px; height: 34px; border-radius: 50%; background: var(--brand); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+ol.pasos b { display: block; }
+.nota { color: var(--muted); font-size: 14px; }
+.icono { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 8px; background: var(--chip); font-size: 18px; vertical-align: middle; margin: 0 2px; }
+.boton { display: block; text-align: center; background: var(--brand); color: #fff; text-decoration: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 17px; }
+.enlace { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+.enlace input { flex: 1; min-width: 0; font: inherit; font-size: 14px; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+.enlace button { border: 0; background: var(--chip); color: var(--text); padding: 10px 14px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+ul.lista { margin: 0; padding-left: 20px; }
+ul.lista li { margin-bottom: 6px; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <img src="icono-iphone.png" alt="">
+  <h1>Instalar Canelo Wind</h1>
+  <p>Ten la app en tu móvil en 1 minuto. Gratis, sin App Store.</p>
+</header>
+<main>
+  <div class="tabs">
+    <button class="tab on" data-so="iphone">📱 iPhone</button>
+    <button class="tab" data-so="android">🤖 Android</button>
+  </div>
+
+  <section class="caja" data-panel="iphone">
+    <h2>En el iPhone</h2>
+    <ol class="pasos">
+      <li><b>Abre la app en Safari</b>Tiene que ser Safari (la brújula azul), no Chrome ni Instagram ni WhatsApp. Si te llegó el enlace por WhatsApp, pulsa los tres puntos o el botón de compartir y elige «Abrir en Safari».</li>
+      <li><b>Pulsa el botón de compartir</b>Es el cuadrado con una flecha hacia arriba <span class="icono">⬆️</span>, abajo en el centro de la pantalla (en algunos iPhone está arriba a la derecha).</li>
+      <li><b>Pulsa «Añadir a pantalla de inicio»</b>Baja un poco en la lista hasta verlo <span class="icono">➕</span>. Si no aparece, baja del todo, pulsa «Editar acciones…» y actívalo.</li>
+      <li><b>Pulsa «Añadir»</b>Arriba a la derecha. Deja el nombre «Canelo Wind».</li>
+      <li><b>¡Listo!</b>En tu pantalla de inicio tienes el icono color canela con la ola. Se abre como cualquier app.</li>
+    </ol>
+  </section>
+
+  <section class="caja" data-panel="android" hidden>
+    <h2>En Android</h2>
+    <ol class="pasos">
+      <li><b>Abre la app en Chrome</b>Si te llegó el enlace por WhatsApp, pulsa los tres puntos y elige «Abrir en Chrome».</li>
+      <li><b>Pulsa el menú</b>Los tres puntos <span class="icono">⋮</span> arriba a la derecha.</li>
+      <li><b>Pulsa «Instalar aplicación» o «Añadir a pantalla de inicio»</b>Según el móvil sale uno u otro; los dos sirven.</li>
+      <li><b>Confirma con «Instalar» o «Añadir»</b></li>
+      <li><b>¡Listo!</b>El icono de Canelo Wind aparece en tu pantalla de inicio o entre tus aplicaciones.</li>
+    </ol>
+  </section>
+
+  <section class="caja">
+    <h2>Abrir la app</h2>
+    <a class="boton" href="./">🪁 Abrir Canelo Wind</a>
+    <div class="enlace">
+      <input id="url" readonly value="https://tainiphone-ux.github.io/canelo-wind/">
+      <button id="copiar">Copiar</button>
+    </div>
+    <p class="nota" style="margin-bottom:0">Copia este enlace para pasárselo a quien quieras.</p>
+  </section>
+
+  <section class="caja">
+    <h2>Bueno saber</h2>
+    <ul class="lista">
+      <li>Es gratis y no hace falta cuenta.</li>
+      <li>Se actualiza sola: al abrirla siempre tienes la última versión.</li>
+      <li>Necesita internet para cargar la previsión.</li>
+      <li>Si estás en el agua, manda tu reporte desde el spot: así la app mejora para todos. 🤙</li>
+      <li>¿Ideas o falta un spot? Usa el botón 💡 de la app.</li>
+    </ul>
+  </section>
+</main>
+<script>
+  const ponerSO = (so) => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.dataset.so === so));
+    document.querySelectorAll("[data-panel]").forEach(p => p.hidden = p.dataset.panel !== so);
+  };
+  document.querySelectorAll(".tab").forEach(t => t.onclick = () => ponerSO(t.dataset.so));
+  if (/android/i.test(navigator.userAgent)) ponerSO("android");
+  document.getElementById("copiar").onclick = async (e) => {
+    const url = document.getElementById("url");
+    try { await navigator.clipboard.writeText(url.value); } catch (err) { url.select(); document.execCommand("copy"); }
+    e.target.textContent = "¡Copiado!";
+    setTimeout(() => e.target.textContent = "Copiar", 2000);
+  };
+</script>
+</body>
+</html>
