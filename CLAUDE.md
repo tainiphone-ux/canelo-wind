@@ -38,6 +38,7 @@ Valentín no es programador: **háblale siempre en español, también en los men
 - Probar en el Mac: `python3 -m http.server 8765 --bind 127.0.0.1` desde esta carpeta y abrir http://127.0.0.1:8765.
 
 ## Pendiente / ideas
+- **Redes sociales por crear (lo pidió Valentín el 08-11-2026):** YouTube, Instagram, TikTok, X (Twitter) y Facebook. Las crea Valentín (Claude no puede crear cuentas) con el correo windcanelo@gmail.com y el mismo nombre en todas: @canelowind (alternativas: @canelo.wind, @canelowind.app). Claude prepara la foto de perfil (logo), la biografía en es/en con el enlace a la landing, los primeros posts y vídeos (con los vídeos de wing foil de Valentín) y añade los enlaces a las redes en la landing y en la app. Recordárselo cuando vuelva a Canelo Wind.
 - Ampliar a Europa y mundo (España hecha el 08-11-2026). Windfinder corta si se le piden muchas páginas seguidas (error 429): comprobar enlaces despacio.
 - Del Word «PROYECTOS CLAUDE/Wing Foil/Aplicación para wing foil.docx» ya está todo (08-11-2026): mareas (Open-Meteo `sea_level_height_msl` cada 15 min, `pintarMareas`), Playa de Troya, Azul Kiteboarding y Windguru. Punta del Hidalgo NO: Valentín no lo quiere.
 - No probado aún en un iPhone de verdad: el visor de webcams y el aviso de volver.
