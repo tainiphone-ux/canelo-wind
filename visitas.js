@@ -1,7 +1,7 @@
 // Contador de visitas con GoatCounter (sin cookies ni datos personales).
 // Para encenderlo: poner aquí el nombre del contador (el de https://NOMBRE.goatcounter.com).
 // Vacío = apagado: la web funciona igual pero no cuenta nada.
-const GOATCOUNTER = "";
+const GOATCOUNTER = "canelowind";
 
 (function () {
   if (!GOATCOUNTER) { window.contar = () => {}; return; }
