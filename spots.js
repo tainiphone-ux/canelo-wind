@@ -92,6 +92,8 @@ const SPOTS = [
     buenos: ["N", "NE"], nivel: "Intermedio",
     nota: "La alternativa cuando el viento del norte ya no llega a El Médano. Wing mejor con marea alta. Duchas y aparcamiento fácil.",
     anemometros: [
+      { nombre: "Holfuy · Puertito de Güímar · viento en directo", url: "https://widget.holfuy.com/?station=1818&su=knots&t=C&lang=es&mode=detailed" },
+      { nombre: "Holfuy · Puertito de Güímar (página completa e histórico)", url: "https://holfuy.com/es/weather/1818" },
       { nombre: "Windfinder · Puertito de Güímar", url: "https://www.windfinder.com/report/gueimar_mole" },
     ],
     webcams: [
