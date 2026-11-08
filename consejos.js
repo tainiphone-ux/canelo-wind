@@ -511,4 +511,9 @@ const CONSEJOS = {
     consejos: ["Agua plana: bueno para aprender.", "Hay playas habilitadas y club náutico."],
     seguridad: "Respeta las zonas de baño y las de navegación.",
   },
+  "puerto-lajas": {
+    consejos: ["Buena para wing incluso con poco viento.", "Mejor con marea alta: con marea baja hay que cruzar piedras y arrecife para llegar al agua."],
+    marea: "alta",
+    seguridad: "Con marea baja hay arrecife de roca en la orilla: usa escarpines y cuidado con el foil. Con viento del oeste sopla hacia fuera.",
+  },
 };

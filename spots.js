@@ -263,8 +263,8 @@ const SPOTS = [
     ],
   },
   {
-    id: "playa-honda", nombre: "Playa Honda", isla: "Lanzarote", zona: "San Bartolomé",
-    lat: 28.950, lon: -13.585, deportes: ["kite", "windsurf", "wing"],
+    id: "playa-honda", nombre: "Playa Honda (Guacimeta)", isla: "Lanzarote", zona: "San Bartolomé",
+    lat: 28.943, lon: -13.597, deportes: ["kite", "windsurf", "wing"],
     buenos: ["E", "SE", "S"], nivel: "Intermedio",
     nota: "Junto al aeropuerto, viento off-shore con el N/NE: cuidado. Mejor con viento del E/SE.",
     anemometros: [ESTACIONES.lzt],
@@ -274,6 +274,14 @@ const SPOTS = [
   },
 
   // ---------- CANARIAS: NUEVOS (08-11-2026) ----------
+  {
+    id: "puerto-lajas", nombre: "Puerto Lajas", isla: "Fuerteventura", zona: "Puerto del Rosario",
+    lat: 28.527, lon: -13.835, deportes: ["wing", "kite", "windsurf"],
+    buenos: ["N", "NO", "NE"], nivel: "Intermedio",
+    nota: "Bahía de arena oscura a 3 km de Puerto del Rosario. Muy buena para wing incluso con poco viento; con viento del norte entra de lado.",
+    anemometros: [ESTACIONES.fue],
+    webcams: [],
+  },
   {
     id: "abades", nombre: "Abades", isla: "Tenerife", zona: "Arico",
     lat: 28.14, lon: -16.428, deportes: ["windsurf", "wing"],

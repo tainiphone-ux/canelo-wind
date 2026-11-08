@@ -151,13 +151,67 @@ footer a { color: var(--muted); }
   .movil-caja::before { width: 320px; height: 320px; }
   .botones .boton { flex: 1 1 100%; }
 }
+/* ---------- Movimiento ---------- */
+.portada { position: relative; }
+.viento-lineas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: .55; }
+.viento-lineas path { fill: none; stroke: #fff; stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 160 900; animation: soplo 7s linear infinite; }
+.viento-lineas path:nth-child(2) { animation-duration: 9s; animation-delay: -3s; stroke-width: 2; }
+.viento-lineas path:nth-child(3) { animation-duration: 6s; animation-delay: -1.5s; }
+.viento-lineas path:nth-child(4) { animation-duration: 10s; animation-delay: -5s; stroke-width: 1.5; }
+@keyframes soplo { from { stroke-dashoffset: 1060; } to { stroke-dashoffset: 0; } }
+.portada .envoltura { position: relative; z-index: 1; }
+.portada .texto > * { animation: subir .9s cubic-bezier(.2,.8,.2,1) both; }
+.portada .texto > *:nth-child(2) { animation-delay: .12s; } .portada .texto > *:nth-child(3) { animation-delay: .24s; }
+.portada .texto > *:nth-child(4) { animation-delay: .36s; } .portada .texto > *:nth-child(5) { animation-delay: .48s; }
+@keyframes subir { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+.movil { animation: flotar 6s ease-in-out infinite; }
+@keyframes flotar { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-12px) rotate(1deg); } }
+.boton.prin { position: relative; overflow: hidden; }
+.boton.prin::after { content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.35), transparent); animation: brillo 4s ease-in-out infinite; }
+@keyframes brillo { 0%, 60% { left: -60%; } 100% { left: 130%; } }
+/* Marquesina de spots */
+.marquesina { overflow: hidden; background: rgba(0,0,0,.55); color: #fff; padding: 12px 0; white-space: nowrap; backdrop-filter: blur(6px); }
+.pista { display: inline-block; animation: deslizar 90s linear infinite; font-weight: 700; font-size: 15px; letter-spacing: .3px; }
+.pista span { margin: 0 18px; opacity: .9; } .pista i { font-style: normal; opacity: .5; }
+@keyframes deslizar { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+/* Galería de vídeos */
+.galeria { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.reel { position: relative; margin: 0; aspect-ratio: 9 / 16; border-radius: 24px; overflow: hidden; background: #123447; box-shadow: 0 18px 40px rgba(0,0,0,.25); transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s; }
+.reel:nth-child(odd) { transform: translateY(18px); }
+.reel:hover { transform: translateY(-6px) scale(1.03) rotate(-1deg); box-shadow: 0 26px 50px rgba(0,0,0,.35); }
+.reel video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.reel figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 14px 14px; color: #fff; font-size: 15px; background: linear-gradient(transparent, rgba(0,0,0,.65)); }
+/* Aparecer al bajar */
+.revela { opacity: 0; transform: translateY(34px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.8,.2,1); }
+.revela.visto { opacity: 1; transform: none; }
+.reel.revela.visto:nth-child(odd) { transform: translateY(18px); }
+.tarjeta { transition: transform .35s ease, box-shadow .35s ease; }
+.tarjeta:hover { transform: translateY(-6px); box-shadow: 0 16px 34px rgba(0,0,0,.12); }
+.tarjeta .ico { display: inline-block; animation: balanceo 3.5s ease-in-out infinite; }
+@keyframes balanceo { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg) translateY(-3px); } }
+.notas span { transition: transform .5s cubic-bezier(.3,1.6,.5,1), opacity .5s; }
+.notas.esperando span { opacity: 0; transform: scale(.6); }
+@media (max-width: 900px) { .galeria { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) {
+  .galeria { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; margin: 0 -16px; padding: 0 16px 24px; scrollbar-width: none; }
+  .galeria::-webkit-scrollbar { display: none; }
+  .reel { flex: 0 0 62vw; scroll-snap-align: center; }
+  .reel:nth-child(odd), .reel.revela.visto:nth-child(odd) { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .viento-lineas, .pista, .movil, .boton.prin::after, .tarjeta .ico, .portada .texto > * { animation: none !important; }
+  .revela { opacity: 1; transform: none; transition: none; }
+}
 </style>
 </head>
 <body>
 <div class="fondo-video" aria-hidden="true">
-  <video muted playsinline loop preload="auto" poster="videos/wing.jpg" data-dep="wing"><source src="videos/wing.mp4" type="video/mp4"></video>
-  <video muted playsinline loop preload="metadata" poster="videos/windsurf.jpg" data-dep="windsurf"><source src="videos/windsurf.mp4" type="video/mp4"></video>
-  <video muted playsinline loop preload="metadata" poster="videos/kite.jpg" data-dep="kite"><source src="videos/kite.mp4" type="video/mp4"></video>
+  <video muted playsinline preload="auto" poster="videos/ola.jpg" data-dep="wing" data-cap="cap_ola"><source src="videos/ola.mp4" type="video/mp4"></video>
+  <video muted playsinline preload="metadata" poster="videos/saltos.jpg" data-dep="wing" data-cap="cap_saltos"><source src="videos/saltos.mp4" type="video/mp4"></video>
+  <video muted playsinline preload="metadata" poster="videos/kite.jpg" data-dep="kite" data-cap="cap_kite"><source src="videos/kite.mp4" type="video/mp4"></video>
+  <video muted playsinline preload="metadata" poster="videos/ola2.jpg" data-dep="wing" data-cap="cap_ola2"><source src="videos/ola2.mp4" type="video/mp4"></video>
+  <video muted playsinline preload="metadata" poster="videos/saltos.jpg" data-dep="wing" data-cap="cap_saltos"><source src="videos/saltos.mp4" type="video/mp4"></video>
+  <video muted playsinline preload="metadata" poster="videos/windsurf.jpg" data-dep="windsurf" data-cap="cap_windsurf"><source src="videos/windsurf.mp4" type="video/mp4"></video>
 </div>
 <div class="velo"></div>
 <div class="deporte-ahora" id="deporteAhora" aria-hidden="true">🪽 Wing foil</div>
@@ -176,6 +230,12 @@ footer a { color: var(--muted); }
 </nav>
 
 <header class="portada">
+  <svg class="viento-lineas" viewBox="0 0 1200 600" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M-50 140 C 250 100, 450 180, 750 130 S 1150 90, 1300 140"/>
+    <path d="M-50 260 C 200 230, 500 300, 800 250 S 1100 220, 1300 270"/>
+    <path d="M-50 420 C 300 380, 550 460, 850 410 S 1150 380, 1300 430"/>
+    <path d="M-50 520 C 250 500, 600 560, 900 515 S 1150 490, 1300 530"/>
+  </svg>
   <div class="envoltura">
     <div class="texto">
       <span class="etiqueta" data-t="etiqueta">Windsurf · Kitesurf · Wing foil</span>
@@ -203,7 +263,22 @@ footer a { color: var(--muted); }
   </div>
 </div>
 
+<div class="marquesina" aria-hidden="true"><div class="pista" id="pista"></div></div>
+
 <section class="bloque">
+  <div class="envoltura">
+    <h2 data-t="g_tit">Así se vive</h2>
+    <p class="intro" data-t="g_intro"></p>
+    <div class="galeria">
+      <figure class="reel"><video muted playsinline loop preload="none" poster="videos/ola.jpg" data-src="videos/ola.mp4"></video><figcaption><span>🪽</span> <b data-t="cap_ola">Surfeando la ola</b></figcaption></figure>
+      <figure class="reel"><video muted playsinline loop preload="none" poster="videos/saltos.jpg" data-src="videos/saltos.mp4"></video><figcaption><span>🪽</span> <b data-t="cap_saltos">Saltos</b></figcaption></figure>
+      <figure class="reel"><video muted playsinline loop preload="none" poster="videos/ola2.jpg" data-src="videos/ola2.mp4"></video><figcaption><span>🪽</span> <b data-t="cap_ola2">Ola grande</b></figcaption></figure>
+      <figure class="reel"><video muted playsinline loop preload="none" poster="videos/wing-pov.jpg" data-src="videos/wing-pov.mp4"></video><figcaption><span>🪽</span> <b data-t="cap_pov">Desde el ala</b></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="bloque alt">
   <div class="envoltura">
     <h2 data-t="f_tit">Todo lo que miras antes de salir al agua</h2>
     <p class="intro" data-t="f_intro"></p>
@@ -211,7 +286,7 @@ footer a { color: var(--muted); }
   </div>
 </section>
 
-<section class="bloque alt">
+<section class="bloque">
   <div class="envoltura dos">
     <div>
       <h2 data-t="n_tit">¿Merece la pena ir hoy?</h2>
@@ -226,7 +301,7 @@ footer a { color: var(--muted); }
   </div>
 </section>
 
-<section class="bloque">
+<section class="bloque alt">
   <div class="envoltura">
     <h2 data-t="s_tit">Los spots</h2>
     <p class="intro" data-t="s_intro"></p>
@@ -234,7 +309,7 @@ footer a { color: var(--muted); }
   </div>
 </section>
 
-<section class="bloque alt" id="instalar">
+<section class="bloque" id="instalar">
   <div class="envoltura">
     <h2 data-t="i_tit">Tenla en tu móvil en un minuto</h2>
     <p class="intro" data-t="i_intro"></p>
@@ -270,7 +345,7 @@ footer a { color: var(--muted); }
 <footer>
   <div class="envoltura">
     <div data-t="pie"></div>
-    <div style="margin-top:6px"><a href="./">Canelo Wind</a> · <a href="instalar.html" data-t="pie_inst">Instalar</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> · <span data-t="videos">Vídeos</span>: <a href="https://www.pexels.com/" target="_blank" rel="noopener">Pexels</a> (David Pickup, SuperClaudio)</div>
+    <div style="margin-top:6px"><a href="./">Canelo Wind</a> · <a href="instalar.html" data-t="pie_inst">Instalar</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> · <span data-t="videos">Vídeos</span>: <a href="https://www.pexels.com/" target="_blank" rel="noopener">Pexels</a> (David Pickup, SuperClaudio) · wing foil: la gente de Canelo Wind</div>
   </div>
 </footer>
 
@@ -308,7 +383,7 @@ const L = {
     d_tit: "Hecha para Miki «el Canelo»", d_txt: "Canelo Wind nació pensando en un amigo que vive mirando el viento. Por eso el color canela del logo, la ola y el ala de wing.",
     d_frase: "«Mira el viento, elige el spot y al agua.»",
     fin_tit: "¿Hay viento hoy?", fin_txt: "Ábrela y lo sabrás en dos segundos.",
-    pie: "Previsión de Open-Meteo (modelos meteorológicos). Comprueba siempre el viento medido y el estado del mar antes de salir.", pie_inst: "Instalar", videos: "Vídeos",
+    pie: "Previsión de Open-Meteo (modelos meteorológicos). Comprueba siempre el viento medido y el estado del mar antes de salir.", pie_inst: "Instalar", videos: "Vídeos", g_tit: "Así se vive", g_intro: "Vídeos de verdad de nuestra gente en el agua. Esto es lo que buscamos cuando miramos el viento.", cap_ola: "Surfeando la ola", cap_saltos: "Saltos", cap_ola2: "Ola grande", cap_pov: "Desde el ala", cap_kite: "Kitesurf", cap_windsurf: "Windsurf",
   },
   en: {
     abrir_corto: "Open the app", etiqueta: "Windsurf · Kitesurf · Wing foil",
@@ -339,7 +414,7 @@ const L = {
     d_tit: "Made for Miki «el Canelo»", d_txt: "Canelo Wind was born thinking of a friend who lives watching the wind. That's why the logo is cinnamon-coloured (canela), with a wave and a wing.",
     d_frase: "«Check the wind, pick the spot, hit the water.»",
     fin_tit: "Is there wind today?", fin_txt: "Open it and you'll know in two seconds.",
-    pie: "Forecast by Open-Meteo (weather models). Always check the measured wind and the sea before going out.", pie_inst: "Install", videos: "Videos",
+    pie: "Forecast by Open-Meteo (weather models). Always check the measured wind and the sea before going out.", pie_inst: "Install", videos: "Videos", g_tit: "This is what it's about", g_intro: "Real videos of our crew on the water. This is what we're looking for when we check the wind.", cap_ola: "Riding the wave", cap_saltos: "Jumps", cap_ola2: "Big wave", cap_pov: "From the wing", cap_kite: "Kitesurf", cap_windsurf: "Windsurf",
   },
   de: {
     abrir_corto: "App öffnen", etiqueta: "Windsurf · Kitesurf · Wingfoil",
@@ -370,7 +445,7 @@ const L = {
     d_tit: "Gemacht für Miki «el Canelo»", d_txt: "Canelo Wind entstand für einen Freund, der ständig den Wind beobachtet. Deshalb das zimtfarbene Logo (canela) mit Welle und Wing.",
     d_frase: "«Wind checken, Spot wählen, ab ins Wasser.»",
     fin_tit: "Gibt es heute Wind?", fin_txt: "Öffne sie und du weißt es in zwei Sekunden.",
-    pie: "Vorhersage von Open-Meteo (Wettermodelle). Prüfe vor dem Rausgehen immer den gemessenen Wind und das Meer.", pie_inst: "Installieren", videos: "Videos",
+    pie: "Vorhersage von Open-Meteo (Wettermodelle). Prüfe vor dem Rausgehen immer den gemessenen Wind und das Meer.", pie_inst: "Installieren", videos: "Videos", g_tit: "So fühlt es sich an", g_intro: "Echte Videos unserer Leute auf dem Wasser. Genau das suchen wir, wenn wir den Wind checken.", cap_ola: "Die Welle abreiten", cap_saltos: "Sprünge", cap_ola2: "Große Welle", cap_pov: "Vom Wing aus", cap_kite: "Kitesurf", cap_windsurf: "Windsurf",
   },
   fr: {
     abrir_corto: "Ouvrir l'appli", etiqueta: "Windsurf · Kitesurf · Wingfoil",
@@ -401,7 +476,7 @@ const L = {
     d_tit: "Faite pour Miki «el Canelo»", d_txt: "Canelo Wind est née en pensant à un ami qui passe sa vie à regarder le vent. D'où le logo couleur cannelle (canela), avec une vague et une aile de wing.",
     d_frase: "«Regarde le vent, choisis le spot, et à l'eau.»",
     fin_tit: "Y a-t-il du vent aujourd'hui ?", fin_txt: "Ouvre-la et tu le sauras en deux secondes.",
-    pie: "Prévisions Open-Meteo (modèles météo). Vérifie toujours le vent mesuré et l'état de la mer avant de sortir.", pie_inst: "Installer", videos: "Vidéos",
+    pie: "Prévisions Open-Meteo (modèles météo). Vérifie toujours le vent mesuré et l'état de la mer avant de sortir.", pie_inst: "Installer", videos: "Vidéos", g_tit: "Voilà ce qu'on vit", g_intro: "De vraies vidéos de notre équipe sur l'eau. C'est ça qu'on cherche quand on regarde le vent.", cap_ola: "Surfer la vague", cap_saltos: "Sauts", cap_ola2: "Grosse vague", cap_pov: "Depuis l'aile", cap_kite: "Kitesurf", cap_windsurf: "Windsurf",
   },
   it: {
     abrir_corto: "Apri l'app", etiqueta: "Windsurf · Kitesurf · Wing foil",
@@ -432,7 +507,7 @@ const L = {
     d_tit: "Fatta per Miki «el Canelo»", d_txt: "Canelo Wind è nata pensando a un amico che vive guardando il vento. Per questo il logo color cannella (canela), con un'onda e un'ala da wing.",
     d_frase: "«Guarda il vento, scegli lo spot e in acqua.»",
     fin_tit: "C'è vento oggi?", fin_txt: "Aprila e lo saprai in due secondi.",
-    pie: "Previsioni di Open-Meteo (modelli meteo). Controlla sempre il vento misurato e lo stato del mare prima di uscire.", pie_inst: "Installa", videos: "Video",
+    pie: "Previsioni di Open-Meteo (modelli meteo). Controlla sempre il vento misurato e lo stato del mare prima di uscire.", pie_inst: "Installa", videos: "Video", g_tit: "Ecco cosa si vive", g_intro: "Video veri della nostra gente in acqua. È questo che cerchiamo quando guardiamo il vento.", cap_ola: "Surfare l'onda", cap_saltos: "Salti", cap_ola2: "Onda grande", cap_pov: "Dall'ala", cap_kite: "Kitesurf", cap_windsurf: "Windsurf",
   },
 };
 
@@ -479,10 +554,11 @@ const ICONOS = { wing: "🪽", windsurf: "🏄", kite: "🪁" };
 let actual = 0;
 const sinMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 function etiquetaDeporte() {
-  const d = videos[actual].dataset.dep;
-  document.getElementById("deporteAhora").textContent = ICONOS[d] + " " + t("dep_" + d);
+  const v = videos[actual], d = v.dataset.dep, cap = v.dataset.cap;
+  const extra = cap && L[idioma][cap] && L[idioma][cap] !== t("dep_" + d) ? " · " + L[idioma][cap] : "";
+  document.getElementById("deporteAhora").textContent = ICONOS[d] + " " + t("dep_" + d) + extra;
 }
-function mostrarVideo(i) {
+let mostrarVideo = function (i) {
   actual = i;
   videos.forEach((v, k) => {
     if (k === i) { v.classList.add("on"); if (!sinMovimiento) { try { v.currentTime = 0; } catch (e) {} v.play().catch(() => {}); } }
@@ -491,11 +567,61 @@ function mostrarVideo(i) {
   // Ir cargando el siguiente para que no se quede en negro
   const sig = videos[(i + 1) % videos.length]; if (sig.preload !== "auto") { sig.preload = "auto"; sig.load(); }
   etiquetaDeporte();
-}
+};
+let reserva = null;
+const siguiente = () => mostrarVideo((actual + 1) % videos.length);
+// Cuando acaba un vídeo, pasa al siguiente (y por si acaso, como mucho a los 12 s)
+videos.forEach(v => v.addEventListener("ended", () => { if (v.classList.contains("on")) siguiente(); }));
+const mostrarOriginal = mostrarVideo;
+mostrarVideo = (i) => { mostrarOriginal(i); clearTimeout(reserva); if (!sinMovimiento) reserva = setTimeout(siguiente, 12000); };
 mostrarVideo(0);
-if (!sinMovimiento) setInterval(() => mostrarVideo((actual + 1) % videos.length), 7000);
-// Al cambiar de idioma, la etiqueta del deporte también
-document.getElementById("menuIdiomas").addEventListener("click", () => setTimeout(etiquetaDeporte, 0));
+// Al cambiar de idioma, la etiqueta del deporte y las animaciones también
+document.getElementById("menuIdiomas").addEventListener("click", () => setTimeout(() => { etiquetaDeporte(); prepararRevelar(); }, 0));
+
+// Marquesina con todos los spots (dos veces seguidas para que el bucle no se note)
+const nombres = SPOTS.map(s => `<span>${s.nombre}</span><i>·</i>`).join("");
+document.getElementById("pista").innerHTML = nombres + nombres;
+
+// Galería: cada vídeo se carga y se reproduce solo cuando se ve
+const verGaleria = new IntersectionObserver(entradas => entradas.forEach(e => {
+  const v = e.target;
+  if (e.isIntersecting) { if (!v.src) v.src = v.dataset.src; if (!sinMovimiento) v.play().catch(() => {}); }
+  else v.pause();
+}), { threshold: 0.35 });
+document.querySelectorAll(".reel video").forEach(v => verGaleria.observe(v));
+
+// Aparecer al bajar
+const verRevela = new IntersectionObserver(entradas => entradas.forEach(e => {
+  if (!e.isIntersecting) return;
+  e.target.classList.add("visto"); verRevela.unobserve(e.target);
+  if (e.target.id === "notas") e.target.classList.remove("esperando");
+}), { threshold: 0.15 });
+function prepararRevelar() {
+  if (sinMovimiento) return;
+  document.querySelectorAll("section.bloque h2, section.bloque .intro, .tarjeta, .region, .paso, .aviso-ej, .reel, .dedicatoria > *, .final").forEach((el, i) => {
+    if (el.classList.contains("visto")) return;
+    el.classList.add("revela");
+    el.style.transitionDelay = (el.matches(".tarjeta, .region, .paso, .reel") ? (Array.from(el.parentNode.children).indexOf(el) % 4) * 0.1 : 0) + "s";
+    verRevela.observe(el);
+  });
+  const notas = document.getElementById("notas");
+  notas.classList.add("esperando");
+  [...notas.children].forEach((s, i) => s.style.transitionDelay = (i * 0.12) + "s");
+  verRevela.observe(notas);
+}
+prepararRevelar();
+
+// Contadores que suben al verlos
+const verCifras = new IntersectionObserver(entradas => entradas.forEach(e => {
+  if (!e.isIntersecting) return; verCifras.disconnect();
+  document.querySelectorAll(".cifra b").forEach(b => {
+    const fin = parseInt(b.textContent, 10); if (sinMovimiento || !fin) return;
+    const t0 = performance.now(), dur = 1400;
+    const paso = (ahora) => { const p = Math.min(1, (ahora - t0) / dur); b.textContent = Math.round(fin * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(paso); };
+    requestAnimationFrame(paso);
+  });
+}), { threshold: 0.5 });
+verCifras.observe(document.querySelector(".cifras"));
 </script>
 </body>
 </html>
