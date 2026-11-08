@@ -13,7 +13,7 @@ Valentín no es programador: **háblale siempre en español, también en los men
 
 ## Archivos
 - `index.html` — la app entera (lista de spots, ficha con previsión, reportes, buzón, visor de enlaces).
-- `spots.js` — los spots (37: 20 de Canarias y 17 de península y Baleares). Para añadir uno, copiar un bloque. `buenos` = direcciones de viento buenas. Fuera de Canarias llevan `region` (comunidad) e `isla` = provincia o isla; la hora sale sola (Canarias o península, `tzDe`).
+- `spots.js` — los spots (59: 28 de Canarias y 31 de península y Baleares; 10 regiones). Para añadir uno, copiar un bloque. `buenos` = direcciones de viento buenas. Fuera de Canarias llevan `region` (comunidad) e `isla` = provincia o isla; la hora sale sola (Canarias o península, `tzDe`).
 - `consejos.js` — consejos y aviso de seguridad de cada spot (por id); `peligro` = direcciones off-shore (salen «Muy malo» y aviso) y `marea: "alta"` = avisa de la bajamar. Al añadir un spot, añadir también aquí sus consejos (y el aviso si hay corrientes, roca, off-shore, poca agua, puerto o zonas balizadas).
 - `idiomas.js` — idiomas de la app (es, en, de, fr, it): `TXT[idioma][clave]`, función `t("clave", {datos})`, rosa de los vientos por idioma. La primera vez sale la pantalla de elegir idioma; luego el botón 🌐. Al añadir una frase nueva a la app, ponerla en los 5 idiomas.
 - `textos_spots.js` — descripción, consejos y aviso de cada spot en en/de/fr/it (el español está en spots.js y consejos.js). Al añadir un spot, traducirlo aquí también.

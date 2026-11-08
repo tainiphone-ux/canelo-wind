@@ -286,4 +286,95 @@ const CONSEJOS = {
     ],
     seguridad: "Olas y corrientes. No salgas solo.",
   },
+
+  // ---------- NUEVOS (08-11-2026) ----------
+  "abades": {
+    consejos: ["Bahía tranquila entre El Médano y Porís, con el alisio del NE.", "Usa escarpines: hay piedras en la entrada."],
+    seguridad: "Rocas a los lados de la bahía. Con viento fuerte llega racheado.",
+  },
+  "burrero": {
+    consejos: ["Más viento en la parte sur de la playa; al norte hay un rincón de arena más resguardado.", "Con mar de fondo del norte entran olas para hacer wave."],
+    seguridad: "Playa de piedras y la ola rompe cerca de las rocas: no es sitio para saltar. Viento del NE algo hacia fuera (side-off).",
+  },
+  "ojos-de-garza": {
+    consejos: ["La alternativa cuando en Pozo sopla demasiado.", "Mejor con viento del N o NNE. Aparcar es difícil los fines de semana."],
+    seguridad: "Viento racheado y zona de rocas al sur de la salida: entra y sal por el sitio de siempre.",
+  },
+  "tarajalillo": {
+    consejos: ["Spot del sur con viento casi todo el año, junto a Bahía Feliz.", "Se juntan kiters y windsurfistas: respeta las zonas de cada uno."],
+    seguridad: "Hay rocas y bañistas cerca: mira bien por dónde entras.",
+  },
+  "salinas-pozo": {
+    consejos: ["Viento de lado (side-shore) y olas largas para hacer wave.", "Material pequeño en verano."],
+    seguridad: "Viento muy fuerte y olas sobre fondo de piedra: solo intermedios altos y expertos.",
+  },
+  "costa-calma": {
+    consejos: ["Al norte de la laguna de Sotavento, con el mismo alisio acelerado.", "Buena para kite con viento de lado."],
+    seguridad: "Fuera de la orilla el viento sopla un poco hacia el mar: no te alejes mucho.",
+  },
+  "majanicho": {
+    consejos: ["Ola de arrecife para windsurf en el norte de Fuerteventura.", "Mira la marea: con marea baja hay muy poca agua sobre el arrecife."],
+    marea: "alta",
+    seguridad: "Arrecife poco profundo, olas y corrientes: solo para expertos. No salgas solo.",
+  },
+  "matagorda": {
+    consejos: ["Zona de kite junto a Puerto del Carmen.", "En verano hay muchos bañistas: usa la zona de kite."],
+    seguridad: "Cerca del aeropuerto de Lanzarote: vuela el kite solo en la zona permitida.",
+  },
+  "punta-paloma": {
+    consejos: ["Entre Valdevaqueros y Bolonia, con la gran duna detrás.", "Con levante el viento es fuerte y racheado; con poniente, más limpio."],
+    seguridad: "Con levante el viento sopla hacia fuera y empuja hacia el Estrecho. Respeta las zonas balizadas en verano.",
+  },
+  "sancti-petri": {
+    consejos: ["Playa larga de Chiclana; funciona con poniente y con levante.", "Mira la marea: la corriente del caño de Sancti Petri es fuerte."],
+    seguridad: "Corriente fuerte en la boca del caño de Sancti Petri: no te acerques al canal.",
+  },
+  "los-alamos": {
+    consejos: ["Zona oficial de kite de Torremolinos, cerca de Málaga.", "La térmica del suroeste entra muchas tardes de primavera a otoño."],
+    seguridad: "Playa con muchos bañistas: sal y entra solo por el pasillo balizado.",
+  },
+  "mazagon": {
+    consejos: ["El spot más conocido de Huelva, playa muy larga.", "Mira la marea: cambia mucho la orilla."],
+    seguridad: "",
+  },
+  "torregarcia": {
+    consejos: ["Playa larga al este de Almería, junto al Cabo de Gata.", "Funciona con levante y con poniente."],
+    seguridad: "Es parque natural: respeta las normas y las zonas de baño.",
+  },
+  "los-urrutias": {
+    consejos: ["Sur del Mar Menor, agua plana y poco profunda.", "Ideal para aprender y practicar con la térmica."],
+    seguridad: "Muy poca profundidad: con foil cuidado con el fondo.",
+  },
+  "pinedo": {
+    consejos: ["La playa de kite de Valencia ciudad.", "La térmica del este entra a mediodía en primavera y verano."],
+    seguridad: "En verano solo se puede salir en la zona balizada para kite.",
+  },
+  "arenales-del-sol": {
+    consejos: ["Playa larga de Elche, con térmica casi diaria en verano.", "Hay escuelas de kite en la zona."],
+    seguridad: "Está cerca del aeropuerto de Alicante: kite solo en la zona permitida.",
+  },
+  "roses": {
+    consejos: ["Golfo de Roses: con tramontana sopla muy fuerte.", "En verano entra la térmica del sur por la tarde."],
+    seguridad: "Con tramontana el viento sopla hacia fuera y muy racheado: si rompes, te aleja de la costa.",
+  },
+  "fornells": {
+    consejos: ["Bahía muy cerrada y protegida en el norte de Menorca: agua plana.", "Buena para aprender y para wing con la tramontana."],
+    seguridad: "Hay barcos fondeados en la bahía: mira bien antes de cruzar.",
+  },
+  "doninos": {
+    consejos: ["El spot más valorado de Galicia, cerca de Ferrol.", "Agua fría: neopreno de 4/3 o 5/4."],
+    seguridad: "Olas fuertes y corrientes del Atlántico: para gente con experiencia. No salgas solo.",
+  },
+  "a-lanzada": {
+    consejos: ["Playa larga y famosa de las Rías Baixas.", "Con nortada en verano sopla casi a diario. Agua fría."],
+    seguridad: "Corrientes en los extremos de la playa: mantente en la zona central.",
+  },
+  "somo": {
+    consejos: ["Frente a Santander; dentro de la ría el agua está más plana.", "Mira la marea: sube y baja más de 3 metros."],
+    seguridad: "Corrientes fuertes en la boca de la ría con la marea: no te metas en el canal.",
+  },
+  "laredo": {
+    consejos: ["Playa de La Salve: con viento del este acelera por efecto embudo.", "Mira la marea: sube y baja más de 3 metros."],
+    seguridad: "Con marea baja la playa se hace enorme y con marea alta queda poca arena: calcula bien la vuelta.",
+  },
 };
