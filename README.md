@@ -1,6 +1,6 @@
 # Canelo Wind 🪁
 
-Viento, rachas y olas para windsurf, kitesurf y wing foil en los spots de Canarias.
+Viento, rachas y olas para windsurf, kitesurf y wing foil en los spots de Canarias, la península y Baleares.
 Hecha pensando en Miki «el Canelo».
 
 - Elige un spot y mira la previsión hora a hora para los próximos 7 días: viento, rachas, dirección, olas, mar de fondo y tiempo.

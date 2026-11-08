@@ -52,6 +52,45 @@ const SPOTS = [
     ],
   },
 
+  {
+    id: "muelle-granadilla", nombre: "Muelle de Granadilla", isla: "Tenerife", zona: "Granadilla",
+    lat: 28.085, lon: -16.493, deportes: ["wing", "windsurf"],
+    buenos: ["NE", "N", "E"], nivel: "Iniciación / intermedio",
+    nota: "Agua plana al abrigo del puerto, a 10 minutos de El Médano. Varias escuelas enseñan aquí wing y windsurf.",
+    anemometros: [
+      { nombre: "Windfinder · Aeropuerto Tenerife Sur", url: "https://www.windfinder.com/report/el_medano" },
+      ESTACIONES.tfs,
+    ],
+    webcams: [
+      { nombre: "Skyline · Surf y kite El Médano (cercana)", url: "https://www.skylinewebcams.com/es/webcam/espana/canarias/santa-cruz-de-tenerife/surf-kitesurf-medano.html" },
+    ],
+  },
+  {
+    id: "poris", nombre: "Bahía del Porís", isla: "Tenerife", zona: "Arico",
+    lat: 28.155, lon: -16.428, deportes: ["wing", "windsurf", "kite"],
+    buenos: ["NE", "N", "E"], nivel: "Intermedio",
+    nota: "Bahía de Porís de Abona, al norte de El Médano. Con el alisio del NE entra viento con agua más recogida.",
+    anemometros: [
+      { nombre: "Windfinder · Aeropuerto Tenerife Sur", url: "https://www.windfinder.com/report/el_medano" },
+      ESTACIONES.tfs,
+    ],
+    webcams: [
+      { nombre: "Surf-Forecast · webcam Porís de Abona", url: "https://www.surf-forecast.com/breaks/Poris-de-Abona/webcams/latest" },
+    ],
+  },
+  {
+    id: "guimar", nombre: "Puertito de Güímar", isla: "Tenerife", zona: "Güímar",
+    lat: 28.288, lon: -16.369, deportes: ["kite", "wing", "windsurf"],
+    buenos: ["N", "NE"], nivel: "Intermedio",
+    nota: "La alternativa cuando el viento del norte ya no llega a El Médano. Wing mejor con marea alta. Duchas y aparcamiento fácil.",
+    anemometros: [
+      { nombre: "Windfinder · Puertito de Güímar", url: "https://www.windfinder.com/report/gueimar_mole" },
+    ],
+    webcams: [
+      { nombre: "Windfinder · webcams Güímar", url: "https://www.windfinder.com/webcams/gueimar_strand" },
+    ],
+  },
+
   // ---------- GRAN CANARIA ----------
   {
     id: "pozo-izquierdo", nombre: "Pozo Izquierdo", isla: "Gran Canaria", zona: "Santa Lucía de Tirajana",
@@ -215,5 +254,160 @@ const SPOTS = [
     webcams: [
       { nombre: "Windfinder · webcams Lanzarote", url: "https://www.windfinder.com/webcams/lanzarote" },
     ],
+  },
+
+  // =====================================================================
+  //  PENÍNSULA Y BALEARES  (region = comunidad; isla = provincia o isla)
+  // =====================================================================
+
+  // ---------- ANDALUCÍA (Cádiz) ----------
+  {
+    id: "valdevaqueros", nombre: "Valdevaqueros", region: "Andalucía", isla: "Cádiz", zona: "Tarifa",
+    lat: 36.060, lon: -5.690, deportes: ["kite", "windsurf", "wing"],
+    buenos: ["E", "O"], nivel: "Intermedio / avanzado",
+    nota: "El spot más famoso de Tarifa. Con levante (E) el viento entra fuerte y racheado; con poniente (O), más suave. En verano hay zonas de kite balizadas.",
+    anemometros: [{ nombre: "Windfinder · Valdevaqueros", url: "https://www.windfinder.com/report/valdevaqueros" }],
+    webcams: [{ nombre: "Windfinder · webcams Valdevaqueros", url: "https://www.windfinder.com/webcams/valdevaqueros" }],
+  },
+  {
+    id: "los-lances", nombre: "Los Lances", region: "Andalucía", isla: "Cádiz", zona: "Tarifa",
+    lat: 36.025, lon: -5.628, deportes: ["kite", "windsurf", "wing"],
+    buenos: ["E", "O"], nivel: "Todos los niveles",
+    nota: "Playa enorme pegada a Tarifa. Funciona con levante y con poniente. En temporada alta hay tramos donde no se permite el kite.",
+    anemometros: [{ nombre: "Windfinder · Tarifa", url: "https://www.windfinder.com/report/tarifa" }],
+    webcams: [{ nombre: "Windfinder · webcams Los Lances", url: "https://www.windfinder.com/webcams/los_lances" }],
+  },
+  {
+    id: "bolonia", nombre: "Bolonia", region: "Andalucía", isla: "Cádiz", zona: "Tarifa",
+    lat: 36.080, lon: -5.775, deportes: ["kite", "windsurf"],
+    buenos: ["O", "E"], nivel: "Intermedio",
+    nota: "Ensenada junto a la duna de Bolonia. Con poniente el agua queda bonita y el viento limpio.",
+    anemometros: [{ nombre: "Windfinder · Bolonia", url: "https://www.windfinder.com/report/bolonia" }],
+    webcams: [],
+  },
+  {
+    id: "canos-de-meca", nombre: "Caños de Meca", region: "Andalucía", isla: "Cádiz", zona: "Barbate",
+    lat: 36.178, lon: -6.020, deportes: ["kite", "windsurf"],
+    buenos: ["E", "O"], nivel: "Intermedio / avanzado",
+    nota: "Junto al cabo de Trafalgar. Con levante se forman olas y el viento acelera en el cabo.",
+    anemometros: [{ nombre: "Windfinder · Caños de Meca", url: "https://www.windfinder.com/report/canos_de_meca" }],
+    webcams: [],
+  },
+
+  // ---------- REGIÓN DE MURCIA (Mar Menor) ----------
+  {
+    id: "los-narejos", nombre: "Los Narejos (Mar Menor)", region: "Murcia", isla: "Murcia", zona: "Los Alcázares",
+    lat: 37.765, lon: -0.828, deportes: ["kite", "wing", "windsurf"],
+    buenos: ["NE", "E", "SE"], nivel: "Iniciación / intermedio",
+    nota: "Laguna de agua plana y poco profunda: ideal para aprender. El levante y las térmicas de verano dan viento casi a diario.",
+    anemometros: [{ nombre: "Windfinder · Los Narejos", url: "https://www.windfinder.com/report/los_narejos" }],
+    webcams: [{ nombre: "Kite Los Narejos (Spinosa)", url: "https://www.mangolinkworld.com/webcams/sport/kitesurfing-los-narejos.html" }],
+  },
+  {
+    id: "lo-pagan", nombre: "Lo Pagán (Mar Menor)", region: "Murcia", isla: "Murcia", zona: "San Pedro del Pinatar",
+    lat: 37.820, lon: -0.778, deportes: ["kite", "wing", "windsurf"],
+    buenos: ["NE", "E"], nivel: "Iniciación / intermedio",
+    nota: "Norte del Mar Menor, agua plana y muy poca profundidad.",
+    anemometros: [{ nombre: "Windfinder · Lo Pagán", url: "https://www.windfinder.com/report/mar_menor_lo_pagan" }],
+    webcams: [
+      { nombre: "Windfinder · webcams Lo Pagán", url: "https://www.windfinder.com/webcams/mar_menor_lo_pagan" },
+      { nombre: "Skyline · La Manga del Mar Menor", url: "https://www.skylinewebcams.com/webcam/espana/region-de-murcia/murcia/manga-mar-menor.html" },
+    ],
+  },
+
+  // ---------- COMUNIDAD VALENCIANA ----------
+  {
+    id: "el-saler", nombre: "El Saler", region: "Comunidad Valenciana", isla: "Valencia", zona: "Valencia",
+    lat: 39.370, lon: -0.305, deportes: ["kite", "windsurf", "wing"],
+    buenos: ["E", "SE", "NE"], nivel: "Intermedio",
+    nota: "Playa abierta al sur de Valencia. Funciona con las térmicas del este en primavera y verano.",
+    anemometros: [{ nombre: "Windfinder · El Saler", url: "https://www.windfinder.com/report/el_saler" }],
+    webcams: [],
+  },
+  {
+    id: "oliva", nombre: "Oliva", region: "Comunidad Valenciana", isla: "Valencia", zona: "Oliva",
+    lat: 38.930, lon: -0.082, deportes: ["kite", "windsurf"],
+    buenos: ["E", "SE"], nivel: "Intermedio",
+    nota: "Playas largas de arena con viento térmico regular en verano.",
+    anemometros: [{ nombre: "Windfinder · Oliva", url: "https://www.windfinder.com/report/oliva" }],
+    webcams: [],
+  },
+  {
+    id: "santa-pola", nombre: "Santa Pola (Gran Playa)", region: "Comunidad Valenciana", isla: "Alicante", zona: "Santa Pola",
+    lat: 38.193, lon: -0.560, deportes: ["kite", "windsurf", "wing"],
+    buenos: ["E", "SE", "NE"], nivel: "Todos los niveles",
+    nota: "Bahía con viento térmico casi diario en verano y agua bastante plana.",
+    anemometros: [{ nombre: "Windfinder · Santa Pola", url: "https://www.windfinder.com/report/santa_pola" }],
+    webcams: [],
+  },
+
+  // ---------- CATALUÑA ----------
+  {
+    id: "sant-pere-pescador", nombre: "Sant Pere Pescador", region: "Cataluña", isla: "Girona", zona: "Empordà",
+    lat: 42.190, lon: 3.125, deportes: ["kite", "windsurf", "wing"],
+    buenos: ["N", "NO", "S"], nivel: "Todos los niveles",
+    nota: "Bahía de Roses. Con tramontana (N) sopla fuerte; en verano entra la térmica del sur. Zona de kite regulada.",
+    anemometros: [{ nombre: "Windfinder · Sant Pere Pescador", url: "https://www.windfinder.com/report/sant_pere_pescador" }],
+    webcams: [{ nombre: "Windfinder · webcams Sant Pere Pescador", url: "https://www.windfinder.com/webcams/sant_pere_pescador" }],
+  },
+  {
+    id: "delta-ebro", nombre: "Delta del Ebro (Trabucador)", region: "Cataluña", isla: "Tarragona", zona: "Sant Carles de la Ràpita",
+    lat: 40.640, lon: 0.760, deportes: ["kite", "windsurf", "wing"],
+    buenos: ["NO", "O", "S", "SO"], nivel: "Todos los niveles",
+    nota: "Bahía dels Alfacs, agua plana y poco profunda. Con mistral (NO) y con garbí (SO) en verano.",
+    anemometros: [{ nombre: "Windfinder · Delta del Ebro", url: "https://www.windfinder.com/report/delta_del_ebro" }],
+    webcams: [],
+  },
+  {
+    id: "castelldefels", nombre: "Castelldefels", region: "Cataluña", isla: "Barcelona", zona: "Castelldefels",
+    lat: 41.258, lon: 1.990, deportes: ["windsurf", "kite", "wing"],
+    buenos: ["S", "SO", "E"], nivel: "Intermedio",
+    nota: "El spot de Barcelona: térmica del sur (garbí) en primavera y verano.",
+    anemometros: [{ nombre: "Windfinder · Castelldefels", url: "https://www.windfinder.com/report/castelldefels" }],
+    webcams: [],
+  },
+
+  // ---------- ISLAS BALEARES ----------
+  {
+    id: "pollenca", nombre: "Port de Pollença", region: "Islas Baleares", isla: "Mallorca", zona: "Pollença",
+    lat: 39.900, lon: 3.100, deportes: ["windsurf", "wing", "kite"],
+    buenos: ["SE", "E", "S"], nivel: "Iniciación / intermedio",
+    nota: "Bahía amplia y protegida con la térmica (embat) casi cada tarde de verano.",
+    anemometros: [{ nombre: "Windfinder · Port de Pollença", url: "https://www.windfinder.com/report/port_de_pollenca" }],
+    webcams: [],
+  },
+  {
+    id: "alcudia", nombre: "Alcúdia", region: "Islas Baleares", isla: "Mallorca", zona: "Alcúdia",
+    lat: 39.825, lon: 3.140, deportes: ["kite", "windsurf", "wing"],
+    buenos: ["E", "SE", "NE"], nivel: "Intermedio",
+    nota: "Bahía de Alcúdia, playa muy larga con viento térmico del este.",
+    anemometros: [{ nombre: "Windfinder · Alcúdia", url: "https://www.windfinder.com/report/alcudia" }],
+    webcams: [],
+  },
+  {
+    id: "sa-rapita", nombre: "Sa Ràpita / Es Trenc", region: "Islas Baleares", isla: "Mallorca", zona: "Campos",
+    lat: 39.350, lon: 2.960, deportes: ["kite", "windsurf", "wing"],
+    buenos: ["S", "SO", "SE"], nivel: "Intermedio",
+    nota: "Playas del sur de Mallorca. La térmica del sur entra por la tarde.",
+    anemometros: [{ nombre: "Windfinder · Sa Ràpita", url: "https://www.windfinder.com/report/sa_rapita" }],
+    webcams: [],
+  },
+
+  // ---------- GALICIA Y ASTURIAS ----------
+  {
+    id: "razo", nombre: "Razo", region: "Galicia", isla: "A Coruña", zona: "Carballo",
+    lat: 43.300, lon: -8.712, deportes: ["kite", "windsurf"],
+    buenos: ["NE", "N", "E"], nivel: "Intermedio / avanzado",
+    nota: "Costa da Morte: playa larga y abierta al Atlántico, con olas. Funciona con el nordeste del verano.",
+    anemometros: [{ nombre: "Windfinder · Razo", url: "https://www.windfinder.com/report/razo" }],
+    webcams: [],
+  },
+  {
+    id: "xago", nombre: "Xagó", region: "Asturias", isla: "Asturias", zona: "Gozón",
+    lat: 43.610, lon: -5.925, deportes: ["kite", "windsurf"],
+    buenos: ["NE", "N", "E"], nivel: "Intermedio / avanzado",
+    nota: "El spot más conocido de Asturias. Playa grande de arena con olas; viento del nordeste en verano.",
+    anemometros: [{ nombre: "Windfinder · Xagó", url: "https://www.windfinder.com/report/xago" }],
+    webcams: [],
   },
 ];

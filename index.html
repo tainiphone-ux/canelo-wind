@@ -140,8 +140,11 @@ const leer = (k, d) => { try { const v = localStorage.getItem("cw_" + k); return
 const UNIDADES = { kn: { t: "nudos", c: "kn", f: 1 }, kmh: { t: "km/h", c: "km/h", f: 1.852 }, ms: { t: "m/s", c: "m/s", f: 0.5144 } };
 let unidad = leer("unidad", "kn");
 let favoritos = leer("favoritos", []);
-let filtroIsla = "Todas", filtroDeporte = "Todos", textoBuscar = "";
+let filtroRegion = leer("region", "Todas"), filtroIsla = "Todas", filtroDeporte = "Todos", textoBuscar = "";
 const cache = {};
+// Región (Canarias, Andalucía…) y hora local de cada spot
+const regionDe = (s) => s.region || "Canarias";
+const tzDe = (s) => s.tz || (regionDe(s) === "Canarias" ? "Atlantic/Canary" : "Europe/Madrid");
 
 const PUNTOS = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSO","SO","OSO","O","ONO","NO","NNO"];
 const rumbo = (g) => PUNTOS[Math.round(((g % 360) / 22.5)) % 16];
@@ -171,33 +174,40 @@ async function viento(spot) {
   const u = `https://api.open-meteo.com/v1/forecast?latitude=${spot.lat}&longitude=${spot.lon}` +
     `&hourly=wind_speed_10m,wind_gusts_10m,wind_direction_10m,temperature_2m,weather_code,precipitation_probability` +
     `&current=wind_speed_10m,wind_gusts_10m,wind_direction_10m,temperature_2m,weather_code` +
-    `&daily=sunrise,sunset&wind_speed_unit=kn&timezone=Atlantic%2FCanary&forecast_days=7&cell_selection=sea`;
+    `&daily=sunrise,sunset&wind_speed_unit=kn&timezone=${encodeURIComponent(tzDe(spot))}&forecast_days=7&cell_selection=sea`;
   const r = await fetch(u); if (!r.ok) throw new Error("viento " + r.status); return r.json();
 }
 async function olas(spot) {
   const u = `https://marine-api.open-meteo.com/v1/marine?latitude=${spot.lat}&longitude=${spot.lon}` +
     `&hourly=wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_period,swell_wave_direction` +
-    `&current=wave_height,wave_period,wave_direction,sea_surface_temperature&timezone=Atlantic%2FCanary&forecast_days=7`;
+    `&current=wave_height,wave_period,wave_direction,sea_surface_temperature&timezone=${encodeURIComponent(tzDe(spot))}&forecast_days=7`;
   const r = await fetch(u); if (!r.ok) throw new Error("olas " + r.status); return r.json();
 }
 // Viento de ahora en todos los spots de una vez (para la lista)
 async function vientoAhoraTodos() {
   const lat = SPOTS.map(s => s.lat).join(","), lon = SPOTS.map(s => s.lon).join(",");
   const u = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-    `&current=wind_speed_10m,wind_gusts_10m,wind_direction_10m&wind_speed_unit=kn&timezone=Atlantic%2FCanary&cell_selection=sea`;
+    `&current=wind_speed_10m,wind_gusts_10m,wind_direction_10m&wind_speed_unit=kn&timezone=auto&cell_selection=sea`;
   const r = await fetch(u); const j = await r.json();
   (Array.isArray(j) ? j : [j]).forEach((d, i) => { if (SPOTS[i]) SPOTS[i].ahora = d.current; });
 }
 
 // ---------- Pantalla: lista de spots ----------
 function pintarLista() {
-  const islas = ["Todas", ...new Set(SPOTS.map(s => s.isla))];
+  const regiones = ["Todas", ...new Set(SPOTS.map(regionDe))];
+  if (!regiones.includes(filtroRegion)) filtroRegion = "Todas";
+  // Islas o provincias de la región elegida (solo si hay más de una)
+  const islas = filtroRegion === "Todas" ? [] : ["Todas", ...new Set(SPOTS.filter(s => regionDe(s) === filtroRegion).map(s => s.isla))];
+  if (!islas.includes(filtroIsla)) filtroIsla = "Todas";
   const deportes = [["Todos", "Todos"], ["windsurf", "Windsurf"], ["kite", "Kite"], ["wing", "Wing foil"]];
   const t = textoBuscar.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
   const visibles = SPOTS.filter(s =>
+    (filtroRegion === "Todas" || regionDe(s) === filtroRegion) &&
     (filtroIsla === "Todas" || s.isla === filtroIsla) &&
     (filtroDeporte === "Todos" || s.deportes.includes(filtroDeporte)) &&
-    (!t || (s.nombre + " " + s.zona + " " + s.isla).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").includes(t)));
+    (!t || (s.nombre + " " + s.zona + " " + s.isla + " " + regionDe(s)).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").includes(t)));
+  // Título de cada grupo: «Tenerife» en Canarias; «Cádiz · Andalucía» en el resto
+  const grupo = (s) => regionDe(s) === "Canarias" || regionDe(s) === s.isla ? s.isla : `${s.isla} · ${regionDe(s)}`;
 
   const tarjeta = (s) => {
     const a = s.ahora;
@@ -211,12 +221,13 @@ function pintarLista() {
   };
 
   let html = `<input class="buscar" id="buscar" placeholder="Buscar spot…" value="${esc(textoBuscar)}">
-    <div class="chips">${islas.map(i => `<button class="chip ${i === filtroIsla ? "on" : ""}" data-isla="${i}">${i}</button>`).join("")}</div>
+    <div class="chips">${regiones.map(r => `<button class="chip ${r === filtroRegion ? "on" : ""}" data-region="${esc(r)}">${r === "Todas" ? "Toda España" : esc(r)}</button>`).join("")}</div>
+    ${islas.length > 2 ? `<div class="chips">${islas.map(i => `<button class="chip ${i === filtroIsla ? "on" : ""}" data-isla="${esc(i)}">${esc(i)}</button>`).join("")}</div>` : ""}
     <div class="chips">${deportes.map(([k, n]) => `<button class="chip ${k === filtroDeporte ? "on" : ""}" data-dep="${k}">${n}</button>`).join("")}</div>`;
   const favs = visibles.filter(s => favoritos.includes(s.id));
   if (favs.length) html += `<h2 class="isla">★ Mis favoritos</h2><div class="lista">${favs.map(tarjeta).join("")}</div>`;
-  [...new Set(visibles.map(s => s.isla))].forEach(isla => {
-    html += `<h2 class="isla">${isla}</h2><div class="lista">${visibles.filter(s => s.isla === isla).map(tarjeta).join("")}</div>`;
+  [...new Set(visibles.map(grupo))].forEach(g => {
+    html += `<h2 class="isla">${esc(g)}</h2><div class="lista">${visibles.filter(s => grupo(s) === g).map(tarjeta).join("")}</div>`;
   });
   if (!visibles.length) html += `<p class="cargando">No hay spots con ese filtro.</p>`;
   html += `<p class="aviso">Viento de ahora según el modelo de previsión (${UNIDADES[unidad].t}). Para el viento medido, entra en el spot y mira «Anemómetros».</p>`;
@@ -224,6 +235,7 @@ function pintarLista() {
 
   const b = $("#buscar");
   b.oninput = () => { textoBuscar = b.value; pintarLista(); const n = $("#buscar"); n.focus(); n.setSelectionRange(n.value.length, n.value.length); };
+  document.querySelectorAll("[data-region]").forEach(e => e.onclick = () => { filtroRegion = e.dataset.region; filtroIsla = "Todas"; guardar("region", filtroRegion); pintarLista(); });
   document.querySelectorAll("[data-isla]").forEach(e => e.onclick = () => { filtroIsla = e.dataset.isla; pintarLista(); });
   document.querySelectorAll("[data-dep]").forEach(e => e.onclick = () => { filtroDeporte = e.dataset.dep; pintarLista(); });
   document.querySelectorAll("[data-fav]").forEach(e => e.onclick = (ev) => {
@@ -278,7 +290,7 @@ function dibujarSpot(spot) {
   <button class="volver" onclick="location.hash=''">← Todos los spots</button>
   <div class="cab">
     <div style="flex:1"><h2>${esc(spot.nombre)}</h2>
-      <div class="sub" style="color:var(--muted)">${esc(spot.zona)} · ${esc(spot.isla)}</div>
+      <div class="sub" style="color:var(--muted)">${esc(spot.zona)} · ${esc(spot.isla)}${regionDe(spot) !== "Canarias" && regionDe(spot) !== spot.isla ? " · " + esc(regionDe(spot)) : ""}</div>
       ${spot.deportes.map(d => `<span class="etq">${{ windsurf: "🏄 Windsurf", kite: "🪁 Kitesurf", wing: "🪽 Wing foil" }[d]}</span>`).join("")}
       <span class="etq">Nivel: ${esc(spot.nivel)}</span>
       <span class="etq">Mejor viento: ${spot.buenos.join(", ")}</span>
@@ -351,8 +363,8 @@ function dibujarSpot(spot) {
 }
 
 // ---------- Reportes de la gente (formulario de Google) ----------
-const hoyISO = () => new Date().toLocaleDateString("sv-SE", { timeZone: "Atlantic/Canary" });
-const horaAhora = () => new Date().toLocaleTimeString("es-ES", { timeZone: "Atlantic/Canary", hour: "2-digit", minute: "2-digit" });
+const hoyISO = (tz = "Atlantic/Canary") => new Date().toLocaleDateString("sv-SE", { timeZone: tz });
+const horaAhora = (tz = "Atlantic/Canary") => new Date().toLocaleTimeString("es-ES", { timeZone: tz, hour: "2-digit", minute: "2-digit" });
 const formListo = (f) => f && f.form && Object.values(f.campos).every(Boolean);
 
 // Envía las respuestas a un formulario de Google (sin salir de la app)
@@ -366,7 +378,7 @@ async function enviarFormulario(f, valores) {
 // Previsión del modelo a esa hora, para comparar con lo que dice la gente
 function prevision(spot, hora) {
   const c = cache[spot.id]; if (!c) return "";
-  const t = hoyISO() + "T" + hora.slice(0, 2) + ":00";
+  const t = hoyISO(tzDe(spot)) + "T" + hora.slice(0, 2) + ":00";
   const i = c.v.hourly.time.indexOf(t); if (i < 0) return "";
   const H = c.v.hourly;
   return `${Math.round(H.wind_speed_10m[i])} kn, rachas ${Math.round(H.wind_gusts_10m[i])} kn, ${rumbo(H.wind_direction_10m[i])}`;
@@ -377,7 +389,7 @@ function pintarReportar(spot) {
   caja.innerHTML = `<h3>📝 ¿Estás en ${esc(spot.nombre)}? Cuéntanos cómo está</h3>
     <p class="aviso" style="margin-top:-4px">Con tus reportes la app aprende qué tal acierta la previsión en cada spot.</p>
     <div class="form" id="fRep">
-      <label>Hora<input type="time" name="hora" value="${horaAhora()}"></label>
+      <label>Hora<input type="time" name="hora" value="${horaAhora(tzDe(spot))}"></label>
       <label>Viento (nudos)<input type="number" name="viento" min="0" max="80" inputmode="numeric" placeholder="ej. 18"></label>
       <label>Rachas (nudos)<input type="number" name="rachas" min="0" max="90" inputmode="numeric" placeholder="ej. 24"></label>
       <label>Dirección<select name="direccion"><option value="">—</option>${["N","NE","E","SE","S","SO","O","NO"].map(d => `<option>${d}</option>`).join("")}</select></label>
@@ -401,7 +413,7 @@ function pintarReportar(spot) {
     guardar("nombre", f.nombre);
     $("#enviarRep").disabled = true;
     try {
-      await enviarFormulario(CONFIG.reportes, { ...f, spot: spot.id, fecha: hoyISO(), valoracion: valoracion || "", prevision: prevision(spot, f.hora) });
+      await enviarFormulario(CONFIG.reportes, { ...f, spot: spot.id, fecha: hoyISO(tzDe(spot)), valoracion: valoracion || "", prevision: prevision(spot, f.hora) });
       msg.innerHTML = `<div class="msg">✅ ¡Gracias${f.nombre ? ", " + esc(f.nombre) : ""}! Tu reporte se ha enviado. Aparecerá aquí en unos minutos.</div>`;
       caja.querySelectorAll("input:not([name=nombre]):not([name=hora]), textarea, select").forEach(e => e.value = "");
     } catch (e) {
@@ -456,7 +468,7 @@ async function pintarReportes(spot) {
     const lista = (await cargarReportes()).filter(r => r.spot === spot.id)
       .sort((a, b) => (b.fecha + b.hora).localeCompare(a.fecha + a.hora)).slice(0, 15);
     if (!lista.length) { caja.innerHTML = `<h3>👥 Lo que dice la gente</h3><p class="aviso">Todavía no hay reportes de este spot. ¡Sé el primero!</p>`; return; }
-    const hoy = hoyISO();
+    const hoy = hoyISO(tzDe(spot));
     caja.innerHTML = `<h3>👥 Lo que dice la gente</h3>` + lista.map(r => {
       const w = parseFloat(r.viento);
       const cuando = r.fecha === hoy ? "Hoy" : new Date(r.fecha + "T12:00").toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" });
@@ -474,7 +486,7 @@ async function pintarReportes(spot) {
 
 // ---------- Enlaces de fuera (webcams, anemómetros, mapas) ----------
 // Webs que dejan verse dentro de la app (comprobado el 08-11-2026). Las demás lo prohíben.
-const SE_VEN_DENTRO = ["in2thebeach.es", "fuerteventuraplayas.com", "embed.windy.com"];
+const SE_VEN_DENTRO = ["in2thebeach.es", "fuerteventuraplayas.com", "embed.windy.com", "mangolinkworld.com"];
 const seVeDentro = (url) => { try { const h = new URL(url).hostname; return SE_VEN_DENTRO.some(d => h === d || h.endsWith("." + d)); } catch (e) { return false; } };
 const nombreWeb = (url) => { try { return new URL(url).hostname.replace(/^www\.|^en\.|^es\./, ""); } catch (e) { return "esa web"; } };
 const esAppInstalada = () => window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;

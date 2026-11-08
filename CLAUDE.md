@@ -12,7 +12,7 @@ Valentín no es programador: **háblale siempre en español, también en los men
 
 ## Archivos
 - `index.html` — la app entera (lista de spots, ficha con previsión, reportes, buzón, visor de enlaces).
-- `spots.js` — los spots (Canarias: 16). Para añadir uno, copiar un bloque. `buenos` = direcciones de viento buenas.
+- `spots.js` — los spots (36: 19 de Canarias y 17 de península y Baleares). Para añadir uno, copiar un bloque. `buenos` = direcciones de viento buenas. Fuera de Canarias llevan `region` (comunidad) e `isla` = provincia o isla; la hora sale sola (Canarias o península, `tzDe`).
 - `config.js` — formularios de Google (reportes y sugerencias), ya conectados.
 - `herramientas/crear_formularios.gs` — el Apps Script que creó los formularios.
 - `logo.svg`, `icono-iphone.png`, `icono-512.png`, `manifest.json` — icono y «Añadir a pantalla de inicio».
@@ -26,6 +26,6 @@ Valentín no es programador: **háblale siempre en español, también en los men
 - Probar en el Mac: `python3 -m http.server 8765 --bind 127.0.0.1` desde esta carpeta y abrir http://127.0.0.1:8765.
 
 ## Pendiente / ideas
-- Ampliar a resto de España, Europa y mundo.
+- Ampliar a Europa y mundo (España hecha el 08-11-2026). Windfinder corta si se le piden muchas páginas seguidas (error 429): comprobar enlaces despacio.
 - En `PROYECTOS CLAUDE/Wing Foil` hay un Word «Aplicación para wing foil.docx» (22-10-2026), probablemente la idea inicial: revisarlo con Valentín.
 - No probado aún en un iPhone de verdad: el visor de webcams y el aviso de volver.
