@@ -1,22 +1,22 @@
 // Conexión con los formularios de Google (reportes del día y buzón de sugerencias).
-// Mientras esté vacío, la app enseña los formularios pero avisa de que aún no están activados.
-// Los pasos para rellenarlo están en «COMO CREAR LOS FORMULARIOS.md».
+// Creados el 08-11-2026 con herramientas/crear_formularios.gs en la cuenta de Google de Valentín.
 
 const CONFIG = {
   reportes: {
-    // Enlace del formulario «Canelo Wind · Reportes» (el que acaba en /viewform)
-    form: "",
-    // Número «entry.XXXX» de cada pregunta (sale del enlace prerrellenado)
+    // Formulario «Canelo Wind · Reportes»
+    form: "https://docs.google.com/forms/d/e/1FAIpQLSfCGPWf3YylCpSwcnQ4k333UIXcU6_hq1cUE_Lg7bv80iobrw/viewform",
     campos: {
-      spot: "", fecha: "", hora: "", viento: "", rachas: "", direccion: "",
-      mar: "", valoracion: "", material: "", comentario: "", nombre: "", prevision: "",
+      spot: "entry.1107885146", fecha: "entry.403954751", hora: "entry.165944545",
+      viento: "entry.727495404", rachas: "entry.1153163332", direccion: "entry.858101845",
+      mar: "entry.2043646994", valoracion: "entry.898346408", material: "entry.1115315951",
+      comentario: "entry.1740572111", nombre: "entry.827975404", prevision: "entry.102502674",
     },
-    // Hoja de respuestas publicada como CSV (Archivo › Compartir › Publicar en la web › CSV)
-    csv: "",
+    // Hoja «Canelo Wind · Reportes (respuestas)», compartida solo para ver
+    csv: "https://docs.google.com/spreadsheets/d/1DwYLv69HGw71w4N0Odz5vZWcL2K9sU2ggNHfghlRZJ8/gviz/tq?tqx=out:csv&gid=1810976243",
   },
   sugerencias: {
-    // Enlace del formulario «Canelo Wind · Sugerencias» (sus respuestas NO se publican)
-    form: "",
-    campos: { tipo: "", mensaje: "", nombre: "", contacto: "" },
+    // Formulario «Canelo Wind · Sugerencias» (su hoja es privada)
+    form: "https://docs.google.com/forms/d/e/1FAIpQLSeB-cp_pnvGJC2FMsgSH3Xa91MHHmEKBzAt25PAmfdJP7AKvQ/viewform",
+    campos: { tipo: "entry.1787035991", mensaje: "entry.1586210193", nombre: "entry.2048740754", contacto: "entry.435415204" },
   },
 };

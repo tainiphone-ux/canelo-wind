@@ -416,6 +416,13 @@ async function cargarReportes() {
   const C = { spot: col("spot"), fecha: col("fecha"), hora: col("hora"), viento: col("viento"), rachas: col("rachas"), direccion: col("direccion"),
     mar: col("mar"), valoracion: col("valoracion"), material: col("material"), comentario: col("comentario"), nombre: col("nombre"), prevision: col("prevision") };
   const lista = filas.filter(f => f.length > 1).map(f => Object.fromEntries(Object.entries(C).map(([k, i]) => [k, i >= 0 ? (f[i] || "").trim() : ""])));
+  // La hoja puede devolver la fecha como 2026-11-08 o 8/11/2026, y la hora como 14:00 o 14:00:00
+  lista.forEach(r => {
+    const d = r.fecha.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (d) r.fecha = `${d[3]}-${d[2].padStart(2, "0")}-${d[1].padStart(2, "0")}`;
+    const h = r.hora.match(/(\d{1,2}):(\d{2})/);
+    if (h) r.hora = `${h[1].padStart(2, "0")}:${h[2]}`;
+  });
   reportesCache = { t: Date.now(), lista };
   return lista;
 }
