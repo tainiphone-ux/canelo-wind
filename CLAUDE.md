@@ -17,6 +17,7 @@ Valentín no es programador: **háblale siempre en español, también en los men
 - `consejos.js` — consejos y aviso de seguridad de cada spot (por id); `peligro` = direcciones off-shore (salen «Muy malo» y aviso) y `marea: "alta"` = avisa de la bajamar. Al añadir un spot, añadir también aquí sus consejos (y el aviso si hay corrientes, roca, off-shore, poca agua, puerto o zonas balizadas).
 - `idiomas.js` — idiomas de la app (es, en, de, fr, it): `TXT[idioma][clave]`, función `t("clave", {datos})`, rosa de los vientos por idioma. La primera vez sale la pantalla de elegir idioma; luego el botón 🌐. Al añadir una frase nueva a la app, ponerla en los 5 idiomas.
 - `textos_spots.js` — descripción, consejos y aviso de cada spot en en/de/fr/it (el español está en spots.js y consejos.js). Al añadir un spot, traducirlo aquí también.
+- `visitas.js` — contador de visitas GoatCounter (sin cookies). `GOATCOUNTER = "nombre"` lo enciende; vacío = apagado; en localhost no cuenta. `contar(ruta, título, evento)`: cuenta /spot/<id>, «instalada», reporte/<id>, sugerencia, idioma/<xx> y enlace/<web>. Cargado en index, landing e instalar.
 - `config.js` — formularios de Google (reportes y sugerencias), ya conectados.
 - `herramientas/crear_formularios.gs` — el Apps Script que creó los formularios.
 - `logo.svg`, `icono-iphone.png`, `icono-512.png`, `manifest.json` — icono y «Añadir a pantalla de inicio».

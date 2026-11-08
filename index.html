@@ -157,6 +157,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
   <span id="pie2"></span> <a href="#" id="pieSugerir"></a>.<br>
   <a href="instalar.html" id="pie4"></a> · <a href="landing.html" id="pie5"></a></footer>
 
+<script src="visitas.js"></script>
 <script src="idiomas.js"></script>
 <script src="spots.js"></script>
 <script src="config.js"></script>
@@ -507,6 +508,7 @@ function pintarReportar(spot) {
     try {
       await enviarFormulario(CONFIG.reportes, { ...f, spot: spot.id, fecha: hoyISO(tzDe(spot)), valoracion: valoracion || "", prevision: prevision(spot, f.hora) });
       msg.innerHTML = `<div class="msg">${t("rep_ok", { n: f.nombre ? ", " + esc(f.nombre) : "" })}</div>`;
+      contar("reporte/" + spot.id, "Reporte enviado · " + spot.nombre, true);
       caja.querySelectorAll("input:not([name=nombre]):not([name=hora]), textarea, select").forEach(e => e.value = "");
     } catch (e) {
       msg.innerHTML = `<div class="msg">${t("err_envio")}</div>`;
@@ -633,6 +635,7 @@ document.addEventListener("click", (e) => {
   const a = e.target.closest("a.ext"); if (!a) return;
   e.preventDefault();
   const titulo = a.childNodes[0].textContent.trim();
+  contar("enlace/" + nombreWeb(a.href), "Enlace · " + titulo, true);
   if (a.dataset.dentro === "1") abrirVisor(a.href, titulo); else avisoFuera(a.href, titulo.replace(/^\S+\s/, ""));
 });
 
@@ -662,6 +665,7 @@ function abrirSugerencias() {
     if (f.nombre) guardar("nombre", f.nombre);
     try {
       await enviarFormulario(CONFIG.sugerencias, f);
+      contar("sugerencia", "Sugerencia enviada · " + f.tipo, true);
       fondo.querySelector(".form").remove();
       msg.innerHTML = `<div class="msg">${t("sug_ok")}</div><div style="margin-top:10px"><button class="btn sec" id="cerrar2">${t("cerrar")}</button></div>`;
       fondo.querySelector("#cerrar2").onclick = cerrar;
@@ -842,7 +846,7 @@ function elegirIdioma(primeraVez) {
   </div>`;
   document.body.appendChild(f);
   f.querySelectorAll("[data-idioma]").forEach(b => b.onclick = () => {
-    IDIOMA = b.dataset.idioma; guardar("idioma", IDIOMA);
+    IDIOMA = b.dataset.idioma; guardar("idioma", IDIOMA); contar("idioma/" + IDIOMA, "Idioma elegido · " + IDIOMA, true);
     f.remove(); ponerTextosFijos(); router();
   });
   const cerrar = f.querySelector("#cerrarIdioma");
@@ -854,7 +858,7 @@ $("#btnIdioma").onclick = () => elegirIdioma(false);
 function router() {
   const m = location.hash.match(/spot=([\w-]+)/);
   const spot = m && SPOTS.find(s => s.id === m[1]);
-  if (spot) { diaElegido = 0; pintarSpot(spot); } else pintarLista();
+  if (spot) { diaElegido = 0; pintarSpot(spot); contar("/spot/" + spot.id, spot.nombre); } else pintarLista();
 }
 window.addEventListener("hashchange", router);
 
@@ -868,6 +872,7 @@ $("#btnUnidad").onclick = () => {
 };
 
 router();
+try { if (esAppInstalada() && !sessionStorage.getItem("cw_contada")) { sessionStorage.setItem("cw_contada", "1"); contar("instalada", "Abierta desde la pantalla de inicio (app instalada)", true); } } catch (e) {}
 vientoAhoraTodos().then(() => { if (!location.hash.includes("spot=")) pintarLista(); }).catch(() => {});
 </script>
 </body>
