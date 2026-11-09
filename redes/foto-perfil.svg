@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs><linearGradient id="canela" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E08A3C"/><stop offset="1" stop-color="#9A4416"/></linearGradient></defs>
+  <rect width="512" height="512" fill="url(#canela)"/>
+  <g transform="translate(40 10) scale(0.9)"><!-- viento -->
+  <g fill="none" stroke="#FFF1DC" stroke-width="22" stroke-linecap="round">
+    <path d="M84 150 H214 a34 34 0 1 0 -34 -34"/>
+    <path d="M84 210 H270 a38 38 0 1 1 -38 38"/>
+  </g>
+  <!-- ala de wing foil -->
+  <path d="M292 96 Q438 150 420 318 Q382 248 262 236 Q300 170 292 96 Z" fill="#FFF1DC"/>
+  <path d="M300 122 Q322 190 290 228" fill="none" stroke="#9A4416" stroke-width="10" stroke-linecap="round"/>
+  </g>
+  <!-- ola -->
+  <path d="M-20 404 C80 320 190 330 236 378 C268 410 312 412 340 386 C300 392 280 360 300 334 C340 290 440 290 532 350 V532 H-20 Z" fill="#FFFFFF"/>
+  <path d="M-20 445 C100 405 200 450 272 432 C340 414 440 430 532 418 V532 H-20 Z" fill="#FFE2BE"/>
+
+</svg>
