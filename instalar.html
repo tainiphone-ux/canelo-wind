@@ -23,6 +23,8 @@ header p { margin: 0; opacity: .9; }
 .banderas button { border: 0; background: rgba(255,255,255,.18); color: #fff; border-radius: 10px; padding: 6px 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
 .banderas button.on { background: #fff; color: #9A4416; }
 main { max-width: 620px; margin: 0 auto; padding: 16px 16px 40px; }
+.video-tit { font-weight: 700; margin: 4px 0 8px; }
+.video-inst { display: block; width: 100%; max-width: 320px; margin: 0 auto 16px; border-radius: 18px; background: #9A4416; aspect-ratio: 9 / 16; }
 .tabs { display: flex; gap: 8px; margin: 4px 0 14px; }
 .tab { flex: 1; border: 0; background: var(--chip); color: var(--text); padding: 12px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; }
 .tab.on { background: var(--brand); color: #fff; }
@@ -59,6 +61,8 @@ ul.lista li { margin-bottom: 6px; }
 
   <section class="caja" data-panel="iphone">
     <h2 data-t="en_iphone">En el iPhone</h2>
+    <p class="video-tit" data-t="video">🎬 Míralo en vídeo (43 s)</p>
+    <video class="video-inst" src="videos/instalar-iphone.mp4" poster="videos/instalar-iphone.jpg" controls playsinline preload="none"></video>
     <ol class="pasos">
       <li data-t="i1"></li>
       <li data-t="i2"></li>
@@ -106,6 +110,7 @@ const ICO_COMPARTIR = '<span class="icono">⬆️</span>', ICO_MAS = '<span clas
 const IDIOMAS = [["es", "🇪🇸", "ES"], ["en", "🇬🇧", "EN"], ["de", "🇩🇪", "DE"], ["fr", "🇫🇷", "FR"], ["it", "🇮🇹", "IT"]];
 const T = {
   es: {
+    video: "🎬 Míralo en vídeo (43 s)",
     titulo: "Instalar Canelo Wind", sub: "Ten la app en tu móvil en 1 minuto. Gratis, sin App Store.",
     en_iphone: "En el iPhone", en_android: "En Android",
     i1: "<b>Abre la app en Safari</b>Tiene que ser Safari (la brújula azul), no Chrome ni Instagram ni WhatsApp. Si te llegó el enlace por WhatsApp, pulsa los tres puntos o el botón de compartir y elige «Abrir en Safari».",
@@ -126,6 +131,7 @@ const T = {
     s5: "¿Ideas o falta un spot? Usa el botón 💡 de la app.",
   },
   en: {
+    video: "🎬 Watch the video (in Spanish, 43 s)",
     titulo: "Install Canelo Wind", sub: "Get the app on your phone in 1 minute. Free, no App Store.",
     en_iphone: "On iPhone", en_android: "On Android",
     i1: "<b>Open the app in Safari</b>It must be Safari (the blue compass), not Chrome, Instagram or WhatsApp. If you got the link on WhatsApp, tap the three dots or the share button and choose «Open in Safari».",
@@ -146,6 +152,7 @@ const T = {
     s5: "Ideas or a missing spot? Use the 💡 button in the app.",
   },
   de: {
+    video: "🎬 Sieh dir das Video an (auf Spanisch, 43 s)",
     titulo: "Canelo Wind installieren", sub: "Hol dir die App in 1 Minute aufs Handy. Kostenlos, ohne App Store.",
     en_iphone: "Auf dem iPhone", en_android: "Auf Android",
     i1: "<b>Öffne die App in Safari</b>Es muss Safari sein (der blaue Kompass), nicht Chrome, Instagram oder WhatsApp. Wenn du den Link per WhatsApp bekommen hast, tippe auf die drei Punkte oder auf Teilen und wähle «In Safari öffnen».",
@@ -166,6 +173,7 @@ const T = {
     s5: "Ideen oder fehlt ein Spot? Nutze den 💡-Knopf in der App.",
   },
   fr: {
+    video: "🎬 Regarde la vidéo (en espagnol, 43 s)",
     titulo: "Installer Canelo Wind", sub: "L'appli sur ton mobile en 1 minute. Gratuite, sans App Store.",
     en_iphone: "Sur iPhone", en_android: "Sur Android",
     i1: "<b>Ouvre l'appli dans Safari</b>Ce doit être Safari (la boussole bleue), pas Chrome, Instagram ou WhatsApp. Si tu as reçu le lien par WhatsApp, touche les trois points ou le bouton de partage et choisis «Ouvrir dans Safari».",
@@ -186,6 +194,7 @@ const T = {
     s5: "Des idées ou il manque un spot ? Utilise le bouton 💡 de l'appli.",
   },
   it: {
+    video: "🎬 Guarda il video (in spagnolo, 43 s)",
     titulo: "Installa Canelo Wind", sub: "L'app sul tuo telefono in 1 minuto. Gratis, senza App Store.",
     en_iphone: "Su iPhone", en_android: "Su Android",
     i1: "<b>Apri l'app in Safari</b>Deve essere Safari (la bussola blu), non Chrome, Instagram o WhatsApp. Se hai ricevuto il link su WhatsApp, tocca i tre puntini o il tasto condividi e scegli «Apri in Safari».",
