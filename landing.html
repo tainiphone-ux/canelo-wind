@@ -112,6 +112,8 @@ h2 { font-size: clamp(28px, 4vw, 40px); line-height: 1.15; margin: 0 0 10px; let
 .region b { display: flex; justify-content: space-between; align-items: baseline; font-size: 17px; }
 .region b em { font-style: normal; color: var(--brand); font-size: 22px; }
 .region div { color: var(--muted); font-size: 14px; margin-top: 4px; }
+.region a { color: inherit; text-decoration: none; } .region a:hover { color: var(--brand); text-decoration: underline; }
+.region b a { color: var(--text); }
 
 /* Instalar */
 .pasos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: paso; margin-bottom: 26px; }
@@ -347,7 +349,7 @@ footer a { color: var(--muted); }
 <footer>
   <div class="envoltura">
     <div data-t="pie"></div>
-    <div style="margin-top:6px"><a href="./">Canelo Wind</a> · <a href="https://www.instagram.com/canelowindapp/" target="_blank" rel="noopener">📸 @canelowindapp</a> · <a href="instalar.html" data-t="pie_inst">Instalar</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> · <span data-t="videos">Vídeos</span>: <a href="https://www.pexels.com/" target="_blank" rel="noopener">Pexels</a> (David Pickup, SuperClaudio) · wing foil: la gente de Canelo Wind</div>
+    <div style="margin-top:6px"><a href="./">Canelo Wind</a> · <a href="/spots/">📍 Todos los spots</a> · <a href="https://www.instagram.com/canelowindapp/" target="_blank" rel="noopener">📸 @canelowindapp</a> · <a href="instalar.html" data-t="pie_inst">Instalar</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> · <span data-t="videos">Vídeos</span>: <a href="https://www.pexels.com/" target="_blank" rel="noopener">Pexels</a> (David Pickup, SuperClaudio) · wing foil: la gente de Canelo Wind</div>
   </div>
 </footer>
 
@@ -529,9 +531,10 @@ function pintar() {
   document.getElementById("notas").innerHTML = [0, 1, 2, 3, 4].map(n => `<span style="background:${COLORES_NOTA[n]}">${t("n" + n)}</span>`).join("");
   // Spots por región (sale solo de spots.js)
   const regiones = {};
-  SPOTS.forEach(s => { const r = s.region || "Canarias"; (regiones[r] = regiones[r] || []).push(s.nombre.replace(/\s*\(.*\)$/, "")); });
+  const slug = (x) => x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  SPOTS.forEach(s => { const r = s.region || "Canarias"; (regiones[r] = regiones[r] || []).push(`<a href="/spot/${s.id}/">${s.nombre.replace(/\s*\(.*\)$/, "")}</a>`); });
   document.getElementById("regiones").innerHTML = Object.entries(regiones).map(([r, lista]) =>
-    `<div class="region"><b>${t("reg_" + r)} <em>${lista.length}</em></b><div>${lista.join(" · ")}</div></div>`).join("");
+    `<div class="region"><b><a href="/zona/${slug(r)}/">${t("reg_" + r)}</a> <em>${lista.length}</em></b><div>${lista.join(" · ")}</div></div>`).join("");
   document.getElementById("nSpots").textContent = SPOTS.length;
   document.getElementById("nRegiones").textContent = Object.keys(regiones).length;
   // Selector de idioma

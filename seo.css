@@ -1,0 +1,47 @@
+/* Estilo de las páginas de spots y regiones (las que lee Google) */
+:root { --bg: #F6F1EA; --card: #FFFFFF; --text: #2A1E16; --muted: #7A6A5E; --line: #E7DDD1; --brand: #B85A22; --brand-a: #E08A3C; --brand-b: #9A4416; --chip: #EFE4D7; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #17120E; --card: #231B15; --text: #F4EAE0; --muted: #B2A193; --line: #3A2E25; --brand: #E08A3C; --chip: #33281F; }
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+a { color: var(--brand); }
+.envoltura { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+header.barra { background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); color: #fff; }
+header.barra .envoltura { display: flex; align-items: center; gap: 10px; height: 58px; }
+header.barra a.marca { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font-weight: 800; font-size: 19px; }
+header.barra img { width: 34px; height: 34px; border-radius: 9px; }
+header.barra .abrir { margin-left: auto; background: #fff; color: var(--brand-b); text-decoration: none; font-weight: 800; padding: 8px 14px; border-radius: 10px; font-size: 14px; }
+nav.miga { font-size: 14px; color: var(--muted); margin: 16px 0 6px; }
+nav.miga a { color: var(--muted); }
+h1 { font-size: clamp(28px, 6vw, 40px); line-height: 1.12; margin: 6px 0 6px; letter-spacing: -.5px; }
+.sub { color: var(--muted); margin: 0 0 14px; }
+.etqs { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 14px; }
+.etq { background: var(--chip); border-radius: 999px; padding: 4px 12px; font-size: 14px; }
+.caja { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px; margin: 14px 0; }
+.caja h2 { margin: 0 0 10px; font-size: 21px; }
+.ahora { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.dato { background: var(--chip); border-radius: 12px; padding: 12px; }
+.dato b { display: block; font-size: 28px; line-height: 1.1; }
+.dato span { font-size: 13px; color: var(--muted); }
+.nota { display: inline-block; color: #fff; font-weight: 800; border-radius: 10px; padding: 6px 14px; font-size: 18px; margin-bottom: 10px; }
+.horas { display: flex; gap: 6px; overflow-x: auto; margin-top: 12px; padding-bottom: 4px; }
+.hora { flex: 0 0 auto; min-width: 58px; text-align: center; border-radius: 10px; padding: 6px 4px; font-size: 13px; color: #1b1b1b; }
+.hora b { display: block; font-size: 16px; }
+.cargando { color: var(--muted); font-size: 14px; }
+.boton { display: block; text-align: center; background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); color: #fff; text-decoration: none; font-weight: 800; padding: 15px; border-radius: 14px; font-size: 18px; margin: 16px 0; box-shadow: 0 8px 20px rgba(154,68,22,.25); }
+.seguridad { background: #FDE8E6; color: #8A1F17; border: 1px solid #F3B4AD; border-radius: 16px; padding: 14px 16px; margin: 14px 0; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .seguridad { background: #3A1714; color: #FFC9C2; border-color: #6B2A23; } }
+.seguridad b { display: block; margin-bottom: 4px; }
+ul.lista { margin: 0; padding-left: 20px; } ul.lista li { margin-bottom: 6px; }
+.enlaces a { display: block; padding: 10px 12px; margin: 6px 0; background: var(--chip); border-radius: 10px; text-decoration: none; color: var(--text); }
+.rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.tarj { display: block; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; text-decoration: none; color: var(--text); }
+.tarj:hover { border-color: var(--brand); }
+.tarj b { display: block; font-size: 17px; }
+.tarj small { color: var(--muted); }
+.tarj .vivo { float: right; font-weight: 800; border-radius: 8px; padding: 2px 8px; font-size: 13px; color: #1b1b1b; }
+h2.grupo { font-size: 15px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin: 22px 0 8px; }
+footer { color: var(--muted); font-size: 14px; text-align: center; padding: 28px 16px 40px; }
+footer a { color: var(--muted); }

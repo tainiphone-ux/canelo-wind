@@ -160,7 +160,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 <footer><span id="pie1"></span><br>
   <span id="pie2"></span> <a href="#" id="pieSugerir"></a>.<br>
   <a href="instalar.html" id="pie4"></a> · <a href="landing.html" id="pie5"></a><br>
-  <a href="https://www.instagram.com/canelowindapp/" target="_blank" rel="noopener">📸 Instagram @canelowindapp</a></footer>
+  <a href="/spots/">📍 Todos los spots</a> · <a href="https://www.instagram.com/canelowindapp/" target="_blank" rel="noopener">📸 Instagram @canelowindapp</a></footer>
 
 <script src="visitas.js"></script>
 <script src="idiomas.js"></script>
@@ -651,7 +651,7 @@ document.addEventListener("click", (e) => {
 // ---------- Compartir un spot (WhatsApp, Instagram, lo que tenga el móvil) ----------
 const BOLITA = ["🔴", "🟠", "🟡", "🟢", "🟢"];
 async function compartirSpot(spot, ev, c) {
-  const url = "https://canelowind.com/#spot=" + spot.id;
+  const url = "https://canelowind.com/spot/" + spot.id + "/";
   const u = UNIDADES[unidad].c;
   const texto = t("comp_texto", {
     b: BOLITA[ev.n], n: spot.nombre, nota: t("n" + ev.n),

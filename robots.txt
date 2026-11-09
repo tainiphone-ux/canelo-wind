@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /herramientas/
+Disallow: /redes/
+
+Sitemap: https://canelowind.com/sitemap.xml
