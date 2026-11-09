@@ -46,9 +46,6 @@ main { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
 .chip { border: 0; background: var(--chip); color: var(--text); padding: 6px 12px; border-radius: 999px; cursor: pointer; font-size: 13px; }
 .chip.on { background: var(--brand); color: #fff; }
-.chips.desliza { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-.chips.desliza::-webkit-scrollbar { display: none; }
-.chips.desliza .chip { flex: 0 0 auto; }
 h2.isla { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin: 18px 0 8px; }
 .lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
 .spot { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; cursor: pointer; display: flex; gap: 10px; align-items: center; }
@@ -304,7 +301,7 @@ function pintarLista() {
   };
 
   let html = `<input class="buscar" id="buscar" placeholder="${t("buscar")}" value="${esc(textoBuscar)}">
-    <div class="chips desliza">${regiones.map(r => `<button class="chip ${r === filtroRegion ? "on" : ""}" data-region="${esc(r)}">${r === "Todas" ? t("toda") : esc(nombreRegion(r))}</button>`).join("")}</div>
+    <div class="chips">${regiones.map(r => `<button class="chip ${r === filtroRegion ? "on" : ""}" data-region="${esc(r)}">${r === "Todas" ? t("toda") : esc(nombreRegion(r))}</button>`).join("")}</div>
     ${islas.length > 2 ? `<div class="chips">${islas.map(i => `<button class="chip ${i === filtroIsla ? "on" : ""}" data-isla="${esc(i)}">${i === "Todas" ? t("todas") : esc(i)}</button>`).join("")}</div>` : ""}
     <div class="chips">${deportes.map(([k, n]) => `<button class="chip ${k === filtroDeporte ? "on" : ""}" data-dep="${k}">${n}</button>`).join("")}</div>`;
   const favs = visibles.filter(s => favoritos.includes(s.id));
