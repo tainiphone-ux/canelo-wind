@@ -25,6 +25,9 @@ Valentín no es programador: **háblale siempre en español, también en los men
 - `idiomas.js` — idiomas de la app (es, en, de, fr, it): `TXT[idioma][clave]`, función `t("clave", {datos})`, rosa de los vientos por idioma. La primera vez sale la pantalla de elegir idioma; luego el botón 🌐. Al añadir una frase nueva a la app, ponerla en los 5 idiomas.
 - `textos_spots.js` — descripción, consejos y aviso de cada spot en en/de/fr/it (el español está en spots.js y consejos.js). Al añadir un spot, traducirlo aquí también.
 - `visitas.js` — contador de visitas GoatCounter (sin cookies). `GOATCOUNTER = "nombre"` lo enciende; vacío = apagado; en localhost no cuenta. `contar(ruta, título, evento)`: cuenta /spot/<id>, «instalada», reporte/<id>, sugerencia, idioma/<xx> y enlace/<web>. Cargado en index, landing e instalar.
+- `cartel.html` — cartel A4 y hoja de 8 pegatinas con QR para imprimir (elige spot o toda la app; QR con `?utm_campaign=cartel-<spot>` para verlo en GoatCounter; QR con qrcodejs de cdnjs). https://tainiphone-ux.github.io/canelo-wind/cartel.html
+- `redes/` — foto de perfil, textos de Instagram (`instagram.md`) y mensajes de promoción para WhatsApp, Facebook, escuelas e Instagram (`mensajes.md`).
+- Botón «📤 Compartir» en cada spot (`compartirSpot`): comparte por WhatsApp/lo que tenga el móvil el spot con su nota y viento de ahora; cuenta `compartir/<id>` en GoatCounter.
 - `config.js` — formularios de Google (reportes y sugerencias), ya conectados.
 - `herramientas/crear_formularios.gs` — el Apps Script que creó los formularios.
 - `logo.svg`, `icono-iphone.png`, `icono-512.png`, `manifest.json` — icono y «Añadir a pantalla de inicio».

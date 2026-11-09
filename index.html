@@ -60,6 +60,10 @@ h2.isla { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color
 .badge small { display: block; font-weight: 500; font-size: 11px; }
 .fav { background: none; border: 0; font-size: 20px; cursor: pointer; color: var(--muted); padding: 0 2px; }
 .fav.on { color: #F2B100; }
+.acciones-spot { display: flex; align-items: center; gap: 6px; }
+.compartir { border: 0; background: var(--brand); color: #fff; border-radius: 999px; padding: 8px 14px; font-weight: 700; font-size: 14px; cursor: pointer; white-space: nowrap; box-shadow: 0 4px 12px rgba(154,68,22,.25); }
+.compartir:active { transform: scale(.96); }
+.aviso-copiado { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #2A1E16; color: #fff; padding: 10px 16px; border-radius: 12px; font-size: 14px; z-index: 40; box-shadow: 0 8px 24px rgba(0,0,0,.3); }
 .flecha { display: inline-block; transition: transform .2s; }
 /* Ficha del spot */
 .volver { background: none; border: 0; color: var(--brand); font-size: 15px; cursor: pointer; padding: 0; margin-bottom: 8px; }
@@ -379,7 +383,10 @@ function dibujarSpot(spot) {
       <span class="etq">${t("nivel")}: ${esc(nombreNivel(spot.nivel))}</span>
       <span class="etq">${t("mejor_viento")}: ${spot.buenos.map(dirIdioma).join(", ")}</span>
     </div>
-    <button class="fav ${favoritos.includes(spot.id) ? "on" : ""}" id="favSpot" title="${t("favorito")}" style="font-size:28px">★</button>
+    <div class="acciones-spot">
+      <button class="compartir" id="compartirSpot" title="${t("compartir")}">📤 <span>${t("compartir")}</span></button>
+      <button class="fav ${favoritos.includes(spot.id) ? "on" : ""}" id="favSpot" title="${t("favorito")}" style="font-size:28px">★</button>
+    </div>
   </div>
   <p style="margin:8px 0 0">${esc(tx.nota)}</p>
   ${tx.seguridad ? `<div class="seguridad"><b>${t("aviso_seg")}</b>${esc(tx.seguridad)}</div>` : ""}
@@ -445,6 +452,7 @@ function dibujarSpot(spot) {
 
   document.querySelectorAll("[data-dia]").forEach(e => e.onclick = () => { diaElegido = +e.dataset.dia; dibujarSpot(spot); });
   $("#noche").onchange = (e) => { verNoche = e.target.checked; dibujarSpot(spot); };
+  $("#compartirSpot").onclick = () => compartirSpot(spot, evAhora, c);
   $("#favSpot").onclick = () => {
     favoritos = favoritos.includes(spot.id) ? favoritos.filter(x => x !== spot.id) : [...favoritos, spot.id];
     guardar("favoritos", favoritos); dibujarSpot(spot);
@@ -639,6 +647,29 @@ document.addEventListener("click", (e) => {
   contar("enlace/" + nombreWeb(a.href), "Enlace · " + titulo, true);
   if (a.dataset.dentro === "1") abrirVisor(a.href, titulo); else avisoFuera(a.href, titulo.replace(/^\S+\s/, ""));
 });
+
+// ---------- Compartir un spot (WhatsApp, Instagram, lo que tenga el móvil) ----------
+const BOLITA = ["🔴", "🟠", "🟡", "🟢", "🟢"];
+async function compartirSpot(spot, ev, c) {
+  const url = "https://tainiphone-ux.github.io/canelo-wind/#spot=" + spot.id;
+  const u = UNIDADES[unidad].c;
+  const texto = t("comp_texto", {
+    b: BOLITA[ev.n], n: spot.nombre, nota: t("n" + ev.n),
+    v: conv(c.wind_speed_10m), r: conv(c.wind_gusts_10m), u, d: rumbo(c.wind_direction_10m),
+  }) + "\n" + t("comp_mira");
+  contar("compartir/" + spot.id, "Compartido · " + spot.nombre, true);
+  if (navigator.share) {
+    try { await navigator.share({ title: "Canelo Wind · " + spot.nombre, text: texto, url }); return; }
+    catch (e) { if (e && e.name === "AbortError") return; }
+  }
+  // Sin «compartir» del sistema (ordenador): abrir WhatsApp con el texto y copiarlo
+  try { await navigator.clipboard.writeText(texto + "\n" + url); avisoCorto(t("comp_copiado")); } catch (e) {}
+  window.open("https://wa.me/?text=" + encodeURIComponent(texto + "\n" + url), "_blank", "noopener");
+}
+function avisoCorto(msg) {
+  const a = document.createElement("div"); a.className = "aviso-copiado"; a.textContent = msg;
+  document.body.appendChild(a); setTimeout(() => a.remove(), 2500);
+}
 
 // ---------- Buzón de sugerencias ----------
 function abrirSugerencias() {

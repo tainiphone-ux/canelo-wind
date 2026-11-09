@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cartel Canelo Wind</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root { --brand-a: #E08A3C; --brand-b: #9A4416; --text: #2A1E16; --muted: #7A6A5E; --bg: #F6F1EA; }
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--text); background: var(--bg); }
+
+/* Panel de opciones (no se imprime) */
+.opciones { max-width: 820px; margin: 0 auto; padding: 18px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.opciones h1 { width: 100%; margin: 0 0 4px; font-size: 22px; }
+.opciones p { width: 100%; margin: 0 0 6px; color: var(--muted); font-size: 14px; }
+.opciones select, .opciones button { font: inherit; padding: 10px 12px; border-radius: 10px; border: 1px solid #E7DDD1; background: #fff; }
+.opciones button.prin { background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); color: #fff; border: 0; font-weight: 800; cursor: pointer; }
+
+/* Hoja A4 */
+.hoja { width: 210mm; height: 297mm; margin: 0 auto 24px; background: #fff; box-shadow: 0 10px 40px rgba(0,0,0,.15); overflow: hidden; position: relative; }
+
+/* --- Cartel --- */
+.cartel { display: flex; flex-direction: column; height: 100%; }
+.cartel .arriba { background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); color: #fff; padding: 16mm 14mm 12mm; text-align: center; position: relative; }
+.cartel .arriba img { width: 34mm; height: 34mm; border-radius: 8mm; box-shadow: 0 2mm 6mm rgba(0,0,0,.25); }
+.cartel .arriba h2 { font-size: 15mm; margin: 5mm 0 1mm; letter-spacing: -.3mm; }
+.cartel .arriba .en { font-size: 6mm; opacity: .9; margin: 0; }
+.cartel .medio { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8mm 14mm; text-align: center; }
+.cartel .pregunta { font-size: 13mm; font-weight: 900; margin: 0; line-height: 1.05; }
+.cartel .pregunta-en { font-size: 6.5mm; color: var(--muted); margin: 2mm 0 7mm; font-weight: 700; }
+.cartel .qr { padding: 5mm; border: 1.2mm solid var(--brand-a); border-radius: 7mm; background: #fff; }
+.cartel .qr img, .cartel .qr canvas { display: block; width: 78mm !important; height: 78mm !important; }
+.cartel .escanea { font-size: 7mm; font-weight: 800; margin: 6mm 0 0; }
+.cartel .escanea span { color: var(--brand-b); }
+.cartel .spot-nombre { font-size: 9mm; font-weight: 900; color: var(--brand-b); margin: 0 0 5mm; }
+.cartel .abajo { padding: 0 14mm 12mm; }
+.cartel .puntos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; text-align: center; font-size: 4.6mm; font-weight: 700; margin-bottom: 7mm; }
+.cartel .puntos div { background: #FBF4EC; border-radius: 4mm; padding: 4mm 2mm; }
+.cartel .puntos b { display: block; font-size: 9mm; margin-bottom: 1mm; }
+.cartel .pie { display: flex; justify-content: space-between; font-size: 4.2mm; color: var(--muted); border-top: .4mm solid #EFE4D7; padding-top: 4mm; }
+
+/* --- Pegatinas: 8 por hoja (2 x 4) --- */
+.pegatinas { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, 1fr); gap: 6mm; padding: 10mm; height: 100%; }
+.pegatina { border: .4mm dashed #D8C7B5; border-radius: 6mm; display: flex; align-items: center; gap: 5mm; padding: 5mm; background: linear-gradient(135deg, #FFF8F0, #fff); }
+.pegatina .qr img, .pegatina .qr canvas { display: block; width: 38mm !important; height: 38mm !important; }
+.pegatina .txt { flex: 1; }
+.pegatina .txt img { width: 11mm; height: 11mm; border-radius: 3mm; vertical-align: middle; }
+.pegatina .txt b { font-size: 6mm; vertical-align: middle; margin-left: 2mm; }
+.pegatina .txt p { margin: 2mm 0 0; font-size: 4.4mm; font-weight: 800; line-height: 1.2; }
+.pegatina .txt small { display: block; margin-top: 1.5mm; font-size: 3.4mm; color: var(--muted); }
+
+@media print {
+  @page { size: A4; margin: 0; }
+  html, body { background: #fff; }
+  .opciones { display: none; }
+  .hoja { margin: 0; box-shadow: none; page-break-after: always; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+@media screen and (max-width: 860px) { .hoja { transform: scale(.42); transform-origin: top left; margin-bottom: calc(-297mm * .58); } .contenedor { overflow: hidden; padding-left: 16px; } }
+</style>
+</head>
+<body>
+<div class="opciones">
+  <h1>🖨️ Cartel y pegatinas de Canelo Wind</h1>
+  <p>Elige a qué lleva el código QR, dale a «Imprimir» y elige tu impresora o «Guardar como PDF». Sale un cartel A4 y una hoja de 8 pegatinas.</p>
+  <select id="destino"></select>
+  <button class="prin" onclick="window.print()">🖨️ Imprimir / guardar PDF</button>
+</div>
+<div class="contenedor">
+  <div class="hoja"><div class="cartel">
+    <div class="arriba">
+      <img src="logo.svg" alt="">
+      <h2>Canelo Wind</h2>
+      <p class="en">Viento · olas · mareas &nbsp;|&nbsp; Wind · waves · tides</p>
+    </div>
+    <div class="medio">
+      <p class="pregunta">¿Hay viento hoy?</p>
+      <p class="pregunta-en">Is there wind today?</p>
+      <p class="spot-nombre" id="spotNombre"></p>
+      <div class="qr" id="qrGrande"></div>
+      <p class="escanea">📷 Escanea con la cámara · <span>Scan with your camera</span></p>
+    </div>
+    <div class="abajo">
+      <div class="puntos">
+        <div><b>🌬️</b>Viento y rachas hora a hora<br><small>Hourly wind & gusts</small></div>
+        <div><b>🌊</b>Olas y mareas<br><small>Waves & tides</small></div>
+        <div><b>✅</b>¿Merece la pena ir?<br><small>Is it worth going?</small></div>
+      </div>
+      <div class="pie"><span>🏄 Windsurf · 🪁 Kite · 🪽 Wing foil</span><span>Gratis · Free · 📸 @canelowindapp</span></div>
+    </div>
+  </div></div>
+
+  <div class="hoja"><div class="pegatinas" id="pegatinas"></div></div>
+</div>
+
+<script src="spots.js"></script>
+<script>
+const BASE = "https://tainiphone-ux.github.io/canelo-wind/";
+const sel = document.getElementById("destino");
+sel.innerHTML = `<option value="">Toda la app (todos los spots)</option>` +
+  SPOTS.slice().sort((a, b) => a.nombre.localeCompare(b.nombre, "es")).map(s => `<option value="${s.id}">${s.nombre} · ${s.isla}</option>`).join("");
+
+function qr(el, texto, tam) {
+  el.innerHTML = "";
+  new QRCode(el, { text: texto, width: tam, height: tam, colorDark: "#2A1E16", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+}
+function pintar() {
+  const id = sel.value, spot = SPOTS.find(s => s.id === id);
+  // utm_campaign: GoatCounter enseña cuánta gente entra por el cartel
+  const url = BASE + "?utm_campaign=cartel" + (spot ? "-" + spot.id : "") + (spot ? "#spot=" + spot.id : "");
+  document.getElementById("spotNombre").textContent = spot ? "📍 " + spot.nombre : "";
+  qr(document.getElementById("qrGrande"), url, 600);
+  const peg = document.getElementById("pegatinas");
+  peg.innerHTML = Array.from({ length: 8 }, () => `<div class="pegatina"><div class="qr"></div><div class="txt">
+      <img src="logo.svg" alt=""><b>Canelo Wind</b>
+      <p>¿Hay viento hoy?<br>Is there wind today?</p>
+      <small>${spot ? "📍 " + spot.nombre + " · " : ""}📸 @canelowindapp</small></div></div>`).join("");
+  peg.querySelectorAll(".qr").forEach(el => qr(el, url, 300));
+}
+sel.onchange = pintar;
+pintar();
+</script>
+</body>
+</html>

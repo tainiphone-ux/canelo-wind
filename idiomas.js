@@ -22,7 +22,7 @@ const PUNTOS_IDIOMA = {
 const TXT = {
   // ======================= ESPAÑOL =======================
   es: {
-    elige: "Elige tu idioma", idioma: "Idioma",
+    elige: "Elige tu idioma", compartir: "Compartir", comp_texto: "{b} {n} ahora: {nota} · {v} {u} (rachas {r}) del {d}", comp_mira: "🪁 Míralo en Canelo Wind:", comp_copiado: "Copiado: pégalo donde quieras", idioma: "Idioma",
     app_sub: "Viento y olas para windsurf, kite y wing", sugerencias: "Sugerencias", t_sug: "Buzón de sugerencias", t_unid: "Cambiar unidades",
     nudos: "nudos", cargando: "Cargando…",
     pie1: "Previsión: Open-Meteo (modelos meteorológicos). Comprueba siempre el viento medido y el estado del mar antes de salir.",
@@ -87,7 +87,7 @@ const TXT = {
 
   // ======================= ENGLISH =======================
   en: {
-    elige: "Choose your language", idioma: "Language",
+    elige: "Choose your language", compartir: "Share", comp_texto: "{b} {n} now: {nota} · {v} {u} (gusts {r}) from {d}", comp_mira: "🪁 Check it on Canelo Wind:", comp_copiado: "Copied: paste it anywhere", idioma: "Language",
     app_sub: "Wind and waves for windsurf, kite and wing", sugerencias: "Suggestions", t_sug: "Suggestion box", t_unid: "Change units",
     nudos: "knots", cargando: "Loading…",
     pie1: "Forecast: Open-Meteo (weather models). Always check the measured wind and the sea before going out.",
@@ -152,7 +152,7 @@ const TXT = {
 
   // ======================= DEUTSCH =======================
   de: {
-    elige: "Wähle deine Sprache", idioma: "Sprache",
+    elige: "Wähle deine Sprache", compartir: "Teilen", comp_texto: "{b} {n} jetzt: {nota} · {v} {u} (Böen {r}) aus {d}", comp_mira: "🪁 Schau auf Canelo Wind:", comp_copiado: "Kopiert: füge es überall ein", idioma: "Sprache",
     app_sub: "Wind und Wellen für Windsurf, Kite und Wing", sugerencias: "Vorschläge", t_sug: "Vorschlagsbox", t_unid: "Einheiten ändern",
     nudos: "Knoten", cargando: "Wird geladen…",
     pie1: "Vorhersage: Open-Meteo (Wettermodelle). Prüfe vor dem Rausgehen immer den gemessenen Wind und das Meer.",
@@ -217,7 +217,7 @@ const TXT = {
 
   // ======================= FRANÇAIS =======================
   fr: {
-    elige: "Choisis ta langue", idioma: "Langue",
+    elige: "Choisis ta langue", compartir: "Partager", comp_texto: "{b} {n} maintenant : {nota} · {v} {u} (rafales {r}) de {d}", comp_mira: "🪁 Regarde sur Canelo Wind :", comp_copiado: "Copié : colle-le où tu veux", idioma: "Langue",
     app_sub: "Vent et vagues pour windsurf, kite et wing", sugerencias: "Suggestions", t_sug: "Boîte à suggestions", t_unid: "Changer d'unités",
     nudos: "nœuds", cargando: "Chargement…",
     pie1: "Prévisions : Open-Meteo (modèles météo). Vérifie toujours le vent mesuré et l'état de la mer avant de sortir.",
@@ -282,7 +282,7 @@ const TXT = {
 
   // ======================= ITALIANO =======================
   it: {
-    elige: "Scegli la tua lingua", idioma: "Lingua",
+    elige: "Scegli la tua lingua", compartir: "Condividi", comp_texto: "{b} {n} ora: {nota} · {v} {u} (raffiche {r}) da {d}", comp_mira: "🪁 Guardalo su Canelo Wind:", comp_copiado: "Copiato: incollalo dove vuoi", idioma: "Lingua",
     app_sub: "Vento e onde per windsurf, kite e wing", sugerencias: "Suggerimenti", t_sug: "Cassetta dei suggerimenti", t_unid: "Cambia unità",
     nudos: "nodi", cargando: "Caricamento…",
     pie1: "Previsioni: Open-Meteo (modelli meteo). Controlla sempre il vento misurato e lo stato del mare prima di uscire.",
