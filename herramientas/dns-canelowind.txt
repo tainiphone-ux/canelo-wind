@@ -1,0 +1,7 @@
+;; Registros DNS de canelowind.com para GitHub Pages (importar en Cloudflare: DNS > Records > Import)
+;; IMPORTANTE: al importar, DESMARCAR «Proxy imported DNS records» (tienen que quedar en gris, «DNS only»).
+canelowind.com.	1	IN	A	185.199.108.153
+canelowind.com.	1	IN	A	185.199.109.153
+canelowind.com.	1	IN	A	185.199.110.153
+canelowind.com.	1	IN	A	185.199.111.153
+www.canelowind.com.	1	IN	CNAME	tainiphone-ux.github.io.

@@ -14,7 +14,7 @@ Canelo Wind · Viento y olas
 📲 App gratis · reporta tu spot 👇
 
 ## Sitio web (solo se puede poner desde la app del móvil)
-https://tainiphone-ux.github.io/canelo-wind/landing.html
+https://canelowind.com/landing.html
 
 ## Para las demás redes
 Mismo nombre que en Instagram: **canelowindapp** (YouTube, TikTok, X, Facebook).

@@ -98,7 +98,7 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ro
 
 <script src="spots.js"></script>
 <script>
-const BASE = "https://tainiphone-ux.github.io/canelo-wind/";
+const BASE = "https://canelowind.com/";
 const sel = document.getElementById("destino");
 sel.innerHTML = `<option value="">Toda la app (todos los spots)</option>` +
   SPOTS.slice().sort((a, b) => a.nombre.localeCompare(b.nombre, "es")).map(s => `<option value="${s.id}">${s.nombre} · ${s.isla}</option>`).join("");

@@ -651,7 +651,7 @@ document.addEventListener("click", (e) => {
 // ---------- Compartir un spot (WhatsApp, Instagram, lo que tenga el móvil) ----------
 const BOLITA = ["🔴", "🟠", "🟡", "🟢", "🟢"];
 async function compartirSpot(spot, ev, c) {
-  const url = "https://tainiphone-ux.github.io/canelo-wind/#spot=" + spot.id;
+  const url = "https://canelowind.com/#spot=" + spot.id;
   const u = UNIDADES[unidad].c;
   const texto = t("comp_texto", {
     b: BOLITA[ev.n], n: spot.nombre, nota: t("n" + ev.n),
