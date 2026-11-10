@@ -17,7 +17,7 @@ Valentín no es programador: **háblale siempre en español, también en los men
 - Instagram: **@canelowindapp** (https://www.instagram.com/canelowindapp/), creada 09-11-2026 con windcanelo@gmail.com. Textos y foto de perfil en `redes/`. Enlazada en el pie de la app y en la landing (botón «Síguenos en Instagram»).
 - TikTok: **@canelowind** (https://www.tiktok.com/@canelowind), creada 09-11-2026 (ojo: sin «app», distinto de Instagram). Textos en `redes/tiktok.md`. Enlazada en el pie de la app, la landing y las páginas de spots.
 - Facebook: Página «Canelo Wind» https://www.facebook.com/profile.php?id=61596200199182 (creada 09-11-2026 desde el perfil Canelo Wind; aún sin nombre de usuario: ponerle @canelowindapp cuando Facebook deje). Portada `redes/portada-facebook.png`. Enlazada en la app, la landing y las páginas de spots.
-- YouTube: canal **@CaneloWind** (https://www.youtube.com/@CaneloWind), creado 10-11-2026 con windcanelo@gmail.com. Enlazado en la app, la landing y las páginas de spots.
+- YouTube: canal **@CaneloWind** (https://www.youtube.com/@CaneloWind), ID del canal UCL4mTq_5s4MdtYoGbv_u9Sg (no cambia: https://www.youtube.com/channel/UCL4mTq_5s4MdtYoGbv_u9Sg), creado 10-11-2026 con windcanelo@gmail.com. Enlazado en la app, la landing y las páginas de spots.
 - Metricool (programar publicaciones): https://app.metricool.com — cuenta windcanelo@gmail.com, con Instagram, Facebook, TikTok y YouTube conectados (10-11-2026). Instagram ya es cuenta profesional y está vinculada a la Página de Facebook. Claude puede subir y programar posts desde Chrome, siempre con el visto bueno de Valentín.
 - GitHub: cuenta `tainiphone-ux` (repo canelo-wind).
 - Formularios de Google (reportes y sugerencias): cuenta tainiphone@gmail.com.
