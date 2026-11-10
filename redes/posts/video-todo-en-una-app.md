@@ -39,3 +39,4 @@ Para que en el perfil se vean los 3 vídeos juntos, el mismo miércoles 11-11-20
 - 18:50 — `videos/instalar-android.mp4` · YouTube: «Cómo instalar Canelo Wind en Android (1 minuto) 🪁 #shorts»
   Texto: igual pero «¿Tienes Android? … sin Play Store», «en Chrome», «Pulsa los tres puntos ⋮», «Instalar aplicación», #android
 - 19:00 — «Todo en la misma app» (queda el primero en el perfil)
+- X (@Canelowind): los 3 programados también en x.com a las 18:40 (iPhone), 18:50 (Android) y 19:00 (Todo en la misma app), con textos cortos (límite 280).
