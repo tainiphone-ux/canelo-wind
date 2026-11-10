@@ -29,3 +29,5 @@ Todo lo que necesitas para windsurf, kitesurf y wing foil en una sola app: vient
 
 ## Programado (10-11-2026)
 En Metricool para el **miércoles 11-11-2026 a las 19:00** (hora de Canarias): Reel en Instagram y Facebook, TikTok y Short en YouTube, todos con el texto de Instagram. Vídeo subido: `redes/videos/todo-en-la-misma-app-720.mp4` (720p, 8 MB: la subida desde Chrome admite como mucho 10 MB).
+X (@Canelowind): programado en x.com (programador propio de X, gratis, solo desde el ordenador) para el mismo día y hora, con este texto:
+¿Hay viento hoy? 🌬️ Viento, rachas, olas, mareas, webcams y anemómetros de tus spots, todo en la misma app 🪁 / Canarias y toda España · gratis · sin registro / 👉 canelowind.com / #windsurf #kitesurf #wingfoil #canarias
