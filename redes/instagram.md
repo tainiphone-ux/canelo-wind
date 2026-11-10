@@ -1,4 +1,4 @@
-# Instagram de Canelo Wind — @canelowindapp
+# Instagram de Canelo Wind — @canelowind (cuenta nueva del 10-11-2026; la antigua @canelowindapp fue suspendida)
 
 Cuenta creada por Valentín el 09-11-2026 con el correo windcanelo@gmail.com.
 
@@ -17,4 +17,4 @@ Canelo Wind · Viento y olas
 https://canelowind.com/landing.html
 
 ## Para las demás redes
-Mismo nombre que en Instagram: **canelowindapp** (YouTube, TikTok, X, Facebook).
+Mismo nombre en Instagram y TikTok: **canelowind** (YouTube, TikTok, X, Facebook).

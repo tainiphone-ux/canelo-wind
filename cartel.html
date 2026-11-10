@@ -89,7 +89,7 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ro
         <div><b>🌊</b>Olas y mareas<br><small>Waves & tides</small></div>
         <div><b>✅</b>¿Merece la pena ir?<br><small>Is it worth going?</small></div>
       </div>
-      <div class="pie"><span>🏄 Windsurf · 🪁 Kite · 🪽 Wing foil</span><span>Gratis · Free · 📸 @canelowindapp</span></div>
+      <div class="pie"><span>🏄 Windsurf · 🪁 Kite · 🪽 Wing foil</span><span>Gratis · Free · 📸 @canelowind</span></div>
     </div>
   </div></div>
 
@@ -117,7 +117,7 @@ function pintar() {
   peg.innerHTML = Array.from({ length: 8 }, () => `<div class="pegatina"><div class="qr"></div><div class="txt">
       <img src="logo.svg" alt=""><b>Canelo Wind</b>
       <p>¿Hay viento hoy?<br>Is there wind today?</p>
-      <small>${spot ? "📍 " + spot.nombre + " · " : ""}📸 @canelowindapp</small></div></div>`).join("");
+      <small>${spot ? "📍 " + spot.nombre + " · " : ""}📸 @canelowind</small></div></div>`).join("");
   peg.querySelectorAll(".qr").forEach(el => qr(el, url, 300));
 }
 sel.onchange = pintar;

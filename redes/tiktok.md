@@ -1,7 +1,7 @@
 # TikTok de Canelo Wind
 
 Cuenta: @canelowind — https://www.tiktok.com/@canelowind
-(Creada por Valentín el 09-11-2026. Ojo: en Instagram es @canelowindapp.)
+(Creada por Valentín el 09-11-2026. En Instagram también es @canelowind desde el 10-11-2026.)
 
 ## Foto de perfil
 La misma que Instagram: `redes/foto-perfil-instagram.png`.
