@@ -1,6 +1,6 @@
 # Instagram de Canelo Wind — @canelowind (cuenta nueva del 10-11-2026; la antigua @canelowindapp fue suspendida)
 
-Cuenta creada por Valentín el 09-11-2026 con el correo windcanelo@gmail.com.
+Cuenta creada por Valentín el 10-11-2026 desde el móvil (la primera, del 09-11-2026, fue suspendida).
 
 ## Foto de perfil
 `redes/foto-perfil-instagram.png` (1080 × 1080, preparada para el recorte en círculo).
@@ -9,7 +9,7 @@ Cuenta creada por Valentín el 09-11-2026 con el correo windcanelo@gmail.com.
 Canelo Wind · Viento y olas
 
 ## Presentación (máx. 150 caracteres)
-🪁 Viento, olas y mareas de 93 spots de España
+🪁 Viento, olas y mareas de tus spots
 🏄 Windsurf · Kite · Wing foil
 📲 App gratis · reporta tu spot 👇
 
