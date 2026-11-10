@@ -31,3 +31,11 @@ Todo lo que necesitas para windsurf, kitesurf y wing foil en una sola app: vient
 En Metricool para el **miércoles 11-11-2026 a las 19:00** (hora de Canarias): Reel en Instagram y Facebook, TikTok y Short en YouTube, todos con el texto de Instagram. Vídeo subido: `redes/videos/todo-en-la-misma-app-720.mp4` (720p, 8 MB: la subida desde Chrome admite como mucho 10 MB).
 X (@Canelowind): programado en x.com (programador propio de X, gratis, solo desde el ordenador) para el mismo día y hora, con este texto:
 ¿Hay viento hoy? 🌬️ Viento, rachas, olas, mareas, webcams y anemómetros de tus spots, todo en la misma app 🪁 / Canarias y toda España · gratis · sin registro / 👉 canelowind.com / #windsurf #kitesurf #wingfoil #canarias
+
+## Vídeos de instalar (programados el 10-11-2026 en Metricool, 4 redes)
+Para que en el perfil se vean los 3 vídeos juntos, el mismo miércoles 11-11-2026:
+- 18:40 — `videos/instalar-iphone.mp4` · YouTube: «Cómo instalar Canelo Wind en iPhone (1 minuto) 🪁 #shorts»
+  Texto: 📲 ¿Tienes iPhone? Instala Canelo Wind en 1 minuto, sin App Store 🪁 / 1️⃣ Abre canelowind.com en Safari / 2️⃣ Pulsa Compartir ⬆️ / 3️⃣ «Añadir a pantalla de inicio» / ¡Y ya la tienes como una app! Gratis · sin registro / 🌬️ Viento, olas, mareas y webcams de tus spots / #windsurf #kitesurf #wingfoil #canarias #iphone #canelowind
+- 18:50 — `videos/instalar-android.mp4` · YouTube: «Cómo instalar Canelo Wind en Android (1 minuto) 🪁 #shorts»
+  Texto: igual pero «¿Tienes Android? … sin Play Store», «en Chrome», «Pulsa los tres puntos ⋮», «Instalar aplicación», #android
+- 19:00 — «Todo en la misma app» (queda el primero en el perfil)
