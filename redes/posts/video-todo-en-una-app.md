@@ -40,3 +40,10 @@ Para que en el perfil se vean los 3 vídeos juntos, el mismo miércoles 11-11-20
   Texto: igual pero «¿Tienes Android? … sin Play Store», «en Chrome», «Pulsa los tres puntos ⋮», «Instalar aplicación», #android
 - 19:00 — «Todo en la misma app» (queda el primero en el perfil)
 - X (@Canelowind): los 3 programados también en x.com a las 18:40 (iPhone), 18:50 (Android) y 19:00 (Todo en la misma app), con textos cortos (límite 280).
+
+## Comprobado el 11-11-2026 (21:25)
+Los 3 vídeos salieron bien en X, YouTube (3 Shorts), TikTok (3 vídeos) y Facebook (3 Reels). Instagram no se comprobó desde el ordenador (no tocar Instagram desde Chrome): mirarlo en el móvil.
+
+## Vídeo «¿Falta tu spot?» (videos/sugerencias.mp4, redes/videos/sugerencias-720.mp4)
+Programado para el jueves 12-11-2026 a las 19:00 en Metricool (Instagram y Facebook como Reel, TikTok, YouTube Short «¿Falta tu spot? Pídelo en Canelo Wind 🪁 #shorts») y en x.com.
+Texto: ¿Falta tu spot? 🤔 Canelo Wind la hacemos entre todos 🪁 / 💡 Pulsa la bombilla de arriba en la app y cuéntanos: 📍 Un spot que falta · 📹 Una webcam o anemómetro · 💡 Una idea o mejora · 🛠️ Algo que no funciona / Y si estás en el agua, deja tu reporte del día 🤙 / Esta semana ya hemos añadido 6 spots nuevos en Cataluña gracias a vuestras sugerencias 🙌 / 📲 canelowind.com (enlace en el perfil) / #windsurf #kitesurf #wingfoil #canarias #catalunya #canelowind
