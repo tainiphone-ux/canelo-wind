@@ -459,6 +459,35 @@ const CONSEJOS = {
     consejos: ["El garbí entra a partir de mediodía.", "Hay escuelas en la zona."],
     seguridad: "En verano solo en los pasillos balizados.",
   },
+  "port-de-la-selva": {
+    consejos: ["Con tramontana sopla muy fuerte y racheado: material pequeño.", "La tramontana es más frecuente en otoño, invierno y primavera."],
+    seguridad: "Tramontana muy racheada. Rocas en los extremos de la bahía y barcos del puerto: navega lejos de la bocana.",
+  },
+  "pals": {
+    consejos: ["Playa muy larga y abierta: hay sitio para montar y despegar.", "Con levante (E) entra mar de fondo y ola."],
+    peligro: ["O", "NO"],
+    seguridad: "Con viento de tierra (oeste o noroeste) sopla hacia fuera: no salgas. En verano respeta la zona de bañistas.",
+  },
+  "palamos": {
+    consejos: ["El garbí entra a partir de mediodía en primavera y verano.", "Dentro de la bahía el agua está más plana."],
+    peligro: ["N", "NO"],
+    seguridad: "Hay puerto con barcos entrando y saliendo: no navegues por la bocana. Con tramontana el viento sopla hacia fuera.",
+  },
+  "vilassar-de-mar": {
+    consejos: ["El garbí entra a mediodía en primavera y verano.", "Se baja a la playa por los pasos bajo la vía del tren."],
+    peligro: ["N", "NO", "O"],
+    seguridad: "Con viento de tierra (noroeste) sopla hacia fuera. En verano, solo por los pasillos balizados.",
+  },
+  "malgrat-de-mar": {
+    consejos: ["Playa larga y ancha, con sitio para montar el kite.", "Con levante entra ola."],
+    peligro: ["N", "NO", "O"],
+    seguridad: "Cerca de la desembocadura de la Tordera puede haber corrientes y troncos. Con viento de tierra sopla hacia fuera.",
+  },
+  "el-prat": {
+    consejos: ["El garbí entra a partir de mediodía.", "Playa larga y más tranquila que Castelldefels."],
+    peligro: ["N", "NO"],
+    seguridad: "Está al lado del aeropuerto: kite solo donde esté permitido y nunca hacia la zona de los aviones. Parte de la playa es espacio natural protegido.",
+  },
   "son-serra": {
     consejos: ["Con viento del norte y nordeste entran olas.", "Fondo de arena con alguna roca."],
     seguridad: "Rocas en algunos tramos de la orilla: entra por la zona de arena.",
