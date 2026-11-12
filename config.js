@@ -20,9 +20,15 @@ const CONFIG = {
     campos: { tipo: "entry.1787035991", mensaje: "entry.1586210193", nombre: "entry.2048740754", contacto: "entry.435415204" },
   },
   quedadas: {
-    // Formulario «Canelo Wind · Quedadas» (se crea con herramientas/crear_quedadas.gs). Su hoja es pública (solo ver).
-    form: "",
-    campos: { tipo: "", fecha: "", hora: "", salida: "", llegada: "", encuentro: "", nivel: "", material: "", detalles: "", nombre: "", instagram: "" },
-    csv: "",
+    // Formulario «Canelo Wind · Quedadas» (creado el 12-11-2026 con herramientas/crear_quedadas.gs en la cuenta windcanelo@gmail.com)
+    form: "https://docs.google.com/forms/d/e/1FAIpQLSc-6rcEa5W6ra-r5_kPdZt8epwXZU_VoQ_ixqsn5vlwSFrNCQ/viewform",
+    campos: {
+      tipo: "entry.2013601178", fecha: "entry.71923980", hora: "entry.2030252577", salida: "entry.826881075",
+      llegada: "entry.1171292873", encuentro: "entry.1813387052", nivel: "entry.584951277", material: "entry.1336687269",
+      detalles: "entry.558304379", nombre: "entry.1038098577", instagram: "entry.1474608316",
+    },
+    // Hoja «Canelo Wind · Quedadas (respuestas)», compartida solo para ver. Para quitar una quedada, borrar su fila:
+    // https://docs.google.com/spreadsheets/d/1oWLK1FuFxtALufOAgx3MjHBRbiwfRbdrKqwGl4DalmU/edit
+    csv: "https://docs.google.com/spreadsheets/d/1oWLK1FuFxtALufOAgx3MjHBRbiwfRbdrKqwGl4DalmU/gviz/tq?tqx=out:csv&gid=1659135050",
   },
 };
