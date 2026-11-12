@@ -112,6 +112,23 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 .reporte .cab2 b { color: var(--text); }
 .fondo { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; z-index: 20; overflow-y: auto; }
 .fondo .caja { max-width: 520px; width: 100%; margin: 0; }
+/* Quedadas (downwinds y sesiones) */
+.banner-q { display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 10px; border: 0; border-radius: 14px; padding: 12px 14px; cursor: pointer; text-align: left;
+  background: linear-gradient(135deg, #2F7FB0, #1B5378); color: #fff; font: inherit; box-shadow: 0 4px 14px rgba(27,83,120,.25); }
+.banner-q b { font-size: 16px; display: block; }
+.banner-q small { opacity: .9; font-size: 12px; }
+.banner-q .ir { margin-left: auto; font-size: 22px; }
+.quedada { border-top: 1px solid var(--line); padding: 12px 0; }
+.quedada:first-of-type { border-top: 0; }
+.quedada .cuando { font-weight: 800; font-size: 16px; }
+.quedada .cuando::first-letter { text-transform: uppercase; }
+.quedada .ruta { font-weight: 700; margin-top: 2px; }
+.quedada .ruta a { text-decoration: none; }
+.quedada .det { font-size: 14px; margin-top: 4px; }
+.quedada .acc { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.tipo-q { display: inline-block; background: #DCEBF5; color: #1B5378; border-radius: 6px; padding: 2px 8px; font-size: 12px; font-weight: 700; margin-right: 6px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tipo-q { background: #173247; color: #A9D3F0; } }
+.btn.peq { padding: 6px 12px; font-size: 13px; }
 /* Notas y avisos del día */
 .nota { display: inline-block; color: #fff; font-weight: 800; border-radius: 8px; padding: 4px 10px; font-size: 15px; white-space: nowrap; }
 .nota.peq { font-size: 11px; padding: 2px 7px; border-radius: 6px; font-weight: 700; }
@@ -301,6 +318,7 @@ function pintarLista() {
   };
 
   let html = `<input class="buscar" id="buscar" placeholder="${t("buscar")}" value="${esc(textoBuscar)}">
+    <button class="banner-q" id="irQuedadas"><span style="font-size:28px">🤙</span><span><b>${t("q_banner")}</b><small id="numQ">${t("q_banner_sub")}</small></span><span class="ir">›</span></button>
     <div class="chips">${regiones.map(r => `<button class="chip ${r === filtroRegion ? "on" : ""}" data-region="${esc(r)}">${r === "Todas" ? t("toda") : esc(nombreRegion(r))}</button>`).join("")}</div>
     ${islas.length > 2 ? `<div class="chips">${islas.map(i => `<button class="chip ${i === filtroIsla ? "on" : ""}" data-isla="${esc(i)}">${i === "Todas" ? t("todas") : esc(i)}</button>`).join("")}</div>` : ""}
     <div class="chips">${deportes.map(([k, n]) => `<button class="chip ${k === filtroDeporte ? "on" : ""}" data-dep="${k}">${n}</button>`).join("")}</div>`;
@@ -324,6 +342,12 @@ function pintarLista() {
     guardar("favoritos", favoritos); pintarLista();
   });
   document.querySelectorAll(".spot").forEach(e => e.onclick = () => { location.hash = "spot=" + e.dataset.id; });
+  $("#irQuedadas").onclick = () => { location.hash = "quedadas"; };
+  // Cuántas quedadas hay próximamente (si ya están cargadas o se cargan rápido)
+  if (formListo(CONFIG.quedadas || {})) cargarQuedadas().then(l => {
+    const n = proximas(l).length, e = $("#numQ");
+    if (e) e.textContent = n ? t("q_banner_n", { n }) : t("q_banner_0");
+  }).catch(() => {});
 }
 
 // ---------- Pantalla: ficha del spot ----------
@@ -431,6 +455,7 @@ function dibujarSpot(spot) {
   </div>
 
   <div class="caja" id="cajaMareas"></div>
+  <div class="caja" id="cajaQuedadas"></div>
   <div class="caja" id="cajaReportar"></div>
   <div class="caja" id="cajaReportes"></div>
 
@@ -457,6 +482,7 @@ function dibujarSpot(spot) {
   grafica(H, dia);
   pintarMareas(spot, dia, v.daily, diaElegido);
   pintarAvisosDia(spot, dia, olaEn);
+  pintarQuedadasSpot(spot);
   pintarReportar(spot);
   pintarReportes(spot);
 }
@@ -582,6 +608,172 @@ async function pintarReportes(spot) {
   } catch (e) {
     caja.innerHTML = `<h3>${t("gente")}</h3><p class="aviso">${t("gente_error")}</p>`;
   }
+}
+
+// ---------- Quedadas: downwinds, sesiones… (formulario de Google + hoja pública, como los reportes) ----------
+// Para quitar una quedada (spam o cancelada) se borra su fila en la hoja «Canelo Wind · Quedadas (respuestas)».
+let quedadasCache = null, quedadasLocales = [];
+const TIPOS_Q = [0, 1, 2, 3], NIVELES_Q = [0, 1, 2];
+const tipoQ = (v) => { const k = TIPOS_Q.find(k => TXT.es["q_tipo" + k] === v); return k != null ? t("q_tipo" + k) : v; };
+const nivelQ = (v) => { const k = NIVELES_Q.find(k => TXT.es["q_niv" + k] === v); return k != null ? t("q_niv" + k) : v; };
+const iconoQ = (v) => v === TXT.es.q_tipo0 ? "🌊" : v === TXT.es.q_tipo2 ? "🎓" : "🤙";
+const spotDe = (id) => SPOTS.find(s => s.id === id);
+const tzQ = (q) => spotDe(q.salida) ? tzDe(spotDe(q.salida)) : "Europe/Madrid";
+const limpiaInsta = (v) => (v || "").trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, "").replace(/^@/, "").replace(/[^\w.]/g, "").slice(0, 30);
+// La hoja puede devolver la fecha como 2026-11-08 o 8/11/2026, y la hora como 14:00 o 14:00:00
+function normalizaFechaHora(r) {
+  const d = (r.fecha || "").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (d) r.fecha = `${d[3]}-${d[2].padStart(2, "0")}-${d[1].padStart(2, "0")}`;
+  const h = (r.hora || "").match(/(\d{1,2}):(\d{2})/);
+  if (h) r.hora = `${h[1].padStart(2, "0")}:${h[2]}`;
+}
+async function cargarQuedadas() {
+  if (!quedadasCache || Date.now() - quedadasCache.t > 3 * 60 * 1000) {
+    const csv = CONFIG.quedadas.csv;
+    const r = await fetch(csv + (csv.includes("?") ? "&" : "?") + "t=" + Date.now());
+    const filas = leerCSV(await r.text());
+    const cab = (filas.shift() || []).map(h => h.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""));
+    const claves = ["tipo", "fecha", "hora", "salida", "llegada", "encuentro", "nivel", "material", "detalles", "nombre", "instagram"];
+    const C = Object.fromEntries(claves.map(k => [k, cab.findIndex(h => h.includes(k))]));
+    const lista = filas.filter(f => f.length > 1).map(f => Object.fromEntries(Object.entries(C).map(([k, i]) => [k, i >= 0 ? (f[i] || "").trim() : ""])));
+    lista.forEach(normalizaFechaHora);
+    // Las que acabas de publicar se ven ya; se quitan cuando aparecen en la hoja
+    quedadasLocales = quedadasLocales.filter(q => !lista.some(r => r.fecha === q.fecha && r.hora === q.hora && r.salida === q.salida && r.nombre === q.nombre));
+    quedadasCache = { t: Date.now(), lista };
+  }
+  return [...quedadasCache.lista, ...quedadasLocales];
+}
+const proximas = (l) => l.filter(q => q.fecha && q.salida && q.fecha >= hoyISO(tzQ(q)))
+  .sort((a, b) => (a.fecha + a.hora).localeCompare(b.fecha + b.hora));
+const diaQ = (q) => q.fecha === hoyISO(tzQ(q)) ? t("hoy") : new Date(q.fecha + "T12:00").toLocaleDateString(localeIdioma(), { weekday: "long", day: "numeric", month: "long" });
+
+function tarjetaQuedada(q, i) {
+  const s = spotDe(q.salida), ll = q.llegada && q.llegada !== q.salida ? spotDe(q.llegada) : null;
+  const sitio = (sp, id) => sp ? `<a href="#spot=${sp.id}">${esc(sp.nombre)}</a>` : esc(id || "");
+  const insta = limpiaInsta(q.instagram);
+  return `<div class="quedada">
+    <div><span class="tipo-q">${iconoQ(q.tipo)} ${esc(tipoQ(q.tipo))}</span>${q.nivel ? `<span class="etq" style="margin:0">${esc(nivelQ(q.nivel))}</span>` : ""}</div>
+    <div class="cuando" style="margin-top:6px">${esc(diaQ(q))}${q.hora ? " · " + esc(q.hora) : ""}</div>
+    <div class="ruta">📍 ${sitio(s, q.salida)}${ll ? ` → ${sitio(ll, q.llegada)}` : ""}</div>
+    ${q.encuentro ? `<div class="det">🚩 ${t("q_encuentro")}: ${esc(q.encuentro)}</div>` : ""}
+    ${q.material ? `<div class="det">🏄 ${esc(q.material)}</div>` : ""}
+    ${q.detalles ? `<div class="det">${esc(q.detalles)}</div>` : ""}
+    <div class="aviso">${t("q_organiza")}: <b>${esc(q.nombre || t("anonimo"))}</b>${insta ? ` · <a href="https://www.instagram.com/${insta}/" target="_blank" rel="noopener">📸 @${esc(insta)}</a>` : ""}</div>
+    <div class="acc">${s ? `<a class="btn sec peq" href="#spot=${s.id}" style="text-decoration:none">🌬️ ${t("q_prev")}</a>` : ""}<button class="btn sec peq" data-qi="${i}">📤 ${t("q_compartir")}</button></div>
+  </div>`;
+}
+function activarQuedadas(caja, l) {
+  caja.querySelectorAll("[data-qi]").forEach(b => b.onclick = () => compartirQuedada(l[+b.dataset.qi]));
+}
+async function compartirQuedada(q) {
+  const s = spotDe(q.salida), ll = q.llegada && spotDe(q.llegada);
+  const url = "https://canelowind.com/#quedadas";
+  const texto = t("q_txt_compartir", { tipo: tipoQ(q.tipo), dia: diaQ(q), hora: q.hora || "", spot: (s ? s.nombre : q.salida) + (ll && ll !== s ? " → " + ll.nombre : "") });
+  contar("compartir-quedada/" + q.salida, "Quedada compartida", true);
+  if (navigator.share) {
+    try { await navigator.share({ title: "Canelo Wind · " + t("q_banner"), text: texto, url }); return; }
+    catch (e) { if (e && e.name === "AbortError") return; }
+  }
+  try { await navigator.clipboard.writeText(texto + "\n" + url); avisoCorto(t("comp_copiado")); } catch (e) {}
+  window.open("https://wa.me/?text=" + encodeURIComponent(texto + "\n" + url), "_blank", "noopener");
+}
+
+// Pantalla con todas las quedadas próximas
+let filtroQ = "Todas";
+async function pintarQuedadas() {
+  window.scrollTo(0, 0);
+  $("#app").innerHTML = `<button class="volver" onclick="location.hash=''">${t("volver_lista")}</button>
+    <h2 style="margin:4px 0">${t("q_tit")}</h2><p style="margin:4px 0 12px">${t("q_sub")}</p>
+    <button class="btn" id="nuevaQ">${t("q_organizar")}</button>
+    <div class="seguridad"><b>${t("q_seg_tit")}</b>${t("q_seg")}</div>
+    <div id="chipsQ"></div>
+    <div class="caja" id="listaQ"><p class="aviso">${t("q_cargando")}</p></div>`;
+  $("#nuevaQ").onclick = () => abrirFormQuedada();
+  const caja = $("#listaQ");
+  if (!formListo(CONFIG.quedadas || {})) { caja.innerHTML = `<p class="aviso">${t("q_no_activo")}</p>`; return; }
+  try {
+    const todas = proximas(await cargarQuedadas());
+    if (location.hash !== "#quedadas") return;
+    const regiones = [...new Set(todas.map(q => spotDe(q.salida)).filter(Boolean).map(regionDe))];
+    if (!regiones.includes(filtroQ)) filtroQ = "Todas";
+    if (regiones.length > 1) {
+      $("#chipsQ").innerHTML = `<div class="chips">${["Todas", ...regiones].map(r => `<button class="chip ${r === filtroQ ? "on" : ""}" data-rq="${esc(r)}">${r === "Todas" ? t("toda") : esc(nombreRegion(r))}</button>`).join("")}</div>`;
+      document.querySelectorAll("[data-rq]").forEach(b => b.onclick = () => { filtroQ = b.dataset.rq; pintarQuedadas(); });
+    }
+    const l = todas.filter(q => filtroQ === "Todas" || (spotDe(q.salida) && regionDe(spotDe(q.salida)) === filtroQ));
+    caja.innerHTML = l.length ? l.map(tarjetaQuedada).join("") : `<p class="aviso">${t("q_ninguna")}</p>`;
+    activarQuedadas(caja, l);
+  } catch (e) { caja.innerHTML = `<p class="aviso">${t("q_error")}</p>`; }
+}
+
+// Caja «Quedadas en este spot» dentro de la ficha
+async function pintarQuedadasSpot(spot) {
+  const caja = $("#cajaQuedadas"); if (!caja) return;
+  const pon = (html) => {
+    caja.innerHTML = `<h3>${t("q_tit_spot")}</h3>${html}
+      <div class="fila" style="margin-top:10px"><button class="btn peq" id="nuevaQSpot">${t("q_organizar_aqui")}</button><a href="#quedadas">${t("q_ver_todas")}</a></div>`;
+    $("#nuevaQSpot").onclick = () => abrirFormQuedada(spot.id);
+  };
+  if (!formListo(CONFIG.quedadas || {})) { pon(`<p class="aviso">${t("q_no_activo")}</p>`); return; }
+  pon(`<p class="aviso">${t("q_cargando")}</p>`);
+  try {
+    const l = proximas(await cargarQuedadas()).filter(q => q.salida === spot.id || q.llegada === spot.id).slice(0, 5);
+    if (!document.body.contains(caja)) return;
+    pon(l.length ? l.map(tarjetaQuedada).join("") : `<p class="aviso">${t("q_ninguna_spot")}</p>`);
+    activarQuedadas(caja, l);
+  } catch (e) { pon(`<p class="aviso">${t("q_error")}</p>`); }
+}
+
+// Formulario para organizar una quedada
+function abrirFormQuedada(spotId) {
+  if (document.querySelector(".fondo")) return;
+  const regiones = [...new Set(SPOTS.map(regionDe))];
+  const opciones = (sel) => regiones.map(r => `<optgroup label="${esc(nombreRegion(r))}">${SPOTS.filter(s => regionDe(s) === r)
+    .sort((a, b) => a.nombre.localeCompare(b.nombre)).map(s => `<option value="${s.id}" ${s.id === sel ? "selected" : ""}>${esc(s.nombre)}</option>`).join("")}</optgroup>`).join("");
+  const hoy = hoyISO(spotId && spotDe(spotId) ? tzDe(spotDe(spotId)) : "Europe/Madrid");
+  const fondo = document.createElement("div");
+  fondo.className = "fondo";
+  fondo.innerHTML = `<div class="caja"><h3>${t("q_form_tit")}</h3>
+    <p class="aviso" style="margin-top:-4px">${t("q_publico")}</p>
+    <div class="form" id="fQ">
+      <label class="ancho">${t("q_f_tipo")}<select name="tipo">${TIPOS_Q.map(k => `<option value="${esc(TXT.es["q_tipo" + k])}">${esc(t("q_tipo" + k))}</option>`).join("")}</select></label>
+      <label>${t("q_f_fecha")}<input type="date" name="fecha" min="${hoy}" value="${hoy}"></label>
+      <label>${t("q_f_hora")}<input type="time" name="hora" value="11:00"></label>
+      <label>${t("q_f_salida")}<select name="salida"><option value="">—</option>${opciones(spotId)}</select></label>
+      <label>${t("q_f_llegada")}<select name="llegada"><option value="">${t("q_f_llegada0")}</option>${opciones("")}</select></label>
+      <label class="ancho">${t("q_f_encuentro")}<input name="encuentro" maxlength="120" placeholder="${t("q_ph_encuentro")}"></label>
+      <label>${t("q_f_nivel")}<select name="nivel">${NIVELES_Q.map(k => `<option value="${esc(TXT.es["q_niv" + k])}">${esc(t("q_niv" + k))}</option>`).join("")}</select></label>
+      <label>${t("q_f_material")}<input name="material" maxlength="80" placeholder="${t("q_ph_material")}"></label>
+      <label class="ancho">${t("q_f_detalles")}<textarea name="detalles" rows="3" maxlength="500" placeholder="${t("q_ph_detalles")}"></textarea></label>
+      <label>${t("f_nombre")}<input name="nombre" maxlength="40" value="${esc(leer("nombre", ""))}"></label>
+      <label>${t("q_f_insta")}<input name="instagram" maxlength="40" placeholder="@usuario" value="${esc(leer("instagram", ""))}"></label>
+      <div class="ancho fila"><button class="btn" id="enviarQ">${t("q_publicar")}</button><button class="btn sec" id="cerrarQ">${t("cerrar")}</button></div>
+    </div><div id="msgQ"></div></div>`;
+  document.body.appendChild(fondo);
+  const cerrar = () => fondo.remove();
+  fondo.onclick = (e) => { if (e.target === fondo) cerrar(); };
+  fondo.querySelector("#cerrarQ").onclick = cerrar;
+  fondo.querySelector("#enviarQ").onclick = async () => {
+    const f = Object.fromEntries([...fondo.querySelectorAll("[name]")].map(e => [e.name, e.value.trim()]));
+    f.instagram = limpiaInsta(f.instagram);
+    if (f.llegada === f.salida) f.llegada = "";
+    const msg = fondo.querySelector("#msgQ");
+    if (!f.fecha || !f.salida || !f.nombre) { msg.innerHTML = `<div class="msg">${t("q_falta")}</div>`; return; }
+    if (f.fecha < hoy) { msg.innerHTML = `<div class="msg">${t("q_fecha_mal")}</div>`; return; }
+    if (!formListo(CONFIG.quedadas || {})) { msg.innerHTML = `<div class="msg">${t("q_no_activo")}</div>`; return; }
+    guardar("nombre", f.nombre); if (f.instagram) guardar("instagram", f.instagram);
+    const b = fondo.querySelector("#enviarQ"); b.disabled = true;
+    try {
+      await enviarFormulario(CONFIG.quedadas, f);
+      quedadasLocales.push({ ...f });
+      contar("quedada/" + f.salida, "Quedada publicada · " + ((spotDe(f.salida) || {}).nombre || f.salida), true);
+      fondo.querySelector(".form").remove();
+      msg.innerHTML = `<div class="msg">${t("q_ok")}</div><div style="margin-top:10px"><button class="btn sec" id="cerrar2">${t("cerrar")}</button></div>`;
+      fondo.querySelector("#cerrar2").onclick = () => { cerrar(); router(); };
+    } catch (e) {
+      msg.innerHTML = `<div class="msg">${t("err_envio")}</div>`; b.disabled = false;
+    }
+  };
 }
 
 // ---------- Enlaces de fuera (webcams, anemómetros, mapas) ----------
@@ -885,6 +1077,7 @@ $("#btnIdioma").onclick = () => elegirIdioma(false);
 
 // ---------- Navegación ----------
 function router() {
+  if (location.hash === "#quedadas") { pintarQuedadas(); contar("/quedadas", "Quedadas"); return; }
   const m = location.hash.match(/spot=([\w-]+)/);
   const spot = m && SPOTS.find(s => s.id === m[1]);
   if (spot) { diaElegido = 0; pintarSpot(spot); contar("/spot/" + spot.id, spot.nombre); } else pintarLista();
@@ -897,12 +1090,12 @@ $("#btnUnidad").onclick = () => {
   const orden = ["kn", "kmh", "ms"]; unidad = orden[(orden.indexOf(unidad) + 1) % 3];
   guardar("unidad", unidad); $("#btnUnidad").textContent = UNIDADES[unidad].t;
   const m = location.hash.match(/spot=([\w-]+)/); const spot = m && SPOTS.find(s => s.id === m[1]);
-  if (spot && cache[spot.id]) dibujarSpot(spot); else pintarLista();
+  if (spot && cache[spot.id]) dibujarSpot(spot); else if (location.hash === "#quedadas") pintarQuedadas(); else pintarLista();
 };
 
 router();
 try { if (esAppInstalada() && !sessionStorage.getItem("cw_contada")) { sessionStorage.setItem("cw_contada", "1"); contar("instalada", "Abierta desde la pantalla de inicio (app instalada)", true); } } catch (e) {}
-vientoAhoraTodos().then(() => { if (!location.hash.includes("spot=")) pintarLista(); }).catch(() => {});
+vientoAhoraTodos().then(() => { if (!location.hash.includes("spot=") && location.hash !== "#quedadas") pintarLista(); }).catch(() => {});
 </script>
 </body>
 </html>

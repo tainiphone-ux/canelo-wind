@@ -19,4 +19,10 @@ const CONFIG = {
     form: "https://docs.google.com/forms/d/e/1FAIpQLSeB-cp_pnvGJC2FMsgSH3Xa91MHHmEKBzAt25PAmfdJP7AKvQ/viewform",
     campos: { tipo: "entry.1787035991", mensaje: "entry.1586210193", nombre: "entry.2048740754", contacto: "entry.435415204" },
   },
+  quedadas: {
+    // Formulario «Canelo Wind · Quedadas» (se crea con herramientas/crear_quedadas.gs). Su hoja es pública (solo ver).
+    form: "",
+    campos: { tipo: "", fecha: "", hora: "", salida: "", llegada: "", encuentro: "", nivel: "", material: "", detalles: "", nombre: "", instagram: "" },
+    csv: "",
+  },
 };
