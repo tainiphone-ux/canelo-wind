@@ -320,9 +320,9 @@ const SPOTS = [
   },
   {
     id: "salinas-pozo", nombre: "Salinas de Pozo", isla: "Gran Canaria", zona: "Santa Lucía de Tirajana",
-    lat: 27.828, lon: -15.408, deportes: ["windsurf"],
+    lat: 27.828, lon: -15.408, deportes: ["windsurf", "kite", "wing"],
     buenos: ["NE", "N"], nivel: "Avanzado (olas)",
-    nota: "Junto a Pozo Izquierdo: viento side-shore y olas largas.",
+    nota: "Junto a Pozo Izquierdo: viento side-shore y olas largas. Se navega con windsurf, kite y foil.",
     anemometros: [ESTACIONES.gcl],
     webcams: [{ nombre: "in2theBeach · Pozo Izquierdo", url: "https://en.in2thebeach.es/webcam/70/pozo-izquierdo" }],
   },
