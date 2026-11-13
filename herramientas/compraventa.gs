@@ -11,6 +11,8 @@
  * La app manda aquí (POST, texto JSON):
  *  - {accion:"publicar", secreto, categoria, titulo, precio, negociable, estado, isla, zona, descripcion, nombre, instagram, whatsapp, fotos:[jpeg en base64]}
  *  - {accion:"renovar", id, secreto}            → el anuncio sigue 30 días más
+ *  - {accion:"editar", id, secreto, categoria, titulo, precio, negociable, estado, isla, zona, descripcion, nombre, instagram, whatsapp, fotos?:[jpeg en base64]}
+ *                                                → cambia los datos; si manda «fotos» se cambian también (las 3 antiguas a la papelera)
  *  - {accion:"quitar", id, secreto, vendido}    → se quita (y sus fotos van a la papelera)
  * El «secreto» solo lo tiene el móvil que puso el anuncio; aquí se guarda cifrado (SHA-256) en las propiedades del script.
  * Para quitar un anuncio a mano (spam): en la hoja, poner «quitado» en la columna Situacion (o borrar la fila).
@@ -90,6 +92,27 @@ function atender_(d) {
 
   if (d.accion === 'renovar') {
     hoja.getRange(fila, 17, 1, 2).setValues([[ahora, 'activo']]);
+    return { ok: true, fecha: ahora };
+  }
+  if (d.accion === 'editar') {
+    const precio = Math.round(Number(d.precio));
+    if (!txt_(d.titulo, 80) || !(precio >= 0) || precio > 100000) throw new Error('datos');
+    hoja.getRange(fila, 3, 1, 11).setValues([[txt_(d.categoria, 40), txt_(d.titulo, 80), String(precio), d.negociable ? 'si' : '',
+      txt_(d.estado, 40), txt_(d.isla, 40), txt_(d.zona, 60), String(d.descripcion || '').trim().slice(0, 1000),
+      txt_(d.nombre, 40), txt_(d.instagram, 30).replace(/[^\w.]/g, ''), txt_(d.whatsapp, 20).replace(/[^\d+]/g, '')]]);
+    if ((d.fotos || []).length) {
+      hoja.getRange(fila, 14, 1, 3).getValues()[0].forEach(function (f) { if (f) try { DriveApp.getFileById(f).setTrashed(true); } catch (e) {} });
+      const carpeta = DriveApp.getFolderById(P.getProperty('CARPETA'));
+      const fotos = d.fotos.slice(0, 3).map(function (b64, i) {
+        const bytes = Utilities.base64Decode(String(b64).replace(/^data:image\/\w+;base64,/, ''));
+        if (bytes.length > 2000000) throw new Error('foto');
+        const f = carpeta.createFile(Utilities.newBlob(bytes, 'image/jpeg', id + '-' + (i + 1) + '.jpg'));
+        f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        return f.getId();
+      });
+      while (fotos.length < 3) fotos.push('');
+      hoja.getRange(fila, 14, 1, 3).setValues([fotos]);
+    }
     return { ok: true, fecha: ahora };
   }
   if (d.accion === 'quitar') {

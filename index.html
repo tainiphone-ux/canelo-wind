@@ -1244,7 +1244,7 @@ function abrirAnuncio(a) {
       <button class="btn sec" id="compartirV">📤 ${t("q_compartir")}</button>
     </div>
     ${mio ? `<div class="caja" style="margin-top:12px;background:var(--bg)"><b>${t("cv_tu_anuncio")}</b>
-      <div class="fila" style="margin-top:8px"><button class="btn verde peq" id="vendidoV">${t("cv_vendido")}</button><button class="btn sec peq" id="renovarV">${t("cv_renovar")}</button><button class="btn sec peq" id="quitarV">${t("cv_quitar")}</button></div>
+      <div class="fila" style="margin-top:8px"><button class="btn sec peq" id="editarV">${t("cv_editar")}</button><button class="btn verde peq" id="vendidoV">${t("cv_vendido")}</button><button class="btn sec peq" id="renovarV">${t("cv_renovar")}</button><button class="btn sec peq" id="quitarV">${t("cv_quitar")}</button></div>
       <div id="msgV"></div></div>` : ""}
     <div class="aviso" style="margin-top:10px">${t("cv_seg_corto")}</div>
     <button class="btn sec" id="cerrarV" style="margin-top:10px">${t("cerrar")}</button>
@@ -1271,6 +1271,7 @@ function abrirAnuncio(a) {
         f.querySelectorAll("#vendidoV,#renovarV,#quitarV").forEach(b => b.disabled = false);
       }
     };
+    f.querySelector("#editarV").onclick = () => { cerrar(); abrirFormAnuncio({ a, secreto: mio.secreto }); };
     f.querySelector("#vendidoV").onclick = () => accion({ accion: "quitar", vendido: true }, t("cv_ok_vendido"));
     f.querySelector("#quitarV").onclick = () => { if (confirm(t("cv_quitar_conf"))) accion({ accion: "quitar", vendido: false }, t("cv_ok_quitado")); };
     f.querySelector("#renovarV").onclick = () => accion({ accion: "renovar" }, t("cv_ok_renovado"));
@@ -1304,32 +1305,36 @@ function achicarFoto(archivo) {
   });
 }
 
-function abrirFormAnuncio() {
+function abrirFormAnuncio(editar) {
   if (document.querySelector(".fondo")) return;
+  const a = editar && editar.a;
   const publicos = SPOTS.filter(s => !s.propio);
   const regiones = [...new Set(publicos.map(regionDe))];
   const zonas = regiones.map(r => `<optgroup label="${esc(nombreRegion(r))}">${[...new Set(publicos.filter(s => regionDe(s) === r).map(s => s.isla))].sort()
     .map(i => `<option value="${esc(i)}">${esc(i)}</option>`).join("")}</optgroup>`).join("");
+  const fotosActuales = a ? [a.foto1, a.foto2, a.foto3].filter(Boolean) : [];
+  let cambiarFotos = !a;
   const fotos = [];
   const f = document.createElement("div");
   f.className = "fondo";
-  f.innerHTML = `<div class="caja"><h3>${t("cv_form_tit")}</h3>
+  f.innerHTML = `<div class="caja"><h3>${t(a ? "cv_form_tit_editar" : "cv_form_tit")}</h3>
     <p class="aviso" style="margin-top:-4px">${t("cv_publico")}</p>
     <div class="form" id="fV">
       <label class="ancho">${t("cv_f_fotos")}<span class="fotos-form" id="fotosV"></span></label>
-      <label>${t("cv_f_cat")}<select name="categoria">${CATS_V.map(k => `<option value="${esc(TXT.es["cv_cat" + k])}">${ICONOS_V[k]} ${esc(t("cv_cat" + k))}</option>`).join("")}</select></label>
-      <label>${t("cv_f_estado")}<select name="estado">${ESTADOS_V.map(k => `<option value="${esc(TXT.es["cv_est" + k])}" ${k === 2 ? "selected" : ""}>${esc(t("cv_est" + k))}</option>`).join("")}</select></label>
-      <label class="ancho">${t("cv_f_titulo")}<input name="titulo" maxlength="80" placeholder="${t("cv_ph_titulo")}"></label>
-      <label>${t("cv_f_precio")}<input name="precio" type="number" min="0" max="100000" inputmode="numeric" placeholder="${t("ph_ej")} 450"></label>
-      <label style="flex-direction:row;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" name="negociable"> ${t("cv_negociable")}</label>
+      <label>${t("cv_f_cat")}<select name="categoria">${CATS_V.map(k => `<option value="${esc(TXT.es["cv_cat" + k])}" ${a && a.categoria === TXT.es["cv_cat" + k] ? "selected" : ""}>${ICONOS_V[k]} ${esc(t("cv_cat" + k))}</option>`).join("")}</select></label>
+      <label>${t("cv_f_estado")}<select name="estado">${ESTADOS_V.map(k => `<option value="${esc(TXT.es["cv_est" + k])}" ${a ? (a.estado === TXT.es["cv_est" + k] ? "selected" : "") : (k === 2 ? "selected" : "")}>${esc(t("cv_est" + k))}</option>`).join("")}</select></label>
+      <label class="ancho">${t("cv_f_titulo")}<input name="titulo" maxlength="80" placeholder="${t("cv_ph_titulo")}" value="${esc(a ? a.titulo : "")}"></label>
+      <label>${t("cv_f_precio")}<input name="precio" type="number" min="0" max="100000" inputmode="numeric" placeholder="${t("ph_ej")} 450" value="${a ? esc(a.precio) : ""}"></label>
+      <label style="flex-direction:row;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" name="negociable" ${a && a.negociable ? "checked" : ""}> ${t("cv_negociable")}</label>
       <label>${t("cv_f_isla")}<select name="isla"><option value="">—</option>${zonas}</select></label>
-      <label>${t("cv_f_zona")}<input name="zona" maxlength="60" placeholder="${t("cv_ph_zona")}"></label>
-      <label class="ancho">${t("cv_f_desc")}<textarea name="descripcion" rows="4" maxlength="1000" placeholder="${t("cv_ph_desc")}"></textarea></label>
-      <label>${t("f_nombre")}<input name="nombre" maxlength="40" value="${esc(leer("nombre", ""))}"></label>
-      <label>${t("q_f_insta")}<input name="instagram" maxlength="40" placeholder="@usuario" value="${esc(leer("instagram", ""))}"></label>
-      <label class="ancho">${t("cv_f_wa")}<input name="whatsapp" type="tel" maxlength="20" placeholder="${t("ph_ej")} +34 600 000 000"><span class="aviso" style="margin:2px 0 0">${t("cv_wa_aviso")}</span></label>
-      <div class="ancho fila"><button class="btn verde" id="publicarV">${t("cv_publicar")}</button><button class="btn sec" id="cerrarFV">${t("cancelar")}</button></div>
+      <label>${t("cv_f_zona")}<input name="zona" maxlength="60" placeholder="${t("cv_ph_zona")}" value="${esc(a ? a.zona : "")}"></label>
+      <label class="ancho">${t("cv_f_desc")}<textarea name="descripcion" rows="4" maxlength="1000" placeholder="${t("cv_ph_desc")}">${esc(a ? a.descripcion : "")}</textarea></label>
+      <label>${t("f_nombre")}<input name="nombre" maxlength="40" value="${esc(a ? a.nombre : leer("nombre", ""))}"></label>
+      <label>${t("q_f_insta")}<input name="instagram" maxlength="40" placeholder="@usuario" value="${esc(a ? a.instagram : leer("instagram", ""))}"></label>
+      <label class="ancho">${t("cv_f_wa")}<input name="whatsapp" type="tel" maxlength="20" placeholder="${t("ph_ej")} +34 600 000 000" value="${esc(a ? a.whatsapp : "")}"><span class="aviso" style="margin:2px 0 0">${t("cv_wa_aviso")}</span></label>
+      <div class="ancho fila"><button class="btn verde" id="publicarV">${t(a ? "cv_guardar" : "cv_publicar")}</button><button class="btn sec" id="cerrarFV">${t("cancelar")}</button></div>
     </div><div id="msgFV"></div></div>`;
+  if (a) { const sel = f.querySelector("[name=isla]"); if ([...sel.options].some(o => o.value === a.isla)) sel.value = a.isla; }
   document.body.appendChild(f);
   const cerrar = () => f.remove();
   f.onclick = (e) => { if (e.target === f) cerrar(); };
@@ -1337,8 +1342,15 @@ function abrirFormAnuncio() {
   const msg = (x) => { f.querySelector("#msgFV").innerHTML = x ? `<div class="msg">${x}</div>` : ""; };
   const pintarFotos = () => {
     const c = f.querySelector("#fotosV");
-    c.innerHTML = fotos.map((x, i) => `<span class="f" style="background-image:url('${x}')"><button type="button" data-qf="${i}">✕</button></span>`).join("") +
-      (fotos.length < 3 ? `<button type="button" class="mas" id="masFoto">📷</button>` : "");
+    if (!cambiarFotos) {
+      c.innerHTML = fotosActuales.map(x => `<span class="f" style="background-image:url('${fotoUrl(x, 200)}')"></span>`).join("") +
+        `<button type="button" class="mas" id="masFoto">📷</button>`;
+      c.insertAdjacentHTML("afterend", `<p class="aviso" id="avisoFotos" style="margin-top:4px">${t("cv_fotos_mantener")}</p>`);
+    } else {
+      c.innerHTML = fotos.map((x, i) => `<span class="f" style="background-image:url('${x}')"><button type="button" data-qf="${i}">✕</button></span>`).join("") +
+        (fotos.length < 3 ? `<button type="button" class="mas" id="masFoto">📷</button>` : "");
+      const av = f.querySelector("#avisoFotos"); if (av) av.remove();
+    }
     c.querySelectorAll("[data-qf]").forEach(b => b.onclick = (e) => { e.preventDefault(); fotos.splice(+b.dataset.qf, 1); pintarFotos(); });
     const m = c.querySelector("#masFoto");
     if (m) m.onclick = (e) => {
@@ -1346,6 +1358,7 @@ function abrirFormAnuncio() {
       const inp = document.createElement("input"); inp.type = "file"; inp.accept = "image/*"; inp.multiple = true;
       inp.onchange = async () => {
         msg(t("cv_preparando"));
+        if (!cambiarFotos) { cambiarFotos = true; fotos.length = 0; }
         for (const a of [...inp.files].slice(0, 3 - fotos.length)) { try { fotos.push(await achicarFoto(a)); } catch (er) {} }
         msg(""); pintarFotos();
       };
@@ -1358,23 +1371,33 @@ function abrirFormAnuncio() {
     const v = (n) => F.querySelector(`[name=${n}]`).value.trim();
     const datos = { categoria: v("categoria"), estado: v("estado"), titulo: v("titulo"), precio: v("precio"), negociable: F.querySelector("[name=negociable]").checked,
       isla: v("isla"), zona: v("zona"), descripcion: v("descripcion"), nombre: v("nombre"), instagram: limpiaInsta(v("instagram")), whatsapp: v("whatsapp").replace(/[^\d+]/g, "") };
-    if (!fotos.length) return msg(t("cv_falta_foto"));
+    if (!a && !fotos.length) return msg(t("cv_falta_foto"));
     if (!datos.titulo || datos.precio === "" || !(+datos.precio >= 0) || !datos.isla || !datos.nombre) return msg(t("cv_falta"));
     if (!datos.instagram && datos.whatsapp.replace(/\D/g, "").length < 9) return msg(t("cv_falta_contacto"));
     if (!cvListo()) return msg(t("cv_no_activo"));
     guardar("nombre", datos.nombre); if (datos.instagram) guardar("instagram", datos.instagram);
     const b = f.querySelector("#publicarV"); b.disabled = true; msg(t("cv_subiendo"));
-    const secreto = [...crypto.getRandomValues(new Uint8Array(18))].map(x => x.toString(16).padStart(2, "0")).join("");
     try {
-      const r = await llamarCV({ accion: "publicar", secreto, ...datos, precio: Math.round(+datos.precio), fotos });
-      guardar("misAnuncios", [...misAnuncios(), { id: r.id, secreto, titulo: datos.titulo }]);
-      contar("anuncio-publicado", "Anuncio publicado · " + datos.categoria, true);
-      anunciosCache = null;
-      F.remove();
-      msg(t("cv_ok"));
-      f.querySelector("#msgFV").insertAdjacentHTML("beforeend", `<div style="margin-top:10px"><button class="btn sec" id="cerrar3">${t("cerrar")}</button></div>`);
-      f.querySelector("#cerrar3").onclick = () => { cerrar(); if (location.hash === "#compraventa") pintarCompraventa(); else location.hash = "compraventa"; };
-    } catch (e) { b.disabled = false; msg(t("cv_err_publicar")); }
+      if (a) {
+        await llamarCV({ accion: "editar", id: a.id, secreto: editar.secreto, ...datos, precio: Math.round(+datos.precio), ...(cambiarFotos ? { fotos } : {}) });
+        guardar("misAnuncios", misAnuncios().map(m => m.id === a.id ? { ...m, titulo: datos.titulo } : m));
+        anunciosCache = null;
+        F.remove();
+        msg(t("cv_ok_editado"));
+        f.querySelector("#msgFV").insertAdjacentHTML("beforeend", `<div style="margin-top:10px"><button class="btn sec" id="cerrar3">${t("cerrar")}</button></div>`);
+        f.querySelector("#cerrar3").onclick = () => { cerrar(); location.hash = "anuncio=" + a.id; };
+      } else {
+        const secreto = [...crypto.getRandomValues(new Uint8Array(18))].map(x => x.toString(16).padStart(2, "0")).join("");
+        const r = await llamarCV({ accion: "publicar", secreto, ...datos, precio: Math.round(+datos.precio), fotos });
+        guardar("misAnuncios", [...misAnuncios(), { id: r.id, secreto, titulo: datos.titulo }]);
+        contar("anuncio-publicado", "Anuncio publicado · " + datos.categoria, true);
+        anunciosCache = null;
+        F.remove();
+        msg(t("cv_ok"));
+        f.querySelector("#msgFV").insertAdjacentHTML("beforeend", `<div style="margin-top:10px"><button class="btn sec" id="cerrar3">${t("cerrar")}</button></div>`);
+        f.querySelector("#cerrar3").onclick = () => { cerrar(); if (location.hash === "#compraventa") pintarCompraventa(); else location.hash = "compraventa"; };
+      }
+    } catch (e) { b.disabled = false; msg(t(a ? "cv_err_editar" : "cv_err_publicar")); }
   };
 }
 
