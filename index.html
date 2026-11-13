@@ -354,7 +354,7 @@ function pintarLista() {
       <div class="info"><b>${esc(s.nombre)}</b><div class="sub">${s.propio ? t("ms_privado") : esc(s.zona) + " · " + esc(s.isla)}</div>
       <div class="sub">${s.deportes.map(d => ({ windsurf: "🏄 ", kite: "🪁 ", wing: "🪽 " }[d]) + t("dep_" + d)).join(" · ")}</div>
       ${a ? `<div style="margin-top:4px">${notaHtml(evaluar(s, a.wind_speed_10m, a.wind_gusts_10m, a.wind_direction_10m, null, a.weather_code || 0).n, true)} <span class="sub">${t("ahora_min")}</span></div>` : ""}</div>
-      <button class="fav ${favoritos.includes(s.id) ? "on" : ""}" data-fav="${s.id}" title="${t("favorito")}">★</button>
+      ${s.propio ? `<button class="fav" data-borrar="${s.id}" title="${t("ms_borrar")}" style="font-size:18px">🗑️</button>` : `<button class="fav ${favoritos.includes(s.id) ? "on" : ""}" data-fav="${s.id}" title="${t("favorito")}">★</button>`}
     </div>`;
   };
 
@@ -390,6 +390,9 @@ function pintarLista() {
     guardar("favoritos", favoritos); pintarLista();
   });
   document.querySelectorAll(".spot").forEach(e => e.onclick = () => { location.hash = "spot=" + e.dataset.id; });
+  document.querySelectorAll("[data-borrar]").forEach(e => e.onclick = (ev) => {
+    ev.stopPropagation(); const s = misSpots().find(x => x.id === e.dataset.borrar); if (s) borrarMiSpot(s); pintarLista();
+  });
   $("#irQuedadas").onclick = () => { location.hash = "quedadas"; };
   $("#irCompraventa").onclick = () => { location.hash = "compraventa"; };
   $("#atajoMio").onclick = () => abrirFormMiSpot();
