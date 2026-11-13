@@ -129,6 +129,15 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 .tipo-q { display: inline-block; background: #DCEBF5; color: #1B5378; border-radius: 6px; padding: 2px 8px; font-size: 12px; font-weight: 700; margin-right: 6px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tipo-q { background: #173247; color: #A9D3F0; } }
 .btn.peq { padding: 6px 12px; font-size: 13px; }
+/* Mis spots (privados) */
+.banner-mio { background: linear-gradient(135deg, #E08A3C, #B85A22); box-shadow: 0 4px 14px rgba(154,68,22,.25); }
+.mapa-mio { height: 260px; border-radius: 12px; border: 1px solid var(--line); background: var(--chip); }
+.rosa { display: grid; grid-template-columns: repeat(3, 64px); gap: 6px; }
+.rosa button, .rosa span { height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.rosa button { border: 1px solid var(--line); background: var(--bg); color: var(--text); cursor: pointer; font: inherit; font-weight: 700; }
+.rosa button.on { background: var(--good); border-color: var(--good); color: #fff; }
+.rosa span { font-size: 22px; }
+label.chip { display: inline-flex; align-items: center; }
 /* Notas y avisos del día */
 .nota { display: inline-block; color: #fff; font-weight: 800; border-radius: 8px; padding: 4px 10px; font-size: 15px; white-space: nowrap; }
 .nota.peq { font-size: 11px; padding: 2px 7px; border-radius: 6px; font-weight: 700; }
@@ -290,14 +299,17 @@ async function vientoAhoraTodos() {
 
 // ---------- Pantalla: lista de spots ----------
 function pintarLista() {
-  const regiones = ["Todas", ...new Set(SPOTS.map(regionDe))];
+  const regiones = ["Todas", ...new Set(SPOTS.filter(s => !s.propio).map(regionDe))];
   if (!regiones.includes(filtroRegion)) filtroRegion = "Todas";
   // Islas o provincias de la región elegida (solo si hay más de una)
   const islas = filtroRegion === "Todas" ? [] : ["Todas", ...new Set(SPOTS.filter(s => regionDe(s) === filtroRegion).map(s => s.isla))];
   if (!islas.includes(filtroIsla)) filtroIsla = "Todas";
   const deportes = [["Todos", t("todos")], ["windsurf", t("dep_windsurf")], ["kite", t("dep_kite")], ["wing", t("dep_wing")]];
   const q = textoBuscar.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-  const visibles = SPOTS.filter(s =>
+  const coincide = (s) => (filtroDeporte === "Todos" || s.deportes.includes(filtroDeporte)) &&
+    (!q || s.nombre.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").includes(q));
+  const mios = SPOTS.filter(s => s.propio && coincide(s));
+  const visibles = SPOTS.filter(s => !s.propio &&
     (filtroRegion === "Todas" || regionDe(s) === filtroRegion) &&
     (filtroIsla === "Todas" || s.isla === filtroIsla) &&
     (filtroDeporte === "Todos" || s.deportes.includes(filtroDeporte)) &&
@@ -310,7 +322,7 @@ function pintarLista() {
     const badge = a ? `<div class="badge" style="background:${color(a.wind_speed_10m)}">${conv(a.wind_speed_10m)}<small>${t("rachas_min")} ${conv(a.wind_gusts_10m)}</small><small>${flecha(a.wind_direction_10m)} ${rumbo(a.wind_direction_10m)}</small></div>` : `<div class="badge" style="background:var(--chip);color:var(--muted)">…</div>`;
     return `<div class="spot" data-id="${s.id}">
       ${badge}
-      <div class="info"><b>${esc(s.nombre)}</b><div class="sub">${esc(s.zona)} · ${esc(s.isla)}</div>
+      <div class="info"><b>${esc(s.nombre)}</b><div class="sub">${s.propio ? t("ms_privado") : esc(s.zona) + " · " + esc(s.isla)}</div>
       <div class="sub">${s.deportes.map(d => ({ windsurf: "🏄 ", kite: "🪁 ", wing: "🪽 " }[d]) + t("dep_" + d)).join(" · ")}</div>
       ${a ? `<div style="margin-top:4px">${notaHtml(evaluar(s, a.wind_speed_10m, a.wind_gusts_10m, a.wind_direction_10m, null, a.weather_code || 0).n, true)} <span class="sub">${t("ahora_min")}</span></div>` : ""}</div>
       <button class="fav ${favoritos.includes(s.id) ? "on" : ""}" data-fav="${s.id}" title="${t("favorito")}">★</button>
@@ -321,7 +333,11 @@ function pintarLista() {
     <button class="banner-q" id="irQuedadas"><span style="font-size:28px">🤙</span><span><b>${t("q_banner")}</b><small id="numQ">${t("q_banner_sub")}</small></span><span class="ir">›</span></button>
     <div class="chips">${regiones.map(r => `<button class="chip ${r === filtroRegion ? "on" : ""}" data-region="${esc(r)}">${r === "Todas" ? t("toda") : esc(nombreRegion(r))}</button>`).join("")}</div>
     ${islas.length > 2 ? `<div class="chips">${islas.map(i => `<button class="chip ${i === filtroIsla ? "on" : ""}" data-isla="${esc(i)}">${i === "Todas" ? t("todas") : esc(i)}</button>`).join("")}</div>` : ""}
+    ${misSpots().length ? "" : `<button class="banner-q banner-mio" id="crearMio"><span style="font-size:28px">📍</span><span><b>${t("ms_crear")}</b><small>${t("ms_crear_sub")}</small></span><span class="ir">›</span></button>`}
     <div class="chips">${deportes.map(([k, n]) => `<button class="chip ${k === filtroDeporte ? "on" : ""}" data-dep="${k}">${n}</button>`).join("")}</div>`;
+  if (misSpots().length) html += `<h2 class="isla">${t("ms_seccion")}</h2>
+    <div class="fila" style="margin-bottom:8px"><button class="btn peq" id="crearMio">${t("ms_crear")}</button><button class="btn sec peq" id="copiaMios">${t("ms_copia")}</button><button class="btn sec peq" id="recuperarMios">${t("ms_recuperar")}</button></div>
+    ${mios.length ? `<div class="lista">${mios.map(tarjeta).join("")}</div>` : ""}`;
   const favs = visibles.filter(s => favoritos.includes(s.id));
   if (favs.length) html += `<h2 class="isla">${t("favoritos")}</h2><div class="lista">${favs.map(tarjeta).join("")}</div>`;
   [...new Set(visibles.map(grupo))].forEach(g => {
@@ -343,6 +359,8 @@ function pintarLista() {
   });
   document.querySelectorAll(".spot").forEach(e => e.onclick = () => { location.hash = "spot=" + e.dataset.id; });
   $("#irQuedadas").onclick = () => { location.hash = "quedadas"; };
+  $("#crearMio").onclick = () => abrirFormMiSpot();
+  if ($("#copiaMios")) { $("#copiaMios").onclick = copiaMisSpots; $("#recuperarMios").onclick = recuperarMisSpots; }
   // Cuántas quedadas hay próximamente (si ya están cargadas o se cargan rápido)
   if (formListo(CONFIG.quedadas || {})) cargarQuedadas().then(l => {
     const n = proximas(l).length, e = $("#numQ");
@@ -399,17 +417,18 @@ function dibujarSpot(spot) {
   <button class="volver" onclick="location.hash=''">${t("volver_lista")}</button>
   <div class="cab">
     <div style="flex:1"><h2>${esc(spot.nombre)}</h2>
-      <div class="sub" style="color:var(--muted)">${esc(spot.zona)} · ${esc(spot.isla)}${regionDe(spot) !== "Canarias" && regionDe(spot) !== spot.isla ? " · " + esc(nombreRegion(regionDe(spot))) : ""}</div>
+      <div class="sub" style="color:var(--muted)">${spot.propio ? t("ms_privado") : esc(spot.zona) + " · " + esc(spot.isla) + (regionDe(spot) !== "Canarias" && regionDe(spot) !== spot.isla ? " · " + esc(nombreRegion(regionDe(spot))) : "")}</div>
       ${spot.deportes.map(d => `<span class="etq">${{ windsurf: "🏄 ", kite: "🪁 ", wing: "🪽 " }[d]}${t("dep_" + d)}</span>`).join("")}
       <span class="etq">${t("nivel")}: ${esc(nombreNivel(spot.nivel))}</span>
       <span class="etq">${t("mejor_viento")}: ${spot.buenos.map(dirIdioma).join(", ")}</span>
     </div>
     <div class="acciones-spot">
-      <button class="compartir" id="compartirSpot" title="${t("compartir")}">📤 <span>${t("compartir")}</span></button>
+      <button class="compartir" id="compartirSpot" title="${spot.propio ? t("ms_pasar") : t("compartir")}">📤 <span>${spot.propio ? t("ms_pasar") : t("compartir")}</span></button>
       <button class="fav ${favoritos.includes(spot.id) ? "on" : ""}" id="favSpot" title="${t("favorito")}" style="font-size:28px">★</button>
     </div>
   </div>
-  <p style="margin:8px 0 0">${esc(tx.nota)}</p>
+  ${spot.propio ? `<div class="fila" style="margin-top:8px"><button class="btn sec peq" id="editarMio">${t("ms_editar")}</button><button class="btn sec peq" id="borrarMio">${t("ms_borrar")}</button></div>` : ""}
+  ${tx.nota ? `<p style="margin:8px 0 0">${esc(tx.nota)}</p>` : ""}
   ${tx.seguridad ? `<div class="seguridad"><b>${t("aviso_seg")}</b>${esc(tx.seguridad)}</div>` : ""}
   ${tx.consejos.length ? `<div class="caja consejos"><h3>${t("consejos")}</h3><ul>${tx.consejos.map(c => `<li>${esc(c)}</li>`).join("")}</ul>
     <p class="aviso">${t("consejos_nota")}</p></div>` : ""}
@@ -455,9 +474,9 @@ function dibujarSpot(spot) {
   </div>
 
   <div class="caja" id="cajaMareas"></div>
-  <div class="caja" id="cajaQuedadas"></div>
+  ${spot.propio ? "" : `<div class="caja" id="cajaQuedadas"></div>
   <div class="caja" id="cajaReportar"></div>
-  <div class="caja" id="cajaReportes"></div>
+  <div class="caja" id="cajaReportes"></div>`}
 
   <div class="caja enlaces"><h3>${t("anemos")}</h3>
     ${enlaces(spot.anemometros, "📡")}
@@ -474,7 +493,8 @@ function dibujarSpot(spot) {
 
   document.querySelectorAll("[data-dia]").forEach(e => e.onclick = () => { diaElegido = +e.dataset.dia; dibujarSpot(spot); });
   $("#noche").onchange = (e) => { verNoche = e.target.checked; dibujarSpot(spot); };
-  $("#compartirSpot").onclick = () => compartirSpot(spot, evAhora, c);
+  $("#compartirSpot").onclick = () => spot.propio ? pasarMiSpot(spot) : compartirSpot(spot, evAhora, c);
+  if (spot.propio) { $("#editarMio").onclick = () => abrirFormMiSpot(spot); $("#borrarMio").onclick = () => borrarMiSpot(spot); }
   $("#favSpot").onclick = () => {
     favoritos = favoritos.includes(spot.id) ? favoritos.filter(x => x !== spot.id) : [...favoritos, spot.id];
     guardar("favoritos", favoritos); dibujarSpot(spot);
@@ -727,8 +747,9 @@ async function pintarQuedadasSpot(spot) {
 // Formulario para organizar una quedada
 function abrirFormQuedada(spotId) {
   if (document.querySelector(".fondo")) return;
-  const regiones = [...new Set(SPOTS.map(regionDe))];
-  const opciones = (sel) => regiones.map(r => `<optgroup label="${esc(nombreRegion(r))}">${SPOTS.filter(s => regionDe(s) === r)
+  const publicos = SPOTS.filter(s => !s.propio); // los spots propios son privados: no van en quedadas
+  const regiones = [...new Set(publicos.map(regionDe))];
+  const opciones = (sel) => regiones.map(r => `<optgroup label="${esc(nombreRegion(r))}">${publicos.filter(s => regionDe(s) === r)
     .sort((a, b) => a.nombre.localeCompare(b.nombre)).map(s => `<option value="${s.id}" ${s.id === sel ? "selected" : ""}>${esc(s.nombre)}</option>`).join("")}</optgroup>`).join("");
   const hoy = hoyISO(spotId && spotDe(spotId) ? tzDe(spotDe(spotId)) : "Europe/Madrid");
   const fondo = document.createElement("div");
@@ -1075,12 +1096,195 @@ function elegirIdioma(primeraVez) {
 }
 $("#btnIdioma").onclick = () => elegirIdioma(false);
 
+// ---------- Mis spots: spots privados que solo ve quien los crea (se guardan en el móvil) ----------
+const MIS = "Mis spots";
+const misSpots = () => SPOTS.filter(s => s.propio);
+const DIRS8 = ["N", "NE", "E", "SE", "S", "SO", "O", "NO"];
+const NIVELES_MIO = ["Todos los niveles", "Iniciación / intermedio", "Intermedio", "Intermedio / avanzado", "Avanzado (olas)", "Experto"];
+function prepararPropio(s) {
+  return { id: s.id, nombre: String(s.nombre || "").slice(0, 60), lat: +s.lat, lon: +s.lon,
+    deportes: (s.deportes || []).filter(d => ["windsurf", "kite", "wing"].includes(d)),
+    buenos: (s.buenos || []).filter(d => DIRS8.includes(d)), nivel: NIVELES_MIO.includes(s.nivel) ? s.nivel : "Todos los niveles",
+    nota: String(s.nota || "").slice(0, 400), interior: !!s.interior,
+    propio: true, region: MIS, isla: MIS, zona: "", tz: +s.lon < -12 ? "Atlantic/Canary" : "Europe/Madrid", anemometros: [], webcams: [] };
+}
+const datosMio = (s) => ({ id: s.id, nombre: s.nombre, lat: s.lat, lon: s.lon, deportes: s.deportes, buenos: s.buenos, nivel: s.nivel, nota: s.nota, interior: s.interior });
+const valido = (s) => s && s.nombre && isFinite(s.lat) && isFinite(s.lon) && Math.abs(s.lat) <= 90 && Math.abs(s.lon) <= 180 && s.deportes.length;
+function guardarMisSpots() { guardar("misSpots", misSpots().map(datosMio)); }
+function anadirMiSpot(datos) {
+  const s = prepararPropio({ ...datos, id: "mi-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5) });
+  if (!valido(s)) return null;
+  SPOTS.push(s); guardarMisSpots(); return s;
+}
+leer("misSpots", []).forEach(d => { const s = prepararPropio(d); if (valido(s) && !SPOTS.some(x => x.id === s.id)) SPOTS.push(s); });
+
+// Mapa (Leaflet + OpenStreetMap), se carga solo al abrir el formulario
+let leafletListo = null;
+function cargarLeaflet() {
+  if (window.L) return Promise.resolve();
+  if (leafletListo) return leafletListo;
+  leafletListo = new Promise((ok, mal) => {
+    const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"; document.head.appendChild(css);
+    const js = document.createElement("script"); js.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"; js.onload = ok; js.onerror = mal; document.head.appendChild(js);
+  });
+  return leafletListo;
+}
+
+function abrirFormMiSpot(editar) {
+  if (document.querySelector(".fondo")) return;
+  const s = editar || {};
+  let lat = editar ? s.lat : null, lon = editar ? s.lon : null;
+  const buenos = new Set(editar ? s.buenos : []);
+  const rosa = [["NO", "N", "NE"], ["O", "", "E"], ["SO", "S", "SE"]];
+  const fondo = document.createElement("div");
+  fondo.className = "fondo";
+  fondo.innerHTML = `<div class="caja"><h3>${editar ? t("ms_editar_tit") : t("ms_crear_tit")}</h3>
+    <p class="aviso" style="margin-top:-4px">${t("ms_privado_txt")}</p>
+    <div class="form" id="fMio">
+      <label class="ancho">${t("ms_nombre")}<input name="nombre" maxlength="60" value="${esc(s.nombre || "")}" placeholder="${t("ms_ph_nombre")}"></label>
+      <div class="ancho"><div style="font-size:12px;color:var(--muted);margin-bottom:4px">${t("ms_donde")}</div>
+        <div id="mapaMio" class="mapa-mio"></div>
+        <div class="fila" style="margin-top:6px"><button type="button" class="btn sec peq" id="aquiMio">${t("ms_aqui")}</button><span class="aviso" style="margin:0" id="estadoMapa">${editar ? t("ms_marcado") : t("ms_toca")}</span></div></div>
+      <div class="ancho"><div style="font-size:12px;color:var(--muted);margin-bottom:4px">${t("ms_deportes")}</div>
+        <div class="chips" style="margin:0">${["windsurf", "kite", "wing"].map(d => `<label class="chip ${(s.deportes || []).includes(d) ? "on" : ""}"><input type="checkbox" name="dep" value="${d}" ${(s.deportes || []).includes(d) ? "checked" : ""} style="display:none">${{ windsurf: "🏄 ", kite: "🪁 ", wing: "🪽 " }[d]}${t("dep_" + d)}</label>`).join("")}</div></div>
+      <div class="ancho"><div style="font-size:12px;color:var(--muted);margin-bottom:4px">${t("ms_dirs")}</div>
+        <div class="rosa">${rosa.flat().map(d => d ? `<button type="button" class="${buenos.has(d) ? "on" : ""}" data-dir="${d}">${dirIdioma(d)}</button>` : `<span>🧭</span>`).join("")}</div></div>
+      <label>${t("ms_nivel")}<select name="nivel">${NIVELES_MIO.map(n => `<option value="${esc(n)}" ${n === s.nivel ? "selected" : ""}>${esc(nombreNivel(n))}</option>`).join("")}</select></label>
+      <label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" name="interior" ${s.interior ? "checked" : ""}> ${t("ms_interior")}</label>
+      <label class="ancho">${t("ms_nota")}<textarea name="nota" rows="2" maxlength="400" placeholder="${t("ms_ph_nota")}">${esc(s.nota || "")}</textarea></label>
+      <div class="ancho fila"><button class="btn" id="guardarMio">${t("ms_guardar")}</button><button class="btn sec" id="cerrarMio">${t("cancelar")}</button></div>
+    </div><div id="msgMio"></div></div>`;
+  document.body.appendChild(fondo);
+  const cerrar = () => fondo.remove();
+  fondo.onclick = (e) => { if (e.target === fondo) cerrar(); };
+  fondo.querySelector("#cerrarMio").onclick = cerrar;
+  fondo.querySelectorAll("label.chip input").forEach(c => c.onchange = () => c.parentElement.classList.toggle("on", c.checked));
+  fondo.querySelectorAll("[data-dir]").forEach(b => b.onclick = () => { const d = b.dataset.dir; buenos.has(d) ? buenos.delete(d) : buenos.add(d); b.classList.toggle("on", buenos.has(d)); });
+
+  // Mapa: tocar para marcar, o «Estoy aquí»
+  let mapa = null, marca = null;
+  const poner = (la, lo, zoom) => {
+    lat = +la.toFixed(5); lon = +lo.toFixed(5);
+    if (mapa) { if (marca) marca.setLatLng([lat, lon]); else marca = L.circleMarker([lat, lon], { radius: 11, color: "#fff", weight: 3, fillColor: "#B85A22", fillOpacity: 1 }).addTo(mapa); if (zoom) mapa.setView([lat, lon], zoom); }
+    $("#estadoMapa").textContent = t("ms_marcado") + ` (${lat.toFixed(3)}, ${lon.toFixed(3)})`;
+  };
+  cargarLeaflet().then(() => {
+    if (!document.body.contains(fondo)) return;
+    mapa = L.map("mapaMio", { zoomControl: true });
+    mapa.attributionControl.setPrefix(false);
+    mapa.setView(lat != null ? [lat, lon] : [34, -9], lat != null ? 14 : 5);
+    const calles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" });
+    const sat = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, attribution: "© Esri" });
+    (lat != null ? sat : calles).addTo(mapa);
+    L.control.layers({ [t("ms_mapa")]: calles, [t("ms_sat")]: sat }, null, { position: "topright" }).addTo(mapa);
+    mapa.on("click", (e) => poner(e.latlng.lat, e.latlng.lng));
+    if (lat != null) poner(lat, lon);
+    setTimeout(() => mapa.invalidateSize(), 200);
+  }).catch(() => { $("#estadoMapa").textContent = t("q_error"); });
+  fondo.querySelector("#aquiMio").onclick = () => {
+    if (!navigator.geolocation) { $("#estadoMapa").textContent = t("ms_sin_gps"); return; }
+    $("#estadoMapa").textContent = t("ms_buscando");
+    navigator.geolocation.getCurrentPosition(p => poner(p.coords.latitude, p.coords.longitude, 15),
+      () => { $("#estadoMapa").textContent = t("ms_sin_gps"); }, { enableHighAccuracy: true, timeout: 15000 });
+  };
+
+  fondo.querySelector("#guardarMio").onclick = () => {
+    const F = fondo.querySelector("#fMio");
+    const datos = { nombre: F.querySelector("[name=nombre]").value.trim(), lat, lon,
+      deportes: [...F.querySelectorAll("[name=dep]:checked")].map(c => c.value), buenos: [...buenos],
+      nivel: F.querySelector("[name=nivel]").value, interior: F.querySelector("[name=interior]").checked, nota: F.querySelector("[name=nota]").value.trim() };
+    if (!datos.nombre || lat == null || !datos.deportes.length) { fondo.querySelector("#msgMio").innerHTML = `<div class="msg">${t("ms_falta")}</div>`; return; }
+    let destino;
+    if (editar) {
+      const nuevo = prepararPropio({ ...datos, id: editar.id });
+      Object.keys(editar).forEach(k => delete editar[k]); Object.assign(editar, nuevo);
+      delete cache[editar.id]; guardarMisSpots(); destino = editar;
+    } else {
+      destino = anadirMiSpot(datos); contar("mi-spot-creado", "Spot propio creado", true);
+    }
+    cerrar();
+    vientoAhoraTodos().catch(() => {});
+    if (location.hash === "#spot=" + destino.id) router(); else location.hash = "spot=" + destino.id;
+  };
+}
+
+function borrarMiSpot(spot) {
+  if (!confirm(t("ms_borrar_conf", { n: spot.nombre }))) return;
+  const i = SPOTS.indexOf(spot); if (i >= 0) SPOTS.splice(i, 1);
+  favoritos = favoritos.filter(x => x !== spot.id); guardar("favoritos", favoritos);
+  guardarMisSpots(); location.hash = "";
+}
+
+// Pasar un spot propio a un amigo: un enlace con los datos (no se guarda en ningún sitio más)
+async function pasarMiSpot(spot) {
+  const d = datosMio(spot); delete d.id;
+  const url = "https://canelowind.com/#amigo=" + encodeURIComponent(JSON.stringify(d));
+  const texto = t("ms_pasar_txt", { n: spot.nombre });
+  contar("mi-spot-pasado", "Spot propio pasado a un amigo", true);
+  if (navigator.share) {
+    try { await navigator.share({ title: "Canelo Wind · " + spot.nombre, text: texto, url }); return; }
+    catch (e) { if (e && e.name === "AbortError") return; }
+  }
+  try { await navigator.clipboard.writeText(texto + "\n" + url); avisoCorto(t("comp_copiado")); } catch (e) {}
+  window.open("https://wa.me/?text=" + encodeURIComponent(texto + "\n" + url), "_blank", "noopener");
+}
+function recibirMiSpot(texto) {
+  let d = null;
+  try { d = JSON.parse(decodeURIComponent(texto)); } catch (e) {}
+  const prueba = d && prepararPropio({ ...d, id: "x" });
+  pintarLista();
+  if (!prueba || !valido(prueba)) { avisoCorto(t("ms_mal")); history.replaceState(null, "", location.pathname + location.search); return; }
+  const ya = misSpots().find(s => s.nombre === prueba.nombre && Math.abs(s.lat - prueba.lat) < 1e-4 && Math.abs(s.lon - prueba.lon) < 1e-4);
+  if (ya) { location.hash = "spot=" + ya.id; return; }
+  const f = document.createElement("div");
+  f.className = "fondo";
+  f.innerHTML = `<div class="caja"><h3>${t("ms_recibir_tit")}</h3><p>${t("ms_recibir_txt", { n: esc(prueba.nombre) })}</p>
+    <div class="fila"><button class="btn" id="siMio">${t("ms_anadir")}</button><button class="btn sec" id="noMio">${t("ms_no")}</button></div></div>`;
+  document.body.appendChild(f);
+  f.querySelector("#noMio").onclick = () => { f.remove(); location.hash = ""; };
+  f.querySelector("#siMio").onclick = () => {
+    const s = anadirMiSpot(d); f.remove(); contar("mi-spot-recibido", "Spot propio recibido de un amigo", true);
+    vientoAhoraTodos().catch(() => {}); location.hash = "spot=" + s.id;
+  };
+}
+
+// Copia de seguridad: un archivo con tus spots (para cambiar de móvil)
+async function copiaMisSpots() {
+  const datos = JSON.stringify({ app: "canelo-wind", tipo: "mis-spots", v: 1, fecha: new Date().toISOString().slice(0, 10), spots: misSpots().map(datosMio) }, null, 1);
+  const nombre = "canelo-wind-mis-spots.json";
+  const archivo = new File([datos], nombre, { type: "application/json" });
+  if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
+    try { await navigator.share({ files: [archivo], title: "Canelo Wind · " + t("ms_seccion") }); return; }
+    catch (e) { if (e && e.name === "AbortError") return; }
+  }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(archivo); a.download = nombre;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+function recuperarMisSpots() {
+  const inp = document.createElement("input"); inp.type = "file"; inp.accept = ".json,application/json";
+  inp.onchange = async () => {
+    try {
+      const j = JSON.parse(await inp.files[0].text());
+      if (!j || j.app !== "canelo-wind" || !Array.isArray(j.spots)) throw new Error("mal");
+      let n = 0;
+      j.spots.forEach(d => {
+        const s = prepararPropio(d);
+        if (!valido(s) || misSpots().some(x => x.id === s.id || (x.nombre === s.nombre && Math.abs(x.lat - s.lat) < 1e-4 && Math.abs(x.lon - s.lon) < 1e-4))) return;
+        SPOTS.push(s); n++;
+      });
+      guardarMisSpots(); avisoCorto(t("ms_recuperados", { n })); pintarLista(); vientoAhoraTodos().then(() => { if (!location.hash) pintarLista(); }).catch(() => {});
+    } catch (e) { avisoCorto(t("ms_copia_mala")); }
+  };
+  inp.click();
+}
+
 // ---------- Navegación ----------
 function router() {
   if (location.hash === "#quedadas") { pintarQuedadas(); contar("/quedadas", "Quedadas"); return; }
+  if (location.hash.startsWith("#amigo=")) { recibirMiSpot(location.hash.slice(7)); return; }
   const m = location.hash.match(/spot=([\w-]+)/);
   const spot = m && SPOTS.find(s => s.id === m[1]);
-  if (spot) { diaElegido = 0; pintarSpot(spot); contar("/spot/" + spot.id, spot.nombre); } else pintarLista();
+  if (spot) { diaElegido = 0; pintarSpot(spot); contar(spot.propio ? "/mi-spot" : "/spot/" + spot.id, spot.propio ? "Mi spot" : spot.nombre); } else pintarLista();
 }
 window.addEventListener("hashchange", router);
 
