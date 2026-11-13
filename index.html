@@ -129,6 +129,35 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 .tipo-q { display: inline-block; background: #DCEBF5; color: #1B5378; border-radius: 6px; padding: 2px 8px; font-size: 12px; font-weight: 700; margin-right: 6px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tipo-q { background: #173247; color: #A9D3F0; } }
 .btn.peq { padding: 6px 12px; font-size: 13px; }
+/* Atajos de arriba: Quedadas · Compraventa · Mi spot */
+.atajos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.atajo { border: 0; border-radius: 14px; padding: 10px; cursor: pointer; text-align: left; color: #fff; font: inherit; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.atajo span { font-size: 24px; line-height: 1.1; }
+.atajo b { font-size: 14px; }
+.atajo small { font-size: 11px; opacity: .92; line-height: 1.2; }
+.atajo.q { background: linear-gradient(135deg, #2F7FB0, #1B5378); }
+.atajo.v { background: linear-gradient(135deg, #3AA169, #1E7247); }
+.atajo.m { background: linear-gradient(135deg, #E08A3C, #B85A22); }
+/* Compraventa */
+.lista-v { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.anuncio { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; cursor: pointer; position: relative; }
+.anuncio:hover { border-color: var(--brand); }
+.anuncio .foto { aspect-ratio: 1 / 1; background: var(--chip) center / cover no-repeat; display: flex; align-items: center; justify-content: center; font-size: 34px; }
+.anuncio .txt { padding: 8px 10px 10px; }
+.anuncio .precio { font-size: 18px; font-weight: 800; }
+.anuncio .precio small { font-size: 11px; font-weight: 600; color: var(--muted); }
+.anuncio b { display: block; font-size: 14px; line-height: 1.25; margin-top: 2px; }
+.anuncio .sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.anuncio .tuyo { position: absolute; top: 8px; left: 8px; background: var(--brand); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+.foto-grande { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: #000; border-radius: 12px; display: block; }
+.miniaturas { display: flex; gap: 6px; margin-top: 6px; }
+.miniaturas img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
+.miniaturas img.on { border-color: var(--brand); }
+.fotos-form { display: flex; gap: 8px; flex-wrap: wrap; }
+.fotos-form .f { position: relative; width: 76px; height: 76px; border-radius: 10px; background: var(--chip) center / cover; }
+.fotos-form .f button { position: absolute; top: -6px; right: -6px; width: 24px; height: 24px; border-radius: 50%; border: 0; background: #2A1E16; color: #fff; cursor: pointer; font-size: 12px; }
+.fotos-form .mas { width: 76px; height: 76px; border-radius: 10px; border: 2px dashed var(--line); background: none; color: var(--muted); font-size: 26px; cursor: pointer; }
+.btn.verde { background: #25A35A; }
 /* Mis spots (privados) */
 .banner-mio { background: linear-gradient(135deg, #E08A3C, #B85A22); box-shadow: 0 4px 14px rgba(154,68,22,.25); }
 .mapa-mio { height: 260px; border-radius: 12px; border: 1px solid var(--line); background: var(--chip); }
@@ -330,10 +359,13 @@ function pintarLista() {
   };
 
   let html = `<input class="buscar" id="buscar" placeholder="${t("buscar")}" value="${esc(textoBuscar)}">
-    <button class="banner-q" id="irQuedadas"><span style="font-size:28px">🤙</span><span><b>${t("q_banner")}</b><small id="numQ">${t("q_banner_sub")}</small></span><span class="ir">›</span></button>
+    <div class="atajos">
+      <button class="atajo q" id="irQuedadas"><span>🤙</span><b>${t("q_atajo")}</b><small id="numQ">${t("q_atajo_sub")}</small></button>
+      <button class="atajo v" id="irCompraventa"><span>🛒</span><b>${t("cv_atajo")}</b><small id="numV">${t("cv_atajo_sub")}</small></button>
+      <button class="atajo m" id="atajoMio"><span>📍</span><b>${t("ms_atajo")}</b><small>${t("ms_atajo_sub")}</small></button>
+    </div>
     <div class="chips">${regiones.map(r => `<button class="chip ${r === filtroRegion ? "on" : ""}" data-region="${esc(r)}">${r === "Todas" ? t("toda") : esc(nombreRegion(r))}</button>`).join("")}</div>
     ${islas.length > 2 ? `<div class="chips">${islas.map(i => `<button class="chip ${i === filtroIsla ? "on" : ""}" data-isla="${esc(i)}">${i === "Todas" ? t("todas") : esc(i)}</button>`).join("")}</div>` : ""}
-    ${misSpots().length ? "" : `<button class="banner-q banner-mio" id="crearMio"><span style="font-size:28px">📍</span><span><b>${t("ms_crear")}</b><small>${t("ms_crear_sub")}</small></span><span class="ir">›</span></button>`}
     <div class="chips">${deportes.map(([k, n]) => `<button class="chip ${k === filtroDeporte ? "on" : ""}" data-dep="${k}">${n}</button>`).join("")}</div>`;
   if (misSpots().length) html += `<h2 class="isla">${t("ms_seccion")}</h2>
     <div class="fila" style="margin-bottom:8px"><button class="btn peq" id="crearMio">${t("ms_crear")}</button><button class="btn sec peq" id="copiaMios">${t("ms_copia")}</button><button class="btn sec peq" id="recuperarMios">${t("ms_recuperar")}</button></div>
@@ -359,12 +391,19 @@ function pintarLista() {
   });
   document.querySelectorAll(".spot").forEach(e => e.onclick = () => { location.hash = "spot=" + e.dataset.id; });
   $("#irQuedadas").onclick = () => { location.hash = "quedadas"; };
-  $("#crearMio").onclick = () => abrirFormMiSpot();
+  $("#irCompraventa").onclick = () => { location.hash = "compraventa"; };
+  $("#atajoMio").onclick = () => abrirFormMiSpot();
+  if ($("#crearMio")) $("#crearMio").onclick = () => abrirFormMiSpot();
   if ($("#copiaMios")) { $("#copiaMios").onclick = copiaMisSpots; $("#recuperarMios").onclick = recuperarMisSpots; }
-  // Cuántas quedadas hay próximamente (si ya están cargadas o se cargan rápido)
+  // Cuántas quedadas y anuncios hay (si se cargan rápido)
   if (formListo(CONFIG.quedadas || {})) cargarQuedadas().then(l => {
     const n = proximas(l).length, e = $("#numQ");
-    if (e) e.textContent = n ? t("q_banner_n", { n }) : t("q_banner_0");
+    if (e && n) e.textContent = t("q_atajo_n", { n });
+  }).catch(() => {});
+  if (cvListo()) cargarAnuncios().then(l => {
+    const n = visiblesV(l).length, e = $("#numV");
+    if (e && n) e.textContent = t("cv_atajo_n", { n });
+    revisarMisAnuncios(l);
   }).catch(() => {});
 }
 
@@ -1096,6 +1135,277 @@ function elegirIdioma(primeraVez) {
 }
 $("#btnIdioma").onclick = () => elegirIdioma(false);
 
+// ---------- Compraventa de material de segunda mano ----------
+// Los anuncios se mandan a un Apps Script (CONFIG.compraventa.url) que guarda las fotos en Drive y apunta el anuncio en una hoja
+// pública; la app lee esa hoja (CSV). «Vendido», «Quitar» y «Renovar» van con un secreto que solo tiene el móvil del vendedor.
+const CATS_V = [0, 1, 2, 3, 4], ESTADOS_V = [0, 1, 2, 3, 4], ICONOS_V = ["🪽", "🪁", "🏄", "🧤", "📦"];
+const DIAS_V = 30, OCULTAR_V = 37;
+const cvListo = () => !!(CONFIG.compraventa && CONFIG.compraventa.url && CONFIG.compraventa.csv);
+const desdeEs = (prefijo, lista, v) => { const k = lista.find(k => TXT.es[prefijo + k] === v); return k != null ? t(prefijo + k) : v; };
+const catV = (v) => desdeEs("cv_cat", CATS_V, v), estV = (v) => desdeEs("cv_est", ESTADOS_V, v);
+const iconoV = (v) => ICONOS_V[CATS_V.find(k => TXT.es["cv_cat" + k] === v) ?? 4];
+const fotoUrl = (id, w = 800) => `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${w}`;
+const misAnuncios = () => leer("misAnuncios", []);
+const esMio = (a) => misAnuncios().some(m => m.id === a.id);
+const diasDesde = (iso) => (Date.now() - Date.parse(iso)) / 864e5;
+const precioV = (a) => (+a.precio).toLocaleString(localeIdioma()) + " €";
+let anunciosCache = null, filtroCat = "Todas", filtroZonaV = "Todas";
+
+async function cargarAnuncios(forzar) {
+  if (forzar || !anunciosCache || Date.now() - anunciosCache.t > 2 * 60 * 1000) {
+    const csv = CONFIG.compraventa.csv;
+    const r = await fetch(csv + (csv.includes("?") ? "&" : "?") + "t=" + Date.now());
+    const filas = leerCSV(await r.text());
+    const cab = (filas.shift() || []).map(h => h.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim());
+    const claves = ["publicado", "id", "categoria", "titulo", "precio", "negociable", "estado", "isla", "zona", "descripcion", "nombre", "instagram", "whatsapp", "foto1", "foto2", "foto3", "renovado", "situacion"];
+    const C = Object.fromEntries(claves.map(k => [k, cab.indexOf(k)]));
+    const lista = filas.filter(f => f.length > 1).map(f => Object.fromEntries(Object.entries(C).map(([k, i]) => [k, i >= 0 ? (f[i] || "").trim() : ""])))
+      .filter(a => a.id);
+    anunciosCache = { t: Date.now(), lista };
+  }
+  return anunciosCache.lista;
+}
+const visiblesV = (l) => l.filter(a => a.situacion === "activo" && diasDesde(a.renovado || a.publicado) < OCULTAR_V)
+  .sort((a, b) => (b.renovado || b.publicado).localeCompare(a.renovado || a.publicado));
+async function llamarCV(datos) {
+  const r = await fetch(CONFIG.compraventa.url, { method: "POST", body: JSON.stringify(datos) });
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.error || "error");
+  return j;
+}
+const haceV = (a) => { const d = Math.floor(diasDesde(a.publicado)); return d < 1 ? t("cv_hoy") : t("cv_hace", { n: d }); };
+
+function tarjetaAnuncio(a, i) {
+  const f = a.foto1 || a.foto2 || a.foto3;
+  return `<div class="anuncio" data-av="${i}">
+    <div class="foto" ${f ? `style="background-image:url('${fotoUrl(f, 500)}')"` : ""}>${f ? "" : iconoV(a.categoria)}</div>
+    ${esMio(a) ? `<span class="tuyo">${t("cv_tuyo")}</span>` : ""}
+    <div class="txt"><div class="precio">${precioV(a)}${a.negociable ? ` <small>${t("cv_negociable")}</small>` : ""}</div>
+      <b>${esc(a.titulo)}</b>
+      <div class="sub">${iconoV(a.categoria)} ${esc(estV(a.estado))}</div>
+      <div class="sub">📍 ${esc(a.isla)}${a.zona ? " · " + esc(a.zona) : ""}</div>
+      <div class="sub">${haceV(a)}</div></div>
+  </div>`;
+}
+
+async function pintarCompraventa(abrirId) {
+  window.scrollTo(0, 0);
+  $("#app").innerHTML = `<button class="volver" onclick="location.hash=''">${t("volver_lista")}</button>
+    <h2 style="margin:4px 0">${t("cv_tit")}</h2><p style="margin:4px 0 12px">${t("cv_sub")}</p>
+    <button class="btn verde" id="nuevoV">${t("cv_poner")}</button>
+    <div class="seguridad"><b>${t("cv_seg_tit")}</b>${t("cv_seg")}</div>
+    <div id="chipsV"></div>
+    <div id="listaV" style="margin-top:10px"><p class="aviso">${t("cv_cargando")}</p></div>`;
+  $("#nuevoV").onclick = () => abrirFormAnuncio();
+  const caja = $("#listaV");
+  if (!cvListo()) { caja.innerHTML = `<p class="aviso">${t("cv_no_activo")}</p>`; return; }
+  try {
+    const todos = visiblesV(await cargarAnuncios());
+    if (!location.hash.startsWith("#compraventa") && !location.hash.startsWith("#anuncio=")) return;
+    const zonas = [...new Set(todos.map(a => a.isla).filter(Boolean))].sort();
+    if (!zonas.includes(filtroZonaV)) filtroZonaV = "Todas";
+    $("#chipsV").innerHTML = `<div class="chips">${["Todas", ...CATS_V].map(k => { const v = k === "Todas" ? k : TXT.es["cv_cat" + k];
+        return `<button class="chip ${v === filtroCat ? "on" : ""}" data-cv="${esc(v)}">${k === "Todas" ? t("todos") : ICONOS_V[k] + " " + t("cv_cat" + k)}</button>`; }).join("")}</div>
+      ${zonas.length > 1 ? `<div class="chips">${["Todas", ...zonas].map(z => `<button class="chip ${z === filtroZonaV ? "on" : ""}" data-zv="${esc(z)}">${z === "Todas" ? t("toda") : esc(z)}</button>`).join("")}</div>` : ""}`;
+    document.querySelectorAll("[data-cv]").forEach(b => b.onclick = () => { filtroCat = b.dataset.cv; pintarCompraventa(); });
+    document.querySelectorAll("[data-zv]").forEach(b => b.onclick = () => { filtroZonaV = b.dataset.zv; pintarCompraventa(); });
+    const l = todos.filter(a => (filtroCat === "Todas" || a.categoria === filtroCat) && (filtroZonaV === "Todas" || a.isla === filtroZonaV));
+    caja.innerHTML = l.length ? `<div class="lista-v">${l.map(tarjetaAnuncio).join("")}</div>` : `<p class="aviso">${t("cv_ninguno")}</p>`;
+    caja.querySelectorAll("[data-av]").forEach(e => e.onclick = () => abrirAnuncio(l[+e.dataset.av]));
+    if (abrirId) {
+      const a = (await cargarAnuncios()).find(x => x.id === abrirId);
+      if (a && visiblesV([a]).length) abrirAnuncio(a); else avisoCorto(t("cv_ya_no"));
+    }
+  } catch (e) { caja.innerHTML = `<p class="aviso">${t("cv_error")}</p>`; }
+}
+
+function abrirAnuncio(a) {
+  if (document.querySelector(".fondo")) return;
+  const fotos = [a.foto1, a.foto2, a.foto3].filter(Boolean);
+  const mio = misAnuncios().find(m => m.id === a.id);
+  const insta = limpiaInsta(a.instagram), wa = (a.whatsapp || "").replace(/[^\d]/g, "");
+  const textoWa = t("cv_wa_txt", { n: a.titulo });
+  const f = document.createElement("div");
+  f.className = "fondo";
+  f.innerHTML = `<div class="caja">
+    ${fotos.length ? `<img class="foto-grande" id="fotoG" src="${fotoUrl(fotos[0], 1200)}" alt="">
+      ${fotos.length > 1 ? `<div class="miniaturas">${fotos.map((x, i) => `<img src="${fotoUrl(x, 200)}" data-fi="${i}" class="${i ? "" : "on"}" alt="">`).join("")}</div>` : ""}` : ""}
+    <div class="precio" style="font-size:24px;font-weight:800;margin-top:10px">${precioV(a)}${a.negociable ? ` <small style="font-size:13px;color:var(--muted)">${t("cv_negociable")}</small>` : ""}</div>
+    <h3 style="margin:2px 0 6px">${esc(a.titulo)}</h3>
+    <div><span class="etq">${iconoV(a.categoria)} ${esc(catV(a.categoria))}</span><span class="etq">${esc(estV(a.estado))}</span><span class="etq">📍 ${esc(a.isla)}${a.zona ? " · " + esc(a.zona) : ""}</span></div>
+    ${a.descripcion ? `<p style="white-space:pre-wrap;margin:10px 0">${esc(a.descripcion)}</p>` : ""}
+    <div class="aviso">${t("cv_vende")}: <b>${esc(a.nombre || t("anonimo"))}</b> · ${haceV(a)}</div>
+    <div class="fila" style="margin-top:10px">
+      ${insta ? `<a class="btn" style="text-decoration:none" href="https://www.instagram.com/${insta}/" target="_blank" rel="noopener">📸 @${esc(insta)}</a>` : ""}
+      ${wa ? `<a class="btn verde" style="text-decoration:none" href="https://wa.me/${wa}?text=${encodeURIComponent(textoWa)}" target="_blank" rel="noopener">💬 WhatsApp</a>` : ""}
+      <button class="btn sec" id="compartirV">📤 ${t("q_compartir")}</button>
+    </div>
+    ${mio ? `<div class="caja" style="margin-top:12px;background:var(--bg)"><b>${t("cv_tu_anuncio")}</b>
+      <div class="fila" style="margin-top:8px"><button class="btn verde peq" id="vendidoV">${t("cv_vendido")}</button><button class="btn sec peq" id="renovarV">${t("cv_renovar")}</button><button class="btn sec peq" id="quitarV">${t("cv_quitar")}</button></div>
+      <div id="msgV"></div></div>` : ""}
+    <div class="aviso" style="margin-top:10px">${t("cv_seg_corto")}</div>
+    <button class="btn sec" id="cerrarV" style="margin-top:10px">${t("cerrar")}</button>
+  </div>`;
+  document.body.appendChild(f);
+  const cerrar = () => f.remove();
+  f.onclick = (e) => { if (e.target === f) cerrar(); };
+  f.querySelector("#cerrarV").onclick = cerrar;
+  f.querySelectorAll("[data-fi]").forEach(m => m.onclick = () => {
+    f.querySelector("#fotoG").src = fotoUrl(fotos[+m.dataset.fi], 1200);
+    f.querySelectorAll("[data-fi]").forEach(x => x.classList.toggle("on", x === m));
+  });
+  f.querySelector("#compartirV").onclick = () => compartirAnuncio(a);
+  if (mio) {
+    const accion = async (datos, okTxt) => {
+      f.querySelectorAll("#vendidoV,#renovarV,#quitarV").forEach(b => b.disabled = true);
+      try {
+        await llamarCV({ ...datos, id: a.id, secreto: mio.secreto });
+        if (datos.accion === "quitar") guardar("misAnuncios", misAnuncios().filter(m => m.id !== a.id));
+        anunciosCache = null; avisoCorto(okTxt); cerrar();
+        if (location.hash.startsWith("#compraventa")) pintarCompraventa(); else location.hash = "compraventa";
+      } catch (e) {
+        f.querySelector("#msgV").innerHTML = `<div class="msg">${t("err_envio")}</div>`;
+        f.querySelectorAll("#vendidoV,#renovarV,#quitarV").forEach(b => b.disabled = false);
+      }
+    };
+    f.querySelector("#vendidoV").onclick = () => accion({ accion: "quitar", vendido: true }, t("cv_ok_vendido"));
+    f.querySelector("#quitarV").onclick = () => { if (confirm(t("cv_quitar_conf"))) accion({ accion: "quitar", vendido: false }, t("cv_ok_quitado")); };
+    f.querySelector("#renovarV").onclick = () => accion({ accion: "renovar" }, t("cv_ok_renovado"));
+  }
+}
+
+async function compartirAnuncio(a) {
+  const url = "https://canelowind.com/#anuncio=" + a.id;
+  const texto = t("cv_compartir_txt", { n: a.titulo, p: precioV(a), z: a.isla });
+  contar("compartir-anuncio", "Anuncio compartido", true);
+  if (navigator.share) {
+    try { await navigator.share({ title: "Canelo Wind · " + a.titulo, text: texto, url }); return; }
+    catch (e) { if (e && e.name === "AbortError") return; }
+  }
+  try { await navigator.clipboard.writeText(texto + "\n" + url); avisoCorto(t("comp_copiado")); } catch (e) {}
+  window.open("https://wa.me/?text=" + encodeURIComponent(texto + "\n" + url), "_blank", "noopener");
+}
+
+// Achica una foto del móvil (máx. 1280 px, JPEG) antes de subirla
+function achicarFoto(archivo) {
+  return new Promise((ok, mal) => {
+    const img = new Image(), u = URL.createObjectURL(archivo);
+    img.onload = () => {
+      const k = Math.min(1, 1280 / Math.max(img.width, img.height));
+      const c = document.createElement("canvas"); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u);
+      ok(c.toDataURL("image/jpeg", 0.78));
+    };
+    img.onerror = () => { URL.revokeObjectURL(u); mal(new Error("foto")); };
+    img.src = u;
+  });
+}
+
+function abrirFormAnuncio() {
+  if (document.querySelector(".fondo")) return;
+  const publicos = SPOTS.filter(s => !s.propio);
+  const regiones = [...new Set(publicos.map(regionDe))];
+  const zonas = regiones.map(r => `<optgroup label="${esc(nombreRegion(r))}">${[...new Set(publicos.filter(s => regionDe(s) === r).map(s => s.isla))].sort()
+    .map(i => `<option value="${esc(i)}">${esc(i)}</option>`).join("")}</optgroup>`).join("");
+  const fotos = [];
+  const f = document.createElement("div");
+  f.className = "fondo";
+  f.innerHTML = `<div class="caja"><h3>${t("cv_form_tit")}</h3>
+    <p class="aviso" style="margin-top:-4px">${t("cv_publico")}</p>
+    <div class="form" id="fV">
+      <label class="ancho">${t("cv_f_fotos")}<span class="fotos-form" id="fotosV"></span></label>
+      <label>${t("cv_f_cat")}<select name="categoria">${CATS_V.map(k => `<option value="${esc(TXT.es["cv_cat" + k])}">${ICONOS_V[k]} ${esc(t("cv_cat" + k))}</option>`).join("")}</select></label>
+      <label>${t("cv_f_estado")}<select name="estado">${ESTADOS_V.map(k => `<option value="${esc(TXT.es["cv_est" + k])}" ${k === 2 ? "selected" : ""}>${esc(t("cv_est" + k))}</option>`).join("")}</select></label>
+      <label class="ancho">${t("cv_f_titulo")}<input name="titulo" maxlength="80" placeholder="${t("cv_ph_titulo")}"></label>
+      <label>${t("cv_f_precio")}<input name="precio" type="number" min="0" max="100000" inputmode="numeric" placeholder="${t("ph_ej")} 450"></label>
+      <label style="flex-direction:row;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" name="negociable"> ${t("cv_negociable")}</label>
+      <label>${t("cv_f_isla")}<select name="isla"><option value="">—</option>${zonas}</select></label>
+      <label>${t("cv_f_zona")}<input name="zona" maxlength="60" placeholder="${t("cv_ph_zona")}"></label>
+      <label class="ancho">${t("cv_f_desc")}<textarea name="descripcion" rows="4" maxlength="1000" placeholder="${t("cv_ph_desc")}"></textarea></label>
+      <label>${t("f_nombre")}<input name="nombre" maxlength="40" value="${esc(leer("nombre", ""))}"></label>
+      <label>${t("q_f_insta")}<input name="instagram" maxlength="40" placeholder="@usuario" value="${esc(leer("instagram", ""))}"></label>
+      <label class="ancho">${t("cv_f_wa")}<input name="whatsapp" type="tel" maxlength="20" placeholder="${t("ph_ej")} +34 600 000 000"><span class="aviso" style="margin:2px 0 0">${t("cv_wa_aviso")}</span></label>
+      <div class="ancho fila"><button class="btn verde" id="publicarV">${t("cv_publicar")}</button><button class="btn sec" id="cerrarFV">${t("cancelar")}</button></div>
+    </div><div id="msgFV"></div></div>`;
+  document.body.appendChild(f);
+  const cerrar = () => f.remove();
+  f.onclick = (e) => { if (e.target === f) cerrar(); };
+  f.querySelector("#cerrarFV").onclick = cerrar;
+  const msg = (x) => { f.querySelector("#msgFV").innerHTML = x ? `<div class="msg">${x}</div>` : ""; };
+  const pintarFotos = () => {
+    const c = f.querySelector("#fotosV");
+    c.innerHTML = fotos.map((x, i) => `<span class="f" style="background-image:url('${x}')"><button type="button" data-qf="${i}">✕</button></span>`).join("") +
+      (fotos.length < 3 ? `<button type="button" class="mas" id="masFoto">📷</button>` : "");
+    c.querySelectorAll("[data-qf]").forEach(b => b.onclick = (e) => { e.preventDefault(); fotos.splice(+b.dataset.qf, 1); pintarFotos(); });
+    const m = c.querySelector("#masFoto");
+    if (m) m.onclick = (e) => {
+      e.preventDefault();
+      const inp = document.createElement("input"); inp.type = "file"; inp.accept = "image/*"; inp.multiple = true;
+      inp.onchange = async () => {
+        msg(t("cv_preparando"));
+        for (const a of [...inp.files].slice(0, 3 - fotos.length)) { try { fotos.push(await achicarFoto(a)); } catch (er) {} }
+        msg(""); pintarFotos();
+      };
+      inp.click();
+    };
+  };
+  pintarFotos();
+  f.querySelector("#publicarV").onclick = async () => {
+    const F = f.querySelector("#fV");
+    const v = (n) => F.querySelector(`[name=${n}]`).value.trim();
+    const datos = { categoria: v("categoria"), estado: v("estado"), titulo: v("titulo"), precio: v("precio"), negociable: F.querySelector("[name=negociable]").checked,
+      isla: v("isla"), zona: v("zona"), descripcion: v("descripcion"), nombre: v("nombre"), instagram: limpiaInsta(v("instagram")), whatsapp: v("whatsapp").replace(/[^\d+]/g, "") };
+    if (!fotos.length) return msg(t("cv_falta_foto"));
+    if (!datos.titulo || datos.precio === "" || !(+datos.precio >= 0) || !datos.isla || !datos.nombre) return msg(t("cv_falta"));
+    if (!datos.instagram && datos.whatsapp.replace(/\D/g, "").length < 9) return msg(t("cv_falta_contacto"));
+    if (!cvListo()) return msg(t("cv_no_activo"));
+    guardar("nombre", datos.nombre); if (datos.instagram) guardar("instagram", datos.instagram);
+    const b = f.querySelector("#publicarV"); b.disabled = true; msg(t("cv_subiendo"));
+    const secreto = [...crypto.getRandomValues(new Uint8Array(18))].map(x => x.toString(16).padStart(2, "0")).join("");
+    try {
+      const r = await llamarCV({ accion: "publicar", secreto, ...datos, precio: Math.round(+datos.precio), fotos });
+      guardar("misAnuncios", [...misAnuncios(), { id: r.id, secreto, titulo: datos.titulo }]);
+      contar("anuncio-publicado", "Anuncio publicado · " + datos.categoria, true);
+      anunciosCache = null;
+      F.remove();
+      msg(t("cv_ok"));
+      f.querySelector("#msgFV").insertAdjacentHTML("beforeend", `<div style="margin-top:10px"><button class="btn sec" id="cerrar3">${t("cerrar")}</button></div>`);
+      f.querySelector("#cerrar3").onclick = () => { cerrar(); if (location.hash === "#compraventa") pintarCompraventa(); else location.hash = "compraventa"; };
+    } catch (e) { b.disabled = false; msg(t("cv_err_publicar")); }
+  };
+}
+
+// A los 30 días, al abrir la app, se pregunta al vendedor si su anuncio sigue disponible
+function revisarMisAnuncios(lista) {
+  const mios = misAnuncios(); if (!mios.length) return;
+  // Olvidar los que ya no están activos (vendidos, quitados o borrados de la hoja)
+  const vivos = mios.filter(m => { const a = lista.find(x => x.id === m.id); return a && a.situacion === "activo"; });
+  if (vivos.length !== mios.length) guardar("misAnuncios", vivos);
+  try { if (sessionStorage.getItem("cw_aviso_v")) return; } catch (e) {}
+  const viejo = vivos.map(m => ({ m, a: lista.find(x => x.id === m.id) })).find(x => diasDesde(x.a.renovado || x.a.publicado) >= DIAS_V);
+  if (!viejo || document.querySelector(".fondo")) return;
+  try { sessionStorage.setItem("cw_aviso_v", "1"); } catch (e) {}
+  const { m, a } = viejo;
+  const oculto = diasDesde(a.renovado || a.publicado) >= OCULTAR_V;
+  const f = document.createElement("div");
+  f.className = "fondo";
+  f.innerHTML = `<div class="caja"><h3>${t("cv_aviso_tit")}</h3>
+    <p>${t(oculto ? "cv_aviso_oculto" : "cv_aviso_txt", { n: esc(a.titulo) })}</p>
+    <div class="fila"><button class="btn verde" id="sigueV">${t("cv_sigue")}</button><button class="btn sec" id="vendiV">${t("cv_vendi")}</button><button class="btn sec" id="luegoV">${t("cv_luego")}</button></div>
+    <div id="msgAV"></div></div>`;
+  document.body.appendChild(f);
+  const hacer = async (datos, okTxt) => {
+    try {
+      await llamarCV({ ...datos, id: a.id, secreto: m.secreto });
+      if (datos.accion === "quitar") guardar("misAnuncios", misAnuncios().filter(x => x.id !== a.id));
+      anunciosCache = null; f.remove(); avisoCorto(okTxt);
+    } catch (e) { f.querySelector("#msgAV").innerHTML = `<div class="msg">${t("err_envio")}</div>`; }
+  };
+  f.querySelector("#sigueV").onclick = () => hacer({ accion: "renovar" }, t("cv_ok_renovado"));
+  f.querySelector("#vendiV").onclick = () => hacer({ accion: "quitar", vendido: true }, t("cv_ok_vendido"));
+  f.querySelector("#luegoV").onclick = () => f.remove();
+}
+
 // ---------- Mis spots: spots privados que solo ve quien los crea (se guardan en el móvil) ----------
 const MIS = "Mis spots";
 const misSpots = () => SPOTS.filter(s => s.propio);
@@ -1282,6 +1592,8 @@ function recuperarMisSpots() {
 function router() {
   if (location.hash === "#quedadas") { pintarQuedadas(); contar("/quedadas", "Quedadas"); return; }
   if (location.hash.startsWith("#amigo=")) { recibirMiSpot(location.hash.slice(7)); return; }
+  if (location.hash === "#compraventa") { pintarCompraventa(); contar("/compraventa", "Compraventa"); return; }
+  if (location.hash.startsWith("#anuncio=")) { pintarCompraventa(location.hash.slice(9).replace(/[^\w]/g, "")); contar("/compraventa", "Compraventa"); return; }
   const m = location.hash.match(/spot=([\w-]+)/);
   const spot = m && SPOTS.find(s => s.id === m[1]);
   if (spot) { diaElegido = 0; pintarSpot(spot); contar(spot.propio ? "/mi-spot" : "/spot/" + spot.id, spot.propio ? "Mi spot" : spot.nombre); } else pintarLista();
@@ -1294,12 +1606,12 @@ $("#btnUnidad").onclick = () => {
   const orden = ["kn", "kmh", "ms"]; unidad = orden[(orden.indexOf(unidad) + 1) % 3];
   guardar("unidad", unidad); $("#btnUnidad").textContent = UNIDADES[unidad].t;
   const m = location.hash.match(/spot=([\w-]+)/); const spot = m && SPOTS.find(s => s.id === m[1]);
-  if (spot && cache[spot.id]) dibujarSpot(spot); else if (location.hash === "#quedadas") pintarQuedadas(); else pintarLista();
+  if (spot && cache[spot.id]) dibujarSpot(spot); else if (!location.hash || location.hash === "#") pintarLista(); else router();
 };
 
 router();
 try { if (esAppInstalada() && !sessionStorage.getItem("cw_contada")) { sessionStorage.setItem("cw_contada", "1"); contar("instalada", "Abierta desde la pantalla de inicio (app instalada)", true); } } catch (e) {}
-vientoAhoraTodos().then(() => { if (!location.hash.includes("spot=") && location.hash !== "#quedadas") pintarLista(); }).catch(() => {});
+vientoAhoraTodos().then(() => { if (!location.hash || location.hash === "#") pintarLista(); }).catch(() => {});
 </script>
 </body>
 </html>

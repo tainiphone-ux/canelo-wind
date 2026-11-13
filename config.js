@@ -31,4 +31,11 @@ const CONFIG = {
     // https://docs.google.com/spreadsheets/d/1oWLK1FuFxtALufOAgx3MjHBRbiwfRbdrKqwGl4DalmU/edit
     csv: "https://docs.google.com/spreadsheets/d/1oWLK1FuFxtALufOAgx3MjHBRbiwfRbdrKqwGl4DalmU/gviz/tq?tqx=out:csv&gid=1659135050",
   },
+  compraventa: {
+    // Apps Script «Canelo Wind · Compraventa» (herramientas/compraventa.gs) publicado como aplicación web, en la cuenta de Canelo Wind
+    url: "https://script.google.com/macros/s/AKfycbyJZtasKovoWkXi-CBbN3HVX0HLet34yxjPDtEs6-XMU_8s4lViCZhzIK_a4BNx-_tcQg/exec",
+    // Hoja «Canelo Wind · Compraventa (anuncios)», pública (solo ver). Para quitar un anuncio a mano: poner «quitado» en Situacion.
+    // https://docs.google.com/spreadsheets/d/1NcVPxSYAmA_v82nVE6CPZ_Vu7u2QM24k10SNYLa_Tyo/edit
+    csv: "https://docs.google.com/spreadsheets/d/1NcVPxSYAmA_v82nVE6CPZ_Vu7u2QM24k10SNYLa_Tyo/gviz/tq?tqx=out:csv&gid=0",
+  },
 };
