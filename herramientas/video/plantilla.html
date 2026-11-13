@@ -1,0 +1,79 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<!-- Vídeo vertical estilo Canelo Wind: fondo canela, móvil en el centro y título arriba.
+     Las escenas van en escenas.js (window.CFG), junto con las capturas (PNG de 1290×2796) y icono.png. -->
+<script src="escenas.js"></script>
+<script>
+const W = 1080, H = 1920, c = document.getElementById("c"), g = c.getContext("2d");
+const { imgs, E, FIN, FINAL, entra: ENTRA = 5.4, portada: P, final: F } = window.CFG;
+const nombres = [...imgs, "icono"]; const I = {};
+const SX = 220, SY = 470, SW = 640, SC = SW / 430, SH = SW * 2796 / 1290;
+const ease = (x) => (x < 0 ? 0 : x > 1 ? 1 : 1 - Math.pow(1 - x, 3));
+function rr(x, y, w, h, r) { g.beginPath(); g.roundRect(x, y, w, h, r); }
+function fondo() {
+  const gr = g.createLinearGradient(0, 0, W, H); gr.addColorStop(0, "#E08A3C"); gr.addColorStop(1, "#9A4416"); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  g.globalAlpha = 0.12; g.strokeStyle = "#fff"; g.lineWidth = 10; g.lineCap = "round"; g.beginPath(); g.moveTo(60, 1880); g.lineTo(420, 1880); g.moveTo(700, 1890); g.lineTo(1020, 1890); g.stroke(); g.globalAlpha = 1;
+}
+function texto(t, x, y, size, col, peso = "800", al = "center", maxW = 980) {
+  g.font = `${peso} ${size}px -apple-system, "Helvetica Neue", sans-serif`; g.fillStyle = col; g.textAlign = al; g.textBaseline = "alphabetic";
+  const L = []; let lin = ""; for (const p of t.split(" ")) { const pr = lin ? lin + " " + p : p; if (g.measureText(pr).width > maxW && lin) { L.push(lin); lin = p; } else lin = pr; } L.push(lin);
+  L.forEach((l, i) => g.fillText(l, x, y + i * size * 1.15)); return L.length;
+}
+function marco(alpha = 1, dy = 0) { g.save(); g.globalAlpha = alpha; g.shadowColor = "rgba(0,0,0,.35)"; g.shadowBlur = 60; g.shadowOffsetY = 30; rr(SX - 20, SY - 20 + dy, SW + 40, SH + 40, 90); g.fillStyle = "#111"; g.fill(); g.restore(); }
+function pantalla(fn, alpha = 1, dy = 0) { g.save(); g.globalAlpha = alpha; rr(SX, SY + dy, SW, SH, 72); g.clip(); fn(); g.restore(); }
+const img = (n, oy = 0, dy = 0) => g.drawImage(I[n], SX, SY + oy + dy, SW, SH);
+function dedo(x, y, tt) {
+  const px = SX + x * SC, py = SY + y * SC; if (tt < -1.2 || tt > 0.9) return;
+  const ap = ease((tt + 1.2) / 0.6), sal = tt > 0.4 ? 1 - ease((tt - 0.4) / 0.5) : 1, ox = (1 - ap) * 120, oy = (1 - ap) * 160;
+  if (tt >= 0 && tt < 0.7) { const k = tt / 0.7; g.beginPath(); g.arc(px, py, 30 + k * 70, 0, 7); g.strokeStyle = `rgba(255,255,255,${0.9 * (1 - k)})`; g.lineWidth = 8; g.stroke(); }
+  g.save(); g.globalAlpha = Math.min(ap, sal); const pr = tt >= 0 && tt < 0.25 ? 0.85 : 1; g.beginPath(); g.arc(px + ox, py + oy, 38 * pr, 0, 7); g.fillStyle = "rgba(255,255,255,.55)"; g.fill(); g.lineWidth = 5; g.strokeStyle = "rgba(0,0,0,.35)"; g.stroke(); g.restore();
+}
+function cabecera(tit, sub, a) { g.save(); g.globalAlpha = a; const n = texto(tit, W / 2, 170, 84, "#fff"); texto(sub, W / 2, 170 + n * 97 + 20, 40, "#FFF1DC", "600"); g.restore(); }
+function portada(a, t) {
+  g.save(); g.globalAlpha = a; const s = 1 + 0.04 * Math.sin(t * 2);
+  g.save(); g.translate(W / 2, 560); g.scale(s, s); g.shadowColor = "rgba(0,0,0,.3)"; g.shadowBlur = 50; g.save(); rr(-170, -170, 340, 340, 76); g.clip(); g.drawImage(I.icono, -170, -170, 340, 340); g.restore(); g.restore();
+  const n = texto(P.titulo, W / 2, 960, 100, "#fff", "900", "center", 980);
+  const k = ease((t - 0.8) / 0.7); g.save(); g.globalAlpha = a * k; texto(P.sub, W / 2, 960 + n * 115 + 20 + (1 - k) * 30, 60, "#FFF1DC", "800", "center", 960); g.restore();
+  const np = P.pills.length, pw = np > 3 ? 230 : 290, gap = np > 3 ? 20 : 20, x0 = W / 2 - (np * pw + (np - 1) * gap) / 2;
+  P.pills.forEach((p, i) => { const kk = ease((t - 1.6 - i * 0.4) / 0.5); g.save(); g.globalAlpha = a * kk; const x = x0 + i * (pw + gap);
+    rr(x, 1330 + (1 - kk) * 30, pw, 96, 48); g.fillStyle = "rgba(255,255,255,.2)"; g.fill(); texto(p, x + pw / 2, 1394 + (1 - kk) * 30, 42, "#fff", "700"); g.restore(); });
+  g.restore();
+}
+function final(a, t) {
+  g.save(); g.globalAlpha = a; g.save(); g.shadowColor = "rgba(0,0,0,.3)"; g.shadowBlur = 50; rr(W / 2 - 150, 300, 300, 300, 68); g.clip(); g.drawImage(I.icono, W / 2 - 150, 300, 300, 300); g.restore();
+  texto(F.titulo, W / 2, 760, 84, "#fff", "900", "center", 960);
+  F.lineas.forEach((l, i) => { const k = ease((t - FINAL - 0.6 - i * 0.35) / 0.5); g.save(); g.globalAlpha = a * k; texto(l, W / 2 + (1 - k) * 40, 1040 + i * 78, 50, "#FFF1DC", "700"); g.restore(); });
+  const k2 = ease((t - FINAL - 2.6) / 0.6); g.save(); g.globalAlpha = a * k2; rr(W / 2 - 330, 1460, 660, 130, 36); g.fillStyle = "#fff"; g.fill(); texto("canelowind.com", W / 2, 1548, 66, "#9A4416", "900");
+  texto(F.pie, W / 2, 1700, 46, "#fff", "700"); g.restore(); g.restore();
+}
+function dibuja(t) {
+  fondo();
+  if (t < ENTRA + 1.2) portada(t < ENTRA ? 1 : 1 - ease((t - ENTRA) / 0.6), t);
+  if (t >= ENTRA && t < FINAL + 0.8) {
+    const entra = ease((t - ENTRA) / 0.8), dy = (1 - entra) * 300;
+    let i = E.findIndex((e) => t >= e[0] && t < e[1]); if (i < 0) i = t < E[0][0] ? 0 : E.length - 1; const e = E[i];
+    marco(entra, dy);
+    const dt = t - e[0];
+    pantalla(() => {
+      if (i > 0 && e[6] === "sube" && dt < 0.7) { const k = ease(dt / 0.7); img(E[i - 1][2], -k * SH * 0.6); g.globalAlpha = k; img(e[2], (1 - k) * SH * 0.6); }
+      else if (i > 0 && dt < 0.5 && E[i - 1][2] !== e[2]) { img(E[i - 1][2]); g.globalAlpha = ease(dt / 0.5); img(e[2]); }
+      else img(e[2], 0, dy);
+    }, entra);
+    if (e[5]) dedo(e[5].x, e[5].y, t - e[5].t);
+    const fa = Math.min(1, dt / 0.4), fo = t > FINAL - 0.2 ? 1 - ease((t - (FINAL - 0.2)) / 0.6) : 1;
+    cabecera(e[3], e[4], fa * fo * entra);
+    if (t > FINAL - 0.2) { g.save(); g.globalAlpha = ease((t - (FINAL - 0.2)) / 0.6); fondo(); g.restore(); }
+  }
+  if (t >= FINAL) final(ease((t - FINAL) / 0.6), t);
+}
+const carga = () => Promise.all(nombres.map((n) => new Promise((r) => { const im = new Image(); im.onload = r; im.onerror = r; im.src = n + ".png"; I[n] = im; })));
+async function main() {
+  await carga();
+  const tipos = ["video/mp4;codecs=avc1.640028", "video/mp4;codecs=avc1", "video/mp4", "video/webm;codecs=vp9"]; const tipo = tipos.find((x) => MediaRecorder.isTypeSupported(x)); window.__tipo = tipo;
+  const st = c.captureStream(30); const rec = new MediaRecorder(st, { mimeType: tipo, videoBitsPerSecond: 8e6 }); const tr = []; rec.ondataavailable = (e) => e.data.size && tr.push(e.data);
+  rec.onstop = async () => { const b = new Blob(tr, { type: tipo }); const fr = new FileReader(); fr.onload = () => { window.__video = fr.result.split(",")[1]; window.__done = true; }; fr.readAsDataURL(b); };
+  dibuja(0); rec.start(1000); const t0 = performance.now();
+  const paso = () => { const t = (performance.now() - t0) / 1000; dibuja(Math.min(t, FIN)); if (t < FIN) setTimeout(paso, 1000 / 30); else setTimeout(() => rec.stop(), 300); }; paso();
+}
+if (!location.hash.includes("foto")) main(); else carga().then(() => { dibuja(parseFloat(location.hash.split("=")[1])); window.__done = true; });
+</script></body></html>
