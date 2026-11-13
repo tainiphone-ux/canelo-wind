@@ -37,4 +37,4 @@ X: 🛒 Compra y vende material de segunda mano de wing, kite y windsurf en Cane
 ## Programado (13-11-2026)
 - Quedadas: sábado 14-11-2026 19:00 en Metricool (Instagram, Facebook, TikTok, YouTube) y en x.com.
 - Compraventa: lunes 16-11-2026 19:00 en Metricool (las 4) y en x.com.
-- OJO: la voz de Siri leía mal «downwind»; en el texto de `say` se escribe «dáun-uind». El vídeo de Quedadas se rehízo con la voz corregida DESPUÉS de programarlo: hay que cambiar el vídeo en la publicación del sábado (Metricool y X) por el nuevo `redes/videos/quedadas-720.mp4`.
+- La voz de Siri leía mal «downwind» (en el texto de `say` se escribe «dáun-uind»). El vídeo de Quedadas se rehízo y se cambió en la publicación del sábado en Metricool y en X (13-11-2026).
