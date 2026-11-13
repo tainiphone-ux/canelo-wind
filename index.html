@@ -1152,7 +1152,7 @@ const misAnuncios = () => leer("misAnuncios", []);
 const esMio = (a) => misAnuncios().some(m => m.id === a.id);
 const diasDesde = (iso) => (Date.now() - Date.parse(iso)) / 864e5;
 const precioV = (a) => (+a.precio).toLocaleString(localeIdioma()) + " €";
-let anunciosCache = null, filtroCat = "Todas", filtroZonaV = "Todas";
+let anunciosCache = null, filtroCat = "Todas", filtroZonaV = "Todas", textoBuscarV = "";
 
 async function cargarAnuncios(forzar) {
   if (forzar || !anunciosCache || Date.now() - anunciosCache.t > 2 * 60 * 1000) {
@@ -1197,9 +1197,12 @@ async function pintarCompraventa(abrirId) {
     <h2 style="margin:4px 0">${t("cv_tit")}</h2><p style="margin:4px 0 12px">${t("cv_sub")}</p>
     <button class="btn verde" id="nuevoV">${t("cv_poner")}</button>
     <div class="seguridad"><b>${t("cv_seg_tit")}</b>${t("cv_seg")}</div>
+    <input class="buscar" id="buscarV" placeholder="${t("cv_buscar")}" value="${esc(textoBuscarV)}">
     <div id="chipsV"></div>
     <div id="listaV" style="margin-top:10px"><p class="aviso">${t("cv_cargando")}</p></div>`;
   $("#nuevoV").onclick = () => abrirFormAnuncio();
+  const bV = $("#buscarV");
+  bV.oninput = () => { textoBuscarV = bV.value; pintarCompraventa(); const n = $("#buscarV"); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } };
   const caja = $("#listaV");
   if (!cvListo()) { caja.innerHTML = `<p class="aviso">${t("cv_no_activo")}</p>`; return; }
   try {
@@ -1212,8 +1215,10 @@ async function pintarCompraventa(abrirId) {
       ${zonas.length > 1 ? `<div class="chips">${["Todas", ...zonas].map(z => `<button class="chip ${z === filtroZonaV ? "on" : ""}" data-zv="${esc(z)}">${z === "Todas" ? t("toda") : esc(z)}</button>`).join("")}</div>` : ""}`;
     document.querySelectorAll("[data-cv]").forEach(b => b.onclick = () => { filtroCat = b.dataset.cv; pintarCompraventa(); });
     document.querySelectorAll("[data-zv]").forEach(b => b.onclick = () => { filtroZonaV = b.dataset.zv; pintarCompraventa(); });
-    const l = todos.filter(a => (filtroCat === "Todas" || a.categoria === filtroCat) && (filtroZonaV === "Todas" || a.isla === filtroZonaV));
-    caja.innerHTML = l.length ? `<div class="lista-v">${l.map(tarjetaAnuncio).join("")}</div>` : `<p class="aviso">${t("cv_ninguno")}</p>`;
+    const qV = textoBuscarV.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    const l = todos.filter(a => (filtroCat === "Todas" || a.categoria === filtroCat) && (filtroZonaV === "Todas" || a.isla === filtroZonaV) &&
+      (!qV || (a.titulo + " " + a.descripcion + " " + a.zona + " " + a.isla).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").includes(qV)));
+    caja.innerHTML = l.length ? `<div class="lista-v">${l.map(tarjetaAnuncio).join("")}</div>` : `<p class="aviso">${t(qV ? "cv_sin_resultados" : "cv_ninguno")}</p>`;
     caja.querySelectorAll("[data-av]").forEach(e => e.onclick = () => abrirAnuncio(l[+e.dataset.av]));
     if (abrirId) {
       const a = (await cargarAnuncios()).find(x => x.id === abrirId);
