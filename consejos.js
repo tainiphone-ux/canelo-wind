@@ -14,6 +14,10 @@ const CONSEJOS = {
     ],
     seguridad: "Con viento del NE el viento es de lado y algo hacia fuera (side-off) en parte de la bahía: si rompes material, la corriente te aleja hacia mar abierto. No salgas solo y avisa a alguien en tierra.",
   },
+  "la-jaquita": {
+    consejos: ["Entrada al agua más fácil que en el centro de El Médano.", "Junto al hotel hay sombra de viento: aléjate un poco de la orilla para salir del rebufo.", "Fuera hay mar de fondo para surfear con el foil."],
+    seguridad: "Hay rocas en algunos tramos de la orilla y algo de corriente fuera: entra por la zona de arena y con foil cuidado con el fondo al salir y al volver.",
+  },
   "el-cabezo": {
     consejos: [
       "Usa escarpines: el fondo es de roca.",

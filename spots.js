@@ -31,8 +31,24 @@ const SPOTS = [
     ],
   },
   {
+    id: "la-jaquita", nombre: "La Jaquita", isla: "Tenerife", zona: "El Médano",
+    lat: 28.047, lon: -16.531, deportes: ["wing"],
+    buenos: ["NE", "E", "N"], nivel: "Intermedio / avanzado",
+    nota: "Playa a barlovento de El Médano, pasado el hotel. Entrada al agua más cómoda que en el centro y, fuera de la sombra del hotel, mar de fondo para surfear con el foil.",
+    anemometros: [
+      { nombre: "Estación de El Cabezo (bergfex) · viento en directo", url: "https://cabezo.bergfex.at/" },
+      { nombre: "Azul Kiteboarding · cámara y anemómetro El Médano", url: "https://www.azulkiteboarding.com/es/el-medano-live" },
+      { nombre: "Windfinder · El Médano", url: "https://www.windfinder.com/report/el_medano" },
+      ESTACIONES.tfs,
+    ],
+    webcams: [
+      { nombre: "Skyline · Surf y kite El Médano", url: "https://www.skylinewebcams.com/es/webcam/espana/canarias/santa-cruz-de-tenerife/surf-kitesurf-medano.html" },
+      { nombre: "Windfinder · webcams El Médano", url: "https://www.windfinder.com/webcams/el_medano" },
+    ],
+  },
+  {
     id: "el-cabezo", nombre: "El Cabezo", isla: "Tenerife", zona: "El Médano",
-    lat: 28.052, lon: -16.522, deportes: ["windsurf", "wing"],
+    lat: 28.052, lon: -16.522, deportes: ["windsurf"],
     buenos: ["NE", "E", "N"], nivel: "Avanzado (olas)",
     nota: "Spot de olas y viento fuerte, sede del PWA. Fondo de roca: cuidado con la marea baja.",
     anemometros: [
