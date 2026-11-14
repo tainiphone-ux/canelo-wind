@@ -48,6 +48,7 @@ function final(a, t) {
 }
 function dibuja(t) {
   fondo();
+  if (window.CFG.soloFinal) { final(ease((t - FINAL) / 0.6), t); return; }
   if (t < ENTRA + 1.2) portada(t < ENTRA ? 1 : 1 - ease((t - ENTRA) / 0.6), t);
   if (t >= ENTRA && t < FINAL + 0.8) {
     const entra = ease((t - ENTRA) / 0.8), dy = (1 - entra) * 300;
