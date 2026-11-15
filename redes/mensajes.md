@@ -78,7 +78,7 @@ Viento, olas y mareas de 93 spots de España · gratis · enlace en la bio 👆
 
 ## 6. WhatsApp a grupos de compraventa de material (pidiendo que cuelguen también su anuncio en Canelo Wind)
 
-🛒 ¡Hola a todos! Si estáis vendiendo material, os dejo un sitio más para que se vea: la compraventa de **Canelo Wind**, la app de viento que estamos haciendo.
+🛒 ¡Qué tal a todos! Si están vendiendo material, les dejo un sitio más para que se vea: la compraventa de **Canelo Wind**, la app de viento que estamos haciendo.
 
 👉 Pon tu anuncio con fotos, precio y tu Instagram o WhatsApp, y que te escriban también desde ahí: https://canelowind.com/#compraventa
 
