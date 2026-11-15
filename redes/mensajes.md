@@ -83,3 +83,5 @@ Viento, olas y mareas de 93 spots de España · gratis · enlace en la bio 👆
 👉 Pon tu anuncio con fotos, precio y tu Instagram o WhatsApp, y que te escriban también desde ahí: https://canelowind.com/#compraventa
 
 Es gratis, no hace falta registrarse y tarda un minuto. Cuantos más anuncios haya, más gente lo mira 🤙
+
+De paso les invito a que vean la página canelowind.com. La hice porque antes miraba la predicción en un sitio, después la marea en otro, el anemómetro de La Jaquita en otro, y luego buscaba una webcam. Ahora lo tengo todo en el mismo sitio, hasta la compraventa.
