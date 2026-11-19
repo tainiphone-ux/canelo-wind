@@ -39,6 +39,40 @@ function portada(a, t) {
     rr(x, 1330 + (1 - kk) * 30, pw, 96, 48); g.fillStyle = "rgba(255,255,255,.2)"; g.fill(); texto(p, x + pw / 2, 1394 + (1 - kk) * 30, 42, "#fff", "700"); g.restore(); });
   g.restore();
 }
+function portadaMarea(a, t) {
+  g.save(); g.globalAlpha = a;
+  const ap1 = Math.min(1, t / 0.7);
+  g.save(); g.globalAlpha = a * ap1; const n = texto(P.titulo, W / 2, 220, 78, "#fff", "900", "center", 940); g.restore();
+  const ap2 = ease((t - 0.4) / 0.6);
+  g.save(); g.globalAlpha = a * ap2; texto(P.sub, W / 2, 220 + n * 92 + 34, 44, "#FFF1DC", "700", "center", 900); g.restore();
+
+  const X0 = 110, X1 = 970, PY0 = 460, PY1 = 1460;
+  g.save(); rr(X0, PY0, X1 - X0, PY1 - PY0, 48); g.clip();
+  g.fillStyle = "rgba(255,255,255,.08)"; g.fillRect(X0, PY0, X1 - X0, PY1 - PY0);
+  g.strokeStyle = "rgba(255,255,255,.22)"; g.lineWidth = 2; g.setLineDash([10, 10]);
+  [0.25, 0.5, 0.75].forEach((f) => { const yy = PY0 + (PY1 - PY0) * f; g.beginPath(); g.moveTo(X0 + 20, yy); g.lineTo(X1 - 20, yy); g.stroke(); });
+  g.setLineDash([]);
+  const ciclo = 7.0, nivel = Math.sin((t / ciclo) * Math.PI * 2 - Math.PI / 2);
+  const midY = (PY0 + PY1) / 2, ampY = (PY1 - PY0) * 0.33, ny = midY - nivel * ampY;
+  const ola = (x) => ny + Math.sin(x / 42 + t * 2.6) * 14 + Math.sin(x / 21 - t * 1.8) * 7;
+  g.beginPath(); g.moveTo(X0, PY1);
+  for (let x = 0; x <= X1 - X0; x += 8) g.lineTo(X0 + x, ola(x));
+  g.lineTo(X1, PY1); g.closePath();
+  const grad = g.createLinearGradient(0, ny - 40, 0, PY1); grad.addColorStop(0, "rgba(120,200,240,.9)"); grad.addColorStop(1, "rgba(30,110,180,.85)");
+  g.fillStyle = grad; g.fill();
+  g.beginPath();
+  for (let x = 0; x <= X1 - X0; x += 8) { const yy = ola(x); if (x === 0) g.moveTo(X0 + x, yy); else g.lineTo(X0 + x, yy); }
+  g.strokeStyle = "#F2FAFF"; g.lineWidth = 5; g.stroke();
+  const bx = (X0 + X1) / 2, by = ola(bx - X0);
+  g.save(); g.font = "64px -apple-system"; g.textAlign = "center"; g.textBaseline = "bottom"; g.fillText("⛵", bx, by - 4); g.restore();
+  g.restore();
+  rr(X0, PY0, X1 - X0, PY1 - PY0, 48); g.lineWidth = 4; g.strokeStyle = "rgba(255,255,255,.4)"; g.stroke();
+
+  const np = P.pills.length, pw = np > 3 ? 230 : 290, gap = 20, x0 = W / 2 - (np * pw + (np - 1) * gap) / 2;
+  P.pills.forEach((p, i) => { const kk = ease((t - 1.6 - i * 0.4) / 0.5); g.save(); g.globalAlpha = a * kk; const x = x0 + i * (pw + gap);
+    rr(x, 1560 + (1 - kk) * 30, pw, 96, 48); g.fillStyle = "rgba(255,255,255,.2)"; g.fill(); texto(p, x + pw / 2, 1624 + (1 - kk) * 30, 42, "#fff", "700"); g.restore(); });
+  g.restore();
+}
 function final(a, t) {
   g.save(); g.globalAlpha = a; g.save(); g.shadowColor = "rgba(0,0,0,.3)"; g.shadowBlur = 50; rr(W / 2 - 150, 300, 300, 300, 68); g.clip(); g.drawImage(I.icono, W / 2 - 150, 300, 300, 300); g.restore();
   texto(F.titulo, W / 2, 760, 84, "#fff", "900", "center", 960);
@@ -49,7 +83,7 @@ function final(a, t) {
 function dibuja(t) {
   fondo();
   if (window.CFG.soloFinal) { final(ease((t - FINAL) / 0.6), t); return; }
-  if (t < ENTRA + 1.2) portada(t < ENTRA ? 1 : 1 - ease((t - ENTRA) / 0.6), t);
+  if (t < ENTRA + 1.2) { const a0 = t < ENTRA ? 1 : 1 - ease((t - ENTRA) / 0.6); if (window.CFG.estiloPortada === "marea") portadaMarea(a0, t); else portada(a0, t); }
   if (t >= ENTRA && t < FINAL + 0.8) {
     const entra = ease((t - ENTRA) / 0.8), dy = (1 - entra) * 300;
     let i = E.findIndex((e) => t >= e[0] && t < e[1]); if (i < 0) i = t < E[0][0] ? 0 : E.length - 1; const e = E[i];
