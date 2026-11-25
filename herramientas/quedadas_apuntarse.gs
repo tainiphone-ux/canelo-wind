@@ -46,10 +46,10 @@ function anadirCampoIdQuedadas() {
   const formUrl = SpreadsheetApp.openById(SSID).getFormUrl();
   if (!formUrl) throw new Error('Esta hoja no tiene un formulario vinculado');
   const f = FormApp.openByUrl(formUrl);
-  let item = f.getItems().find(function (it) { return it.getTitle() === 'ID'; });
-  if (!item) item = f.addTextItem().setTitle('ID').setHelpText('No tocar: lo rellena la app sola.');
+  const existente = f.getItems().find(function (it) { return it.getTitle() === 'ID'; });
+  const item = existente ? existente.asTextItem() : f.addTextItem().setTitle('ID').setHelpText('No tocar: lo rellena la app sola.');
   const marca = 'MARCA' + Date.now();
-  const resp = f.createResponse().withItemResponse(item.asTextItem().createResponse(marca));
+  const resp = f.createResponse().withItemResponse(item.createResponse(marca));
   const m = resp.toPrefilledUrl().match(new RegExp('entry\\.(\\d+)=' + marca));
   Logger.log('CAMPO_ID=' + (m ? 'entry.' + m[1] : 'NO ENCONTRADO (mira el formulario a mano)'));
 }
