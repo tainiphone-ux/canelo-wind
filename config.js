@@ -44,4 +44,18 @@ const CONFIG = {
     // https://docs.google.com/spreadsheets/d/1NcVPxSYAmA_v82nVE6CPZ_Vu7u2QM24k10SNYLa_Tyo/edit
     csv: "https://docs.google.com/spreadsheets/d/1NcVPxSYAmA_v82nVE6CPZ_Vu7u2QM24k10SNYLa_Tyo/gviz/tq?tqx=out:csv&gid=0",
   },
+  // Avisos de verdad (aunque el móvil tenga la app cerrada), con Firebase Cloud Messaging.
+  // Proyecto «Canelo Wind» creado el 25-11-2026 en la cuenta windcanelo@gmail.com. Estos datos son públicos
+  // (no son secretos: lo secreto es la clave privada de la cuenta de servicio, que solo está en los Apps Script).
+  push: {
+    firebaseConfig: {
+      apiKey: "AIzaSyAJIDyzIkzcCRg0304IshOJeioG5sv-WPY",
+      authDomain: "canelo-wind.firebaseapp.com",
+      projectId: "canelo-wind",
+      storageBucket: "canelo-wind.firebasestorage.app",
+      messagingSenderId: "714309594413",
+      appId: "1:714309594413:web:65323a740c6ff9d09c37a4",
+    },
+    vapidKey: "BDdibPNHi_LSf7moyU2bK_6Bzg4-a7A9R15ZJno5LNkuEkFZXJrlX2dpwivF7OmkXCBof7QB1WaTgNPYw_8acYs",
+  },
 };

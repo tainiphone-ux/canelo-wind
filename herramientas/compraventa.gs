@@ -26,6 +26,12 @@
  *  - {accion:"contar_cv", id, secreto}                   → (solo quien vende) cuántos mensajes hay en total, para avisar de novedades
  * Los mensajes se guardan en una hoja privada aparte («Canelo Wind · Compraventa (mensajes)», se crea sola la primera vez
  * que hace falta: no hay que ejecutar nada a mano para esto). Para borrar spam: abrirla y borrar la fila.
+ *
+ * Avisos de verdad (aunque el móvil tenga la app cerrada), con Firebase Cloud Messaging:
+ *  - {accion:"registrar_push_cv", id, convId, token}  → guarda el token de este móvil para avisarle de esa conversación
+ * En las Propiedades del script (⚙️ Configuración del proyecto → Propiedades del script) añadir FB_PROJECT_ID,
+ * FB_CLIENT_EMAIL y FB_PRIVATE_KEY, con los datos del archivo JSON de la cuenta de servicio de Firebase
+ * (nunca subir ese archivo a ningún sitio: solo pegarlo aquí).
  */
 
 function prepararCompraventa() {
@@ -66,7 +72,7 @@ function txt_(v, n) { return String(v == null ? '' : v).replace(/[\r\n\t]+/g, ' 
 function sha_(s) { return Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(s))); }
 
 // Hoja PRIVADA de los chats (se crea sola la primera vez; nunca se comparte).
-function hojaMensajes_(P) {
+function hojaCV_(P) {
   let id = P.getProperty('HOJAM');
   if (!id) {
     const ss = SpreadsheetApp.create('Canelo Wind · Compraventa (mensajes)');
@@ -75,13 +81,81 @@ function hojaMensajes_(P) {
     h.setFrozenRows(1);
     id = ss.getId(); P.setProperty('HOJAM', id);
   }
-  return SpreadsheetApp.openById(id).getSheets()[0];
+  const ss = SpreadsheetApp.openById(id);
+  return {
+    mensajes: ss.getSheetByName('Mensajes'),
+    tokens: ss.getSheetByName('Tokens') || (function () {
+      const h = ss.insertSheet('Tokens');
+      h.appendRow(['Fecha', 'ConvId', 'Token']);
+      h.setFrozenRows(1);
+      return h;
+    })(),
+  };
+}
+function tokensDeConv_(hoja, convId, excluir) {
+  const n = hoja.getLastRow();
+  if (n < 2) return [];
+  const vals = hoja.getRange(2, 1, n - 1, 3).getValues();
+  const vistos = {}, out = [];
+  vals.forEach(function (f) {
+    const tok = f[2];
+    if (String(f[1]) === convId && tok && tok !== excluir && !vistos[tok]) { vistos[tok] = true; out.push(tok); }
+  });
+  return out;
+}
+
+// ---- Avisos de verdad con Firebase Cloud Messaging (HTTP v1) ----
+function tokenAcceso_() {
+  const cache = CacheService.getScriptCache();
+  const cacheado = cache.get('FB_TOKEN');
+  if (cacheado) return cacheado;
+  const P = PropertiesService.getScriptProperties();
+  const email = P.getProperty('FB_CLIENT_EMAIL');
+  const clave = (P.getProperty('FB_PRIVATE_KEY') || '').replace(/\\n/g, '\n');
+  if (!email || !clave) return null;
+  const ahora = Math.floor(Date.now() / 1000);
+  const b64 = function (obj) { return Utilities.base64EncodeWebSafe(JSON.stringify(obj)).replace(/=+$/, ''); };
+  const base = b64({ alg: 'RS256', typ: 'JWT' }) + '.' + b64({
+    iss: email, scope: 'https://www.googleapis.com/auth/firebase.messaging',
+    aud: 'https://oauth2.googleapis.com/token', exp: ahora + 3600, iat: ahora,
+  });
+  const firma = Utilities.base64EncodeWebSafe(Utilities.computeRsaSha256Signature(base, clave)).replace(/=+$/, '');
+  const resp = UrlFetchApp.fetch('https://oauth2.googleapis.com/token', {
+    method: 'post',
+    payload: { grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion: base + '.' + firma },
+    muteHttpExceptions: true,
+  });
+  const datos = JSON.parse(resp.getContentText());
+  if (!datos.access_token) return null;
+  cache.put('FB_TOKEN', datos.access_token, (datos.expires_in || 3600) - 60);
+  return datos.access_token;
+}
+function enviarPush_(token, titulo, cuerpo, url) {
+  try {
+    const P = PropertiesService.getScriptProperties();
+    const proyecto = P.getProperty('FB_PROJECT_ID');
+    const acceso = tokenAcceso_();
+    if (!proyecto || !acceso) return;
+    UrlFetchApp.fetch('https://fcm.googleapis.com/v1/projects/' + proyecto + '/messages:send', {
+      method: 'post',
+      contentType: 'application/json',
+      headers: { Authorization: 'Bearer ' + acceso },
+      payload: JSON.stringify({ message: { token: token, notification: { title: titulo, body: cuerpo }, webpush: { fcm_options: { link: url } } } }),
+      muteHttpExceptions: true,
+    });
+  } catch (e) { /* un aviso que falla no debe romper el chat */ }
 }
 
 function atenderChat_(d, P, ahora) {
-  const hoja = hojaMensajes_(P);
+  const H = hojaCV_(P), hoja = H.mensajes;
   const id = txt_(d.id, 20); if (!id) throw new Error('id');
 
+  if (d.accion === 'registrar_push_cv') {
+    const convId = txt_(d.convId, 40); if (convId.length < 16) throw new Error('conv');
+    const token = txt_(d.token, 300); if (!token) throw new Error('token');
+    H.tokens.appendRow([ahora, convId, token]);
+    return { ok: true };
+  }
   if (d.accion === 'mensaje_cv') {
     const convId = txt_(d.convId, 40); if (convId.length < 16) throw new Error('conv');
     const autor = d.autor === 'vendedor' ? 'vendedor' : 'comprador';
@@ -92,6 +166,9 @@ function atenderChat_(d, P, ahora) {
     const nombre = txt_(d.nombre, 40), texto = txt_(d.texto, 500);
     if (!nombre || !texto) throw new Error('datos');
     hoja.appendRow([ahora, id, convId, autor, nombre, texto]);
+    tokensDeConv_(H.tokens, convId, txt_(d.miToken, 300)).forEach(function (tok) {
+      enviarPush_(tok, nombre, texto, 'https://canelowind.com/#anuncio=' + id);
+    });
     return { ok: true };
   }
   if (d.accion === 'mensajes_cv') {
@@ -131,7 +208,7 @@ function atender_(d) {
   const hoja = SpreadsheetApp.openById(P.getProperty('HOJA')).getSheets()[0];
   const ahora = new Date().toISOString();
 
-  if (d.accion === 'mensaje_cv' || d.accion === 'mensajes_cv' || d.accion === 'conversaciones' || d.accion === 'contar_cv') {
+  if (d.accion === 'mensaje_cv' || d.accion === 'mensajes_cv' || d.accion === 'conversaciones' || d.accion === 'contar_cv' || d.accion === 'registrar_push_cv') {
     return atenderChat_(d, P, ahora);
   }
 

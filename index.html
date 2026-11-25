@@ -224,6 +224,8 @@ label.chip { display: inline-flex; align-items: center; }
 <script src="config.js"></script>
 <script src="consejos.js"></script>
 <script src="textos_spots.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js"></script>
 <script>
 // ---------- Utilidades ----------
 const $ = (s) => document.querySelector(s);
@@ -854,6 +856,29 @@ function abrirFormQuedada(spotId) {
   };
 }
 
+// ---------- Avisos de verdad (Firebase Cloud Messaging), aunque el móvil tenga la app cerrada ----------
+const pushListo = () => !!(CONFIG.push && CONFIG.push.firebaseConfig && window.isSecureContext
+  && "serviceWorker" in navigator && "PushManager" in window && typeof firebase !== "undefined");
+const miPushToken = () => leer("pushToken", "");
+async function pedirAvisos(boton) {
+  if (!pushListo()) { avisoCorto(t("push_no_disp")); return null; }
+  if (boton) boton.disabled = true;
+  try {
+    const permiso = await Notification.requestPermission();
+    if (permiso !== "granted") { avisoCorto(t("push_denegado")); return null; }
+    if (!firebase.apps.length) firebase.initializeApp(CONFIG.push.firebaseConfig);
+    const reg = await navigator.serviceWorker.register("firebase-messaging-sw.js");
+    const messaging = firebase.messaging();
+    const token = await messaging.getToken({ vapidKey: CONFIG.push.vapidKey, serviceWorkerRegistration: reg });
+    if (token) guardar("pushToken", token);
+    return token || null;
+  } catch (e) { avisoCorto(t("push_error")); return null; }
+  finally { if (boton) boton.disabled = false; }
+}
+function botonAvisarme(id) {
+  return pushListo() ? `<button class="btn sec peq" id="${id}">${t("push_avisarme")}</button>` : "";
+}
+
 // ---------- Apuntarse y chat de las quedadas (Apps Script privado: nadie ve nombres de email ni teléfono) ----------
 const quedadasAppLista = () => !!(CONFIG.quedadasApp && CONFIG.quedadasApp.url);
 async function llamarQuedadasApp(accion, datos) {
@@ -895,12 +920,18 @@ function abrirApuntarse(q) {
     <div class="form" id="fApuntarse">
       <label>${t("f_nombre")}<input name="nombre" maxlength="40" value="${esc(leer("nombre", ""))}"></label>
       <label>${t("q_f_insta")}<input name="instagram" maxlength="40" placeholder="@usuario" value="${esc(leer("instagram", ""))}"></label>
+      <div class="ancho fila">${botonAvisarme("avisarmeApunt")}</div>
       <div class="ancho fila"><button class="btn" id="enviarApunt">${t("q_apunt_enviar")}</button><button class="btn sec" id="cerrarApunt">${t("cerrar")}</button></div>
     </div><div id="msgApunt"></div></div>`;
   document.body.appendChild(fondo);
   const cerrar = () => fondo.remove();
   fondo.onclick = (e) => { if (e.target === fondo) cerrar(); };
   fondo.querySelector("#cerrarApunt").onclick = cerrar;
+  const bAvisar = fondo.querySelector("#avisarmeApunt");
+  if (bAvisar) bAvisar.onclick = async () => {
+    const token = await pedirAvisos(bAvisar);
+    if (token) { await llamarQuedadasApp("registrar_push", { id: q.id, token }); bAvisar.textContent = t("push_activado"); }
+  };
   fondo.querySelector("#enviarApunt").onclick = async () => {
     const nombre = fondo.querySelector("[name=nombre]").value.trim();
     const instagram = limpiaInsta(fondo.querySelector("[name=instagram]").value.trim());
@@ -909,7 +940,7 @@ function abrirApuntarse(q) {
     const b = fondo.querySelector("#enviarApunt"); b.disabled = true;
     try {
       guardar("nombre", nombre); if (instagram) guardar("instagram", instagram);
-      const j = await llamarQuedadasApp("apuntarse", { id: q.id, nombre, instagram });
+      const j = await llamarQuedadasApp("apuntarse", { id: q.id, nombre, instagram, miToken: miPushToken() });
       const span = document.querySelector(`[data-cuenta="${q.id}"]`); if (span) span.textContent = t("q_apuntados_n", { n: j.contador });
       recordarQuedada(q.id, (spotDe(q.salida) || {}).nombre || q.salida, j.contador);
       fondo.querySelector(".form").remove();
@@ -928,6 +959,7 @@ function abrirChatQuedada(q) {
     <div class="form" id="fChat" style="margin-top:10px">
       <label>${t("f_nombre")}<input name="nombre" maxlength="40" value="${esc(leer("nombre", ""))}"></label>
       <label class="ancho">${t("q_chat_ph")}<textarea name="texto" rows="2" maxlength="300" placeholder="${t("q_chat_ph")}"></textarea></label>
+      <div class="ancho fila">${botonAvisarme("avisarmeChat")}</div>
       <div class="ancho fila"><button class="btn" id="enviarChat">${t("q_chat_enviar")}</button><button class="btn sec" id="cerrarChat">${t("cerrar")}</button></div>
     </div><div id="msgChat"></div></div>`;
   document.body.appendChild(fondo);
@@ -935,6 +967,11 @@ function abrirChatQuedada(q) {
   const cerrar = () => { vivo = false; fondo.remove(); };
   fondo.onclick = (e) => { if (e.target === fondo) cerrar(); };
   fondo.querySelector("#cerrarChat").onclick = cerrar;
+  const bAvisarChat = fondo.querySelector("#avisarmeChat");
+  if (bAvisarChat) bAvisarChat.onclick = async () => {
+    const token = await pedirAvisos(bAvisarChat);
+    if (token) { await llamarQuedadasApp("registrar_push", { id: q.id, token }); bAvisarChat.textContent = t("push_activado"); }
+  };
   const burbuja = (m) => `<div class="msg-chat"><b>${esc(m.nombre)}</b>${esc(m.texto)}</div>`;
   const cargar = async () => {
     try {
@@ -955,7 +992,7 @@ function abrirChatQuedada(q) {
     const b = fondo.querySelector("#enviarChat"); b.disabled = true;
     try {
       guardar("nombre", nombre);
-      await llamarQuedadasApp("mensaje", { id: q.id, nombre, texto });
+      await llamarQuedadasApp("mensaje", { id: q.id, nombre, texto, miToken: miPushToken() });
       fondo.querySelector("[name=texto]").value = "";
       msg.innerHTML = "";
       await cargar();
@@ -1457,6 +1494,7 @@ function abrirChatCV(a, opts) {
     <div class="form" id="fChatV" style="margin-top:10px">
       <label>${t("f_nombre")}<input name="nombre" maxlength="40" value="${esc(leer("nombre", ""))}"></label>
       <label class="ancho">${t("q_chat_ph")}<textarea name="texto" rows="2" maxlength="500" placeholder="${t("q_chat_ph")}"></textarea></label>
+      <div class="ancho fila">${botonAvisarme("avisarmeChatV")}</div>
       <div class="ancho fila"><button class="btn" id="enviarChatV">${t("q_chat_enviar")}</button><button class="btn sec" id="cerrarChatV">${t("cerrar")}</button></div>
     </div><div id="msgChatV"></div></div>`;
   document.body.appendChild(fondo);
@@ -1464,6 +1502,11 @@ function abrirChatCV(a, opts) {
   const cerrar = () => { vivo = false; fondo.remove(); };
   fondo.onclick = (e) => { if (e.target === fondo) cerrar(); };
   fondo.querySelector("#cerrarChatV").onclick = cerrar;
+  const bAvisarV = fondo.querySelector("#avisarmeChatV");
+  if (bAvisarV) bAvisarV.onclick = async () => {
+    const token = await pedirAvisos(bAvisarV);
+    if (token) { await llamarCV({ accion: "registrar_push_cv", id: a.id, convId, token }); bAvisarV.textContent = t("push_activado"); }
+  };
   const burbuja = (m) => `<div class="msg-chat"><b>${esc(m.nombre)}</b>${esc(m.texto)}</div>`;
   const cargar = async () => {
     try {
@@ -1485,7 +1528,7 @@ function abrirChatCV(a, opts) {
     const b = fondo.querySelector("#enviarChatV"); b.disabled = true;
     try {
       guardar("nombre", nombre);
-      await llamarCV({ accion: "mensaje_cv", id: a.id, convId, autor: opts.autor, nombre, texto, secreto: opts.secreto });
+      await llamarCV({ accion: "mensaje_cv", id: a.id, convId, autor: opts.autor, nombre, texto, secreto: opts.secreto, miToken: miPushToken() });
       fondo.querySelector("[name=texto]").value = ""; msg.innerHTML = "";
       await cargar();
     } catch (e) { msg.innerHTML = `<div class="msg">${t("q_chat_error")}</div>`; }
