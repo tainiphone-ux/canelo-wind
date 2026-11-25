@@ -26,10 +26,16 @@ const CONFIG = {
       tipo: "entry.2013601178", fecha: "entry.71923980", hora: "entry.2030252577", salida: "entry.826881075",
       llegada: "entry.1171292873", encuentro: "entry.1813387052", nivel: "entry.584951277", material: "entry.1336687269",
       detalles: "entry.558304379", nombre: "entry.1038098577", instagram: "entry.1474608316",
+      id: "", // ← pegar aquí el CAMPO_ID que sale al ejecutar anadirCampoIdQuedadas() en herramientas/quedadas_apuntarse.gs
     },
     // Hoja «Canelo Wind · Quedadas (respuestas)», compartida solo para ver. Para quitar una quedada, borrar su fila:
     // https://docs.google.com/spreadsheets/d/1oWLK1FuFxtALufOAgx3MjHBRbiwfRbdrKqwGl4DalmU/edit
     csv: "https://docs.google.com/spreadsheets/d/1oWLK1FuFxtALufOAgx3MjHBRbiwfRbdrKqwGl4DalmU/gviz/tq?tqx=out:csv&gid=1659135050",
+  },
+  // Apuntarse y chat de las quedadas: Apps Script «Canelo Wind · Quedadas (apuntarse y chat)» (herramientas/quedadas_apuntarse.gs),
+  // publicado como aplicación web en la cuenta de Canelo Wind. Vacío = la sección no sale en la app.
+  quedadasApp: {
+    url: "",
   },
   compraventa: {
     // Apps Script «Canelo Wind · Compraventa» (herramientas/compraventa.gs) publicado como aplicación web, en la cuenta de Canelo Wind

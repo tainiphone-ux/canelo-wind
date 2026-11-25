@@ -128,6 +128,10 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 .quedada .acc { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
 .tipo-q { display: inline-block; background: #DCEBF5; color: #1B5378; border-radius: 6px; padding: 2px 8px; font-size: 12px; font-weight: 700; margin-right: 6px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tipo-q { background: #173247; color: #A9D3F0; } }
+.chat-lista { max-height: 300px; overflow-y: auto; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--chip); }
+.msg-chat { padding: 6px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.msg-chat:first-child { border-top: 0; }
+.msg-chat b { margin-right: 6px; }
 .btn.peq { padding: 6px 12px; font-size: 13px; }
 /* Atajos de arriba: Quedadas · Compraventa · Mi spot */
 .atajos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
@@ -552,7 +556,7 @@ function dibujarSpot(spot) {
 // ---------- Reportes de la gente (formulario de Google) ----------
 const hoyISO = (tz = "Atlantic/Canary") => new Date().toLocaleDateString("sv-SE", { timeZone: tz });
 const horaAhora = (tz = "Atlantic/Canary") => new Date().toLocaleTimeString("es-ES", { timeZone: tz, hour: "2-digit", minute: "2-digit" });
-const formListo = (f) => f && f.form && Object.values(f.campos).every(Boolean);
+const formListo = (f) => f && f.form && Object.entries(f.campos).every(([k, v]) => k === "id" || Boolean(v));
 
 // Envía las respuestas a un formulario de Google (sin salir de la app)
 async function enviarFormulario(f, valores) {
@@ -695,7 +699,7 @@ async function cargarQuedadas() {
     const r = await fetch(csv + (csv.includes("?") ? "&" : "?") + "t=" + Date.now());
     const filas = leerCSV(await r.text());
     const cab = (filas.shift() || []).map(h => h.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""));
-    const claves = ["tipo", "fecha", "hora", "salida", "llegada", "encuentro", "nivel", "material", "detalles", "nombre", "instagram"];
+    const claves = ["tipo", "fecha", "hora", "salida", "llegada", "encuentro", "nivel", "material", "detalles", "nombre", "instagram", "id"];
     const C = Object.fromEntries(claves.map(k => [k, cab.findIndex(h => h.includes(k))]));
     const lista = filas.filter(f => f.length > 1).map(f => Object.fromEntries(Object.entries(C).map(([k, i]) => [k, i >= 0 ? (f[i] || "").trim() : ""])));
     lista.forEach(normalizaFechaHora);
@@ -721,11 +725,20 @@ function tarjetaQuedada(q, i) {
     ${q.material ? `<div class="det">🏄 ${esc(q.material)}</div>` : ""}
     ${q.detalles ? `<div class="det">${esc(q.detalles)}</div>` : ""}
     <div class="aviso">${t("q_organiza")}: <b>${esc(q.nombre || t("anonimo"))}</b>${insta ? ` · <a href="https://www.instagram.com/${insta}/" target="_blank" rel="noopener">📸 @${esc(insta)}</a>` : ""}</div>
-    <div class="acc">${s ? `<a class="btn sec peq" href="#spot=${s.id}" style="text-decoration:none">🌬️ ${t("q_prev")}</a>` : ""}<button class="btn sec peq" data-qi="${i}">📤 ${t("q_compartir")}</button></div>
+    ${q.id && quedadasAppLista() ? `<div class="aviso" data-cuenta="${esc(q.id)}">${t("q_apuntados_0")}</div>` : ""}
+    <div class="acc">${s ? `<a class="btn sec peq" href="#spot=${s.id}" style="text-decoration:none">🌬️ ${t("q_prev")}</a>` : ""}${q.id && quedadasAppLista() ? `<button class="btn sec peq" data-apunt="${i}">${t("q_apuntarme")}</button><button class="btn sec peq" data-chat="${i}">${t("q_chat_btn")}</button>` : ""}<button class="btn sec peq" data-qi="${i}">📤 ${t("q_compartir")}</button></div>
   </div>`;
 }
 function activarQuedadas(caja, l) {
   caja.querySelectorAll("[data-qi]").forEach(b => b.onclick = () => compartirQuedada(l[+b.dataset.qi]));
+  caja.querySelectorAll("[data-apunt]").forEach(b => b.onclick = () => abrirApuntarse(l[+b.dataset.apunt]));
+  caja.querySelectorAll("[data-chat]").forEach(b => b.onclick = () => abrirChatQuedada(l[+b.dataset.chat]));
+  if (quedadasAppLista()) {
+    const ids = [...new Set(l.map(q => q.id).filter(Boolean))];
+    if (ids.length) contarApuntados(ids).then(contador => {
+      ids.forEach(id => { const span = caja.querySelector(`[data-cuenta="${id}"]`); if (span) span.textContent = contador[id] ? t("q_apuntados_n", { n: contador[id] }) : t("q_apuntados_0"); });
+    }).catch(() => {});
+  }
 }
 async function compartirQuedada(q) {
   const s = spotDe(q.salida), ll = q.llegada && spotDe(q.llegada);
@@ -820,6 +833,7 @@ function abrirFormQuedada(spotId) {
     const f = Object.fromEntries([...fondo.querySelectorAll("[name]")].map(e => [e.name, e.value.trim()]));
     f.instagram = limpiaInsta(f.instagram);
     if (f.llegada === f.salida) f.llegada = "";
+    f.id = "q" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     const msg = fondo.querySelector("#msgQ");
     if (!f.fecha || !f.salida || !f.nombre) { msg.innerHTML = `<div class="msg">${t("q_falta")}</div>`; return; }
     if (f.fecha < hoy) { msg.innerHTML = `<div class="msg">${t("q_fecha_mal")}</div>`; return; }
@@ -829,6 +843,7 @@ function abrirFormQuedada(spotId) {
     try {
       await enviarFormulario(CONFIG.quedadas, f);
       quedadasLocales.push({ ...f });
+      if (quedadasAppLista()) recordarQuedada(f.id, (spotDe(f.salida) || {}).nombre || f.salida, 0);
       contar("quedada/" + f.salida, "Quedada publicada · " + ((spotDe(f.salida) || {}).nombre || f.salida), true);
       fondo.querySelector(".form").remove();
       msg.innerHTML = `<div class="msg">${t("q_ok")}</div><div style="margin-top:10px"><button class="btn sec" id="cerrar2">${t("cerrar")}</button></div>`;
@@ -836,6 +851,116 @@ function abrirFormQuedada(spotId) {
     } catch (e) {
       msg.innerHTML = `<div class="msg">${t("err_envio")}</div>`; b.disabled = false;
     }
+  };
+}
+
+// ---------- Apuntarse y chat de las quedadas (Apps Script privado: nadie ve nombres de email ni teléfono) ----------
+const quedadasAppLista = () => !!(CONFIG.quedadasApp && CONFIG.quedadasApp.url);
+async function llamarQuedadasApp(accion, datos) {
+  const r = await fetch(CONFIG.quedadasApp.url, { method: "POST", body: JSON.stringify({ accion, ...datos }) });
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.error || "error");
+  return j;
+}
+async function contarApuntados(ids) {
+  if (!ids.length) return {};
+  const r = await fetch(CONFIG.quedadasApp.url + "?accion=contar&ids=" + encodeURIComponent(ids.join(",")));
+  const j = await r.json();
+  return j.ok ? j.contador : {};
+}
+// Quedadas que organizas o a las que te has apuntado, para avisarte si hay novedades (solo en este móvil)
+const misQuedadas = () => leer("misQuedadas", []);
+function recordarQuedada(id, resumen, vistos) {
+  const l = misQuedadas().filter(q => q.id !== id);
+  l.push({ id, resumen, vistos: vistos || 0 });
+  guardar("misQuedadas", l.slice(-30));
+}
+async function comprobarAvisosQuedadas() {
+  if (!quedadasAppLista()) return;
+  const mias = misQuedadas(); if (!mias.length) return;
+  try {
+    const contador = await contarApuntados(mias.map(q => q.id));
+    const nuevas = mias.filter(q => (contador[q.id] || 0) > q.vistos);
+    if (nuevas.length) avisoCorto(nuevas.length === 1 ? t("q_aviso_1", { spot: nuevas[0].resumen }) : t("q_aviso_n", { n: nuevas.length }), 6000);
+    mias.forEach(q => { if (contador[q.id] != null) q.vistos = contador[q.id]; });
+    guardar("misQuedadas", mias);
+  } catch (e) {}
+}
+
+function abrirApuntarse(q) {
+  if (document.querySelector(".fondo")) return;
+  const fondo = document.createElement("div");
+  fondo.className = "fondo";
+  fondo.innerHTML = `<div class="caja"><h3>${t("q_apunt_tit")}</h3>
+    <div class="form" id="fApuntarse">
+      <label>${t("f_nombre")}<input name="nombre" maxlength="40" value="${esc(leer("nombre", ""))}"></label>
+      <label>${t("q_f_insta")}<input name="instagram" maxlength="40" placeholder="@usuario" value="${esc(leer("instagram", ""))}"></label>
+      <div class="ancho fila"><button class="btn" id="enviarApunt">${t("q_apunt_enviar")}</button><button class="btn sec" id="cerrarApunt">${t("cerrar")}</button></div>
+    </div><div id="msgApunt"></div></div>`;
+  document.body.appendChild(fondo);
+  const cerrar = () => fondo.remove();
+  fondo.onclick = (e) => { if (e.target === fondo) cerrar(); };
+  fondo.querySelector("#cerrarApunt").onclick = cerrar;
+  fondo.querySelector("#enviarApunt").onclick = async () => {
+    const nombre = fondo.querySelector("[name=nombre]").value.trim();
+    const instagram = limpiaInsta(fondo.querySelector("[name=instagram]").value.trim());
+    const msg = fondo.querySelector("#msgApunt");
+    if (!nombre) { msg.innerHTML = `<div class="msg">${t("q_falta")}</div>`; return; }
+    const b = fondo.querySelector("#enviarApunt"); b.disabled = true;
+    try {
+      guardar("nombre", nombre); if (instagram) guardar("instagram", instagram);
+      const j = await llamarQuedadasApp("apuntarse", { id: q.id, nombre, instagram });
+      const span = document.querySelector(`[data-cuenta="${q.id}"]`); if (span) span.textContent = t("q_apuntados_n", { n: j.contador });
+      recordarQuedada(q.id, (spotDe(q.salida) || {}).nombre || q.salida, j.contador);
+      fondo.querySelector(".form").remove();
+      msg.innerHTML = `<div class="msg">${t("q_apunt_ok")}</div><div style="margin-top:10px"><button class="btn sec" id="cerrarApunt2">${t("cerrar")}</button></div>`;
+      fondo.querySelector("#cerrarApunt2").onclick = cerrar;
+    } catch (e) { msg.innerHTML = `<div class="msg">${t("q_apunt_error")}</div>`; b.disabled = false; }
+  };
+}
+
+function abrirChatQuedada(q) {
+  if (document.querySelector(".fondo")) return;
+  const fondo = document.createElement("div");
+  fondo.className = "fondo";
+  fondo.innerHTML = `<div class="caja"><h3>${t("q_chat_tit")}</h3>
+    <div id="listaChat" class="chat-lista"><p class="aviso">${t("q_chat_cargando")}</p></div>
+    <div class="form" id="fChat" style="margin-top:10px">
+      <label>${t("f_nombre")}<input name="nombre" maxlength="40" value="${esc(leer("nombre", ""))}"></label>
+      <label class="ancho">${t("q_chat_ph")}<textarea name="texto" rows="2" maxlength="300" placeholder="${t("q_chat_ph")}"></textarea></label>
+      <div class="ancho fila"><button class="btn" id="enviarChat">${t("q_chat_enviar")}</button><button class="btn sec" id="cerrarChat">${t("cerrar")}</button></div>
+    </div><div id="msgChat"></div></div>`;
+  document.body.appendChild(fondo);
+  let vivo = true;
+  const cerrar = () => { vivo = false; fondo.remove(); };
+  fondo.onclick = (e) => { if (e.target === fondo) cerrar(); };
+  fondo.querySelector("#cerrarChat").onclick = cerrar;
+  const burbuja = (m) => `<div class="msg-chat"><b>${esc(m.nombre)}</b>${esc(m.texto)}</div>`;
+  const cargar = async () => {
+    try {
+      const r = await fetch(CONFIG.quedadasApp.url + "?accion=mensajes&id=" + encodeURIComponent(q.id));
+      const j = await r.json(); if (!vivo) return;
+      const caja = fondo.querySelector("#listaChat"); if (!caja) return;
+      caja.innerHTML = j.ok && j.mensajes.length ? j.mensajes.map(burbuja).join("") : `<p class="aviso">${t("q_chat_vacio")}</p>`;
+      caja.scrollTop = caja.scrollHeight;
+    } catch (e) { if (vivo && fondo.querySelector("#listaChat")) fondo.querySelector("#listaChat").innerHTML = `<p class="aviso">${t("q_chat_error")}</p>`; }
+  };
+  cargar();
+  const intervalo = setInterval(() => { if (vivo) cargar(); else clearInterval(intervalo); }, 6000);
+  fondo.querySelector("#enviarChat").onclick = async () => {
+    const nombre = fondo.querySelector("[name=nombre]").value.trim();
+    const texto = fondo.querySelector("[name=texto]").value.trim();
+    const msg = fondo.querySelector("#msgChat");
+    if (!nombre || !texto) { msg.innerHTML = `<div class="msg">${t("q_chat_falta")}</div>`; return; }
+    const b = fondo.querySelector("#enviarChat"); b.disabled = true;
+    try {
+      guardar("nombre", nombre);
+      await llamarQuedadasApp("mensaje", { id: q.id, nombre, texto });
+      fondo.querySelector("[name=texto]").value = "";
+      msg.innerHTML = "";
+      await cargar();
+    } catch (e) { msg.innerHTML = `<div class="msg">${t("q_chat_error")}</div>`; }
+    b.disabled = false;
   };
 }
 
@@ -918,9 +1043,9 @@ async function compartirSpot(spot, ev, c) {
   try { await navigator.clipboard.writeText(texto + "\n" + url); avisoCorto(t("comp_copiado")); } catch (e) {}
   window.open("https://wa.me/?text=" + encodeURIComponent(texto + "\n" + url), "_blank", "noopener");
 }
-function avisoCorto(msg) {
+function avisoCorto(msg, ms) {
   const a = document.createElement("div"); a.className = "aviso-copiado"; a.textContent = msg;
-  document.body.appendChild(a); setTimeout(() => a.remove(), 2500);
+  document.body.appendChild(a); setTimeout(() => a.remove(), ms || 2500);
 }
 
 // ---------- Buzón de sugerencias ----------
@@ -1641,6 +1766,7 @@ $("#btnUnidad").onclick = () => {
 };
 
 router();
+comprobarAvisosQuedadas();
 try { if (esAppInstalada() && !sessionStorage.getItem("cw_contada")) { sessionStorage.setItem("cw_contada", "1"); contar("instalada", "Abierta desde la pantalla de inicio (app instalada)", true); } } catch (e) {}
 vientoAhoraTodos().then(() => { if (!location.hash || location.hash === "#") pintarLista(); }).catch(() => {});
 </script>
