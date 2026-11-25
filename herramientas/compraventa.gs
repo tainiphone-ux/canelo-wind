@@ -16,6 +16,16 @@
  *  - {accion:"quitar", id, secreto, vendido}    → se quita (y sus fotos van a la papelera)
  * El «secreto» solo lo tiene el móvil que puso el anuncio; aquí se guarda cifrado (SHA-256) en las propiedades del script.
  * Para quitar un anuncio a mano (spam): en la hoja, poner «quitado» en la columna Situacion (o borrar la fila).
+ *
+ * CHAT privado entre quien compra y quien vende (cada conversación la ve solo esa pareja; ni email ni teléfono de nadie):
+ *  - {accion:"mensaje_cv", id, convId, autor:"comprador"|"vendedor", nombre, texto, secreto?}
+ *      → «convId» lo genera el móvil de quien compra (token largo al azar) y lo guarda para seguir la misma conversación.
+ *        Si autor es «vendedor» hace falta el secreto del anuncio (igual que editar/quitar).
+ *  - {accion:"mensajes_cv", id, convId}                  → los mensajes de esa conversación (sin secreto: basta con conocer el convId)
+ *  - {accion:"conversaciones", id, secreto}              → (solo quien vende) la lista de conversaciones de ese anuncio
+ *  - {accion:"contar_cv", id, secreto}                   → (solo quien vende) cuántos mensajes hay en total, para avisar de novedades
+ * Los mensajes se guardan en una hoja privada aparte («Canelo Wind · Compraventa (mensajes)», se crea sola la primera vez
+ * que hace falta: no hay que ejecutar nada a mano para esto). Para borrar spam: abrirla y borrar la fila.
  */
 
 function prepararCompraventa() {
@@ -55,10 +65,75 @@ function doGet() {
 function txt_(v, n) { return String(v == null ? '' : v).replace(/[\r\n\t]+/g, ' ').trim().slice(0, n); }
 function sha_(s) { return Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(s))); }
 
+// Hoja PRIVADA de los chats (se crea sola la primera vez; nunca se comparte).
+function hojaMensajes_(P) {
+  let id = P.getProperty('HOJAM');
+  if (!id) {
+    const ss = SpreadsheetApp.create('Canelo Wind · Compraventa (mensajes)');
+    const h = ss.getSheets()[0]; h.setName('Mensajes');
+    h.appendRow(['Fecha', 'AnuncioId', 'ConvId', 'Autor', 'Nombre', 'Texto']);
+    h.setFrozenRows(1);
+    id = ss.getId(); P.setProperty('HOJAM', id);
+  }
+  return SpreadsheetApp.openById(id).getSheets()[0];
+}
+
+function atenderChat_(d, P, ahora) {
+  const hoja = hojaMensajes_(P);
+  const id = txt_(d.id, 20); if (!id) throw new Error('id');
+
+  if (d.accion === 'mensaje_cv') {
+    const convId = txt_(d.convId, 40); if (convId.length < 16) throw new Error('conv');
+    const autor = d.autor === 'vendedor' ? 'vendedor' : 'comprador';
+    if (autor === 'vendedor') {
+      const guardado = P.getProperty('S_' + id);
+      if (!guardado || guardado !== sha_(d.secreto)) throw new Error('permiso');
+    }
+    const nombre = txt_(d.nombre, 40), texto = txt_(d.texto, 500);
+    if (!nombre || !texto) throw new Error('datos');
+    hoja.appendRow([ahora, id, convId, autor, nombre, texto]);
+    return { ok: true };
+  }
+  if (d.accion === 'mensajes_cv') {
+    const convId = txt_(d.convId, 40); if (!convId) throw new Error('conv');
+    const n = hoja.getLastRow();
+    const filas = n > 1 ? hoja.getRange(2, 1, n - 1, 6).getValues() : [];
+    const mensajes = filas.filter(function (f) { return String(f[1]) === id && String(f[2]) === convId; })
+      .map(function (f) { return { fecha: f[0], autor: f[3], nombre: f[4], texto: f[5] }; }).slice(-100);
+    return { ok: true, mensajes: mensajes };
+  }
+
+  // «conversaciones» y «contar_cv» son solo para quien vende: hace falta su secreto.
+  const guardado = P.getProperty('S_' + id);
+  if (!guardado || guardado !== sha_(d.secreto)) throw new Error('permiso');
+  const n = hoja.getLastRow();
+  const filas = n > 1 ? hoja.getRange(2, 1, n - 1, 6).getValues() : [];
+  const deEsteAnuncio = filas.filter(function (f) { return String(f[1]) === id; });
+
+  if (d.accion === 'conversaciones') {
+    const porConv = {};
+    deEsteAnuncio.forEach(function (f) {
+      const c = String(f[2]);
+      if (!porConv[c]) porConv[c] = { convId: c, mensajes: 0 };
+      porConv[c].mensajes++; porConv[c].ultimo = f[5]; porConv[c].fecha = f[0];
+      if (f[3] === 'comprador') porConv[c].nombre = f[4];
+    });
+    const lista = Object.keys(porConv).map(function (k) { return porConv[k]; })
+      .sort(function (a, b) { return String(b.fecha).localeCompare(String(a.fecha)); });
+    return { ok: true, conversaciones: lista };
+  }
+  if (d.accion === 'contar_cv') return { ok: true, contador: deEsteAnuncio.length };
+  throw new Error('accion');
+}
+
 function atender_(d) {
   const P = PropertiesService.getScriptProperties();
   const hoja = SpreadsheetApp.openById(P.getProperty('HOJA')).getSheets()[0];
   const ahora = new Date().toISOString();
+
+  if (d.accion === 'mensaje_cv' || d.accion === 'mensajes_cv' || d.accion === 'conversaciones' || d.accion === 'contar_cv') {
+    return atenderChat_(d, P, ahora);
+  }
 
   if (d.accion === 'publicar') {
     if (!d.secreto || String(d.secreto).length < 16) throw new Error('secreto');

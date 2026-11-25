@@ -1371,10 +1371,11 @@ function abrirAnuncio(a) {
     <div class="fila" style="margin-top:10px">
       ${insta ? `<a class="btn" style="text-decoration:none" href="https://www.instagram.com/${insta}/" target="_blank" rel="noopener">📸 @${esc(insta)}</a>` : ""}
       ${wa ? `<a class="btn verde" style="text-decoration:none" href="https://wa.me/${wa}?text=${encodeURIComponent(textoWa)}" target="_blank" rel="noopener">💬 WhatsApp</a>` : ""}
+      ${!mio ? `<button class="btn sec" id="chatCompradorV">${t("cv_chat_btn")}</button>` : ""}
       <button class="btn sec" id="compartirV">📤 ${t("q_compartir")}</button>
     </div>
     ${mio ? `<div class="caja" style="margin-top:12px;background:var(--bg)"><b>${t("cv_tu_anuncio")}</b>
-      <div class="fila" style="margin-top:8px"><button class="btn sec peq" id="editarV">${t("cv_editar")}</button><button class="btn verde peq" id="vendidoV">${t("cv_vendido")}</button><button class="btn sec peq" id="renovarV">${t("cv_renovar")}</button><button class="btn sec peq" id="quitarV">${t("cv_quitar")}</button></div>
+      <div class="fila" style="margin-top:8px"><button class="btn sec peq" id="editarV">${t("cv_editar")}</button><button class="btn verde peq" id="vendidoV">${t("cv_vendido")}</button><button class="btn sec peq" id="renovarV">${t("cv_renovar")}</button><button class="btn sec peq" id="quitarV">${t("cv_quitar")}</button><button class="btn sec peq" id="mensajesV">${t("cv_chat_mensajes_btn")}</button></div>
       <div id="msgV"></div></div>` : ""}
     <div class="aviso" style="margin-top:10px">${t("cv_seg_corto")}</div>
     <button class="btn sec" id="cerrarV" style="margin-top:10px">${t("cerrar")}</button>
@@ -1388,6 +1389,7 @@ function abrirAnuncio(a) {
     f.querySelectorAll("[data-fi]").forEach(x => x.classList.toggle("on", x === m));
   });
   f.querySelector("#compartirV").onclick = () => compartirAnuncio(a);
+  if (!mio) f.querySelector("#chatCompradorV").onclick = () => { cerrar(); abrirChatCV(a, { autor: "comprador" }); };
   if (mio) {
     const accion = async (datos, okTxt) => {
       f.querySelectorAll("#vendidoV,#renovarV,#quitarV").forEach(b => b.disabled = true);
@@ -1405,7 +1407,115 @@ function abrirAnuncio(a) {
     f.querySelector("#vendidoV").onclick = () => accion({ accion: "quitar", vendido: true }, t("cv_ok_vendido"));
     f.querySelector("#quitarV").onclick = () => { if (confirm(t("cv_quitar_conf"))) accion({ accion: "quitar", vendido: false }, t("cv_ok_quitado")); };
     f.querySelector("#renovarV").onclick = () => accion({ accion: "renovar" }, t("cv_ok_renovado"));
+    f.querySelector("#mensajesV").onclick = () => { cerrar(); abrirConversacionesCV(a, mio.secreto); };
   }
+}
+
+// ---------- Chat privado entre comprador y vendedor (cada conversación la ve solo esa pareja) ----------
+const tokenAzar = (n) => [...crypto.getRandomValues(new Uint8Array(n))].map(x => x.toString(16).padStart(2, "0")).join("");
+const misChatsCV = () => leer("misChatsCV", {});
+function convIdCV(a) {
+  const m = misChatsCV();
+  if (!m[a.id]) { m[a.id] = { convId: tokenAzar(18), vistos: 0, titulo: a.titulo }; guardar("misChatsCV", m); }
+  return m[a.id].convId;
+}
+async function comprobarAvisosCV() {
+  if (!cvListo()) return;
+  try {
+    const chats = misChatsCV(); let huboNuevo = false;
+    for (const id of Object.keys(chats)) {
+      const r = await llamarCV({ accion: "mensajes_cv", id, convId: chats[id].convId });
+      if (r.mensajes.length > chats[id].vistos) {
+        avisoCorto(t("cv_aviso_1", { titulo: chats[id].titulo || id }), 6000);
+        chats[id].vistos = r.mensajes.length; huboNuevo = true;
+      }
+    }
+    if (huboNuevo) guardar("misChatsCV", chats);
+  } catch (e) {}
+  try {
+    const mios = misAnuncios(); if (!mios.length) return;
+    const nuevas = []; const actualizados = [];
+    for (const m of mios) {
+      const r = await llamarCV({ accion: "contar_cv", id: m.id, secreto: m.secreto });
+      if (r.contador > (m.vistosChat || 0)) nuevas.push(m);
+      actualizados.push({ ...m, vistosChat: r.contador });
+    }
+    if (nuevas.length) {
+      avisoCorto(nuevas.length === 1 ? t("cv_aviso_1", { titulo: nuevas[0].titulo }) : t("cv_aviso_n", { n: nuevas.length }), 6000);
+      guardar("misAnuncios", actualizados);
+    }
+  } catch (e) {}
+}
+
+function abrirChatCV(a, opts) {
+  if (document.querySelector(".fondo")) return;
+  const convId = opts.convId || convIdCV(a);
+  const fondo = document.createElement("div");
+  fondo.className = "fondo";
+  fondo.innerHTML = `<div class="caja"><h3>${t("cv_chat_tit")}</h3>
+    <div id="listaChatV" class="chat-lista"><p class="aviso">${t("q_chat_cargando")}</p></div>
+    <div class="form" id="fChatV" style="margin-top:10px">
+      <label>${t("f_nombre")}<input name="nombre" maxlength="40" value="${esc(leer("nombre", ""))}"></label>
+      <label class="ancho">${t("q_chat_ph")}<textarea name="texto" rows="2" maxlength="500" placeholder="${t("q_chat_ph")}"></textarea></label>
+      <div class="ancho fila"><button class="btn" id="enviarChatV">${t("q_chat_enviar")}</button><button class="btn sec" id="cerrarChatV">${t("cerrar")}</button></div>
+    </div><div id="msgChatV"></div></div>`;
+  document.body.appendChild(fondo);
+  let vivo = true;
+  const cerrar = () => { vivo = false; fondo.remove(); };
+  fondo.onclick = (e) => { if (e.target === fondo) cerrar(); };
+  fondo.querySelector("#cerrarChatV").onclick = cerrar;
+  const burbuja = (m) => `<div class="msg-chat"><b>${esc(m.nombre)}</b>${esc(m.texto)}</div>`;
+  const cargar = async () => {
+    try {
+      const j = await llamarCV({ accion: "mensajes_cv", id: a.id, convId });
+      if (!vivo) return;
+      const caja = fondo.querySelector("#listaChatV"); if (!caja) return;
+      caja.innerHTML = j.mensajes.length ? j.mensajes.map(burbuja).join("") : `<p class="aviso">${t("q_chat_vacio")}</p>`;
+      caja.scrollTop = caja.scrollHeight;
+      if (opts.autor === "comprador") { const c = misChatsCV(); if (c[a.id]) { c[a.id].vistos = j.mensajes.length; guardar("misChatsCV", c); } }
+    } catch (e) { if (vivo && fondo.querySelector("#listaChatV")) fondo.querySelector("#listaChatV").innerHTML = `<p class="aviso">${t("q_chat_error")}</p>`; }
+  };
+  cargar();
+  const intervalo = setInterval(() => { if (vivo) cargar(); else clearInterval(intervalo); }, 6000);
+  fondo.querySelector("#enviarChatV").onclick = async () => {
+    const nombre = fondo.querySelector("[name=nombre]").value.trim();
+    const texto = fondo.querySelector("[name=texto]").value.trim();
+    const msg = fondo.querySelector("#msgChatV");
+    if (!nombre || !texto) { msg.innerHTML = `<div class="msg">${t("q_chat_falta")}</div>`; return; }
+    const b = fondo.querySelector("#enviarChatV"); b.disabled = true;
+    try {
+      guardar("nombre", nombre);
+      await llamarCV({ accion: "mensaje_cv", id: a.id, convId, autor: opts.autor, nombre, texto, secreto: opts.secreto });
+      fondo.querySelector("[name=texto]").value = ""; msg.innerHTML = "";
+      await cargar();
+    } catch (e) { msg.innerHTML = `<div class="msg">${t("q_chat_error")}</div>`; }
+    b.disabled = false;
+  };
+}
+
+async function abrirConversacionesCV(a, secreto) {
+  if (document.querySelector(".fondo")) return;
+  const fondo = document.createElement("div");
+  fondo.className = "fondo";
+  fondo.innerHTML = `<div class="caja"><h3>${t("cv_chat_mensajes_tit")}</h3><div id="listaConvV"><p class="aviso">${t("q_chat_cargando")}</p></div>
+    <button class="btn sec" id="cerrarConvV" style="margin-top:10px">${t("cerrar")}</button></div>`;
+  document.body.appendChild(fondo);
+  const cerrar = () => fondo.remove();
+  fondo.onclick = (e) => { if (e.target === fondo) cerrar(); };
+  fondo.querySelector("#cerrarConvV").onclick = cerrar;
+  try {
+    const j = await llamarCV({ accion: "conversaciones", id: a.id, secreto });
+    const caja = fondo.querySelector("#listaConvV");
+    caja.innerHTML = j.conversaciones.length ? j.conversaciones.map((c, i) => `<div class="reporte">
+        <div class="cab2"><b>${esc(c.nombre || t("anonimo"))}</b></div>
+        <div style="margin-top:4px">${esc(c.ultimo)}</div>
+        <div class="fila" style="margin-top:6px"><button class="btn sec peq" data-conv="${i}">${t("cv_chat_abrir")}</button></div>
+      </div>`).join("") : `<p class="aviso">${t("cv_chat_sin_conversaciones")}</p>`;
+    caja.querySelectorAll("[data-conv]").forEach(b => b.onclick = () => {
+      const c = j.conversaciones[+b.dataset.conv]; cerrar();
+      abrirChatCV(a, { autor: "vendedor", convId: c.convId, secreto });
+    });
+  } catch (e) { fondo.querySelector("#listaConvV").innerHTML = `<p class="aviso">${t("q_chat_error")}</p>`; }
 }
 
 async function compartirAnuncio(a) {
@@ -1767,6 +1877,7 @@ $("#btnUnidad").onclick = () => {
 
 router();
 comprobarAvisosQuedadas();
+comprobarAvisosCV();
 try { if (esAppInstalada() && !sessionStorage.getItem("cw_contada")) { sessionStorage.setItem("cw_contada", "1"); contar("instalada", "Abierta desde la pantalla de inicio (app instalada)", true); } } catch (e) {}
 vientoAhoraTodos().then(() => { if (!location.hash || location.hash === "#") pintarLista(); }).catch(() => {});
 </script>
